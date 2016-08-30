@@ -5,8 +5,8 @@ PI.piClient
 ~~~~~~~~~~~~~~~~~~~
 This module contains the piClient object used to access pi infrastructure and data
 """
-from PI._piBase import _piBase
-from PI._piServer import _piServer
+from OSIsoftPy._piBase import _piBase
+from OSIsoftPy._piServer import _piServer
 
 class pi_client(_piBase):
     def __init__(self, piWebApiDomain, userName='', password='', authenticationType='kerberos',verifySSL=True):

@@ -1,5 +1,10 @@
-from PI._piBase import _piBase
-from PI._piPoint import _piPoint
+from OSIsoftPy._piBase import _piBase
+from OSIsoftPy._piPoint import _piPoint
+from threading import Thread
+from time import sleep
+import rx
+from rx import Observable, Observer
+from rx.core import Scheduler
 
 class _piServer(_piBase):
     def __init__(self, piWebApiDomain, session, webId):
@@ -7,6 +12,9 @@ class _piServer(_piBase):
         self._webId = webId
         self._piWebApiDomain = piWebApiDomain
         self._fetchServerInfo()
+        self.__observableTags = set([])
+        self.__observable = {}
+        self.__previousValues = {}
 
     def _fetchServerInfo(self):
         r = super(_piServer,self).Request('dataservers/' + self._webId)
@@ -112,3 +120,31 @@ class _piServer(_piBase):
 
     def IsConnected(self):
         return self._isConnected
+
+    # DATA PIPE MADNESS
+
+    def Observable(self, tags):
+
+        return Observable.timer(1000, 1000, Scheduler.timeout).map(lambda second: tags)\
+            .map(lambda tagList: self.CurrentValues(list(tagList)))\
+            .map(lambda qResult: self._checkAgainstPrevious(qResult)).filter(lambda y: y is not None).publish()
+
+    def _checkAgainstPrevious(self, dictionary):
+        result = {}
+
+        for timeKey in dictionary.keys():
+            for tagKey in dictionary[timeKey].keys():
+                if timeKey not in result.keys():
+                    result[timeKey] = {}
+                if tagKey in self.__previousValues.keys():
+                    if self.__previousValues[tagKey] < timeKey:
+                        result[timeKey][tagKey] = dictionary[timeKey][tagKey]
+                        self.__previousValues[tagKey] = timeKey
+                else:
+                    result[timeKey][tagKey] = dictionary[timeKey][tagKey]
+                    self.__previousValues[tagKey] = timeKey
+
+        if len(result) == 0:
+            return None
+        else:
+            return result

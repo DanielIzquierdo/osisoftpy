@@ -1,4 +1,4 @@
-from PI._piBase import _piBase
+from OSIsoftPy._piBase import _piBase
 
 class _piPoint(_piBase):
     def __init__(self, piWebApiDomain, session, webId):

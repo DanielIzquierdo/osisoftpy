@@ -1,10 +1,18 @@
+# -*- coding: utf-8 -*-
+
+"""
+PI._piBase
+~~~~~~~~~~~~~~~~~~~
+This module contains the base class for PI objects
+"""
+
 import re
 import requests
 from requests.auth import HTTPBasicAuth
 from requests_kerberos import HTTPKerberosAuth, REQUIRED, OPTIONAL
 
 class _piBase(object):
-
+    """The Base Pi Object"""
     def __init__(self, piWebApiDomain, userName='', password='', authenticationType='kerberos',verifySSL=True):
         self._piWebApiDomain = self.__domainNameCleanup(piWebApiDomain)
         self.__session = requests.Session()
@@ -13,6 +21,7 @@ class _piBase(object):
         self.__testConnection()
 
     def Session(self):
+        """Retrieves the Requests.Session client"""
         return self.__session;
 
     def _session(self,session):

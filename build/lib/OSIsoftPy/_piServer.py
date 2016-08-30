@@ -1,5 +1,5 @@
-from PI._piBase import _piBase
-from PI._piPoint import _piPoint
+from OSIsoftPy._piBase import _piBase
+from OSIsoftPy._piPoint import _piPoint
 from threading import Thread
 from time import sleep
 import rx
