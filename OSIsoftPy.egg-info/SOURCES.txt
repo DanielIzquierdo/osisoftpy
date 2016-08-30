@@ -1,9 +1,9 @@
 setup.py
 OSIsoftPy/__init__.py
-OSIsoftPy/_piBase.py
-OSIsoftPy/_piPoint.py
-OSIsoftPy/_piServer.py
-OSIsoftPy/piClient.py
+OSIsoftPy/_base.py
+OSIsoftPy/_point.py
+OSIsoftPy/_server.py
+OSIsoftPy/client.py
 OSIsoftPy.egg-info/PKG-INFO
 OSIsoftPy.egg-info/SOURCES.txt
 OSIsoftPy.egg-info/dependency_links.txt

@@ -1,14 +1,21 @@
-from PI._piBase import _piBase
+"""
+OSIsoftPy._point
+~~~~~~~~~~~~~~~~~~~
+This module contains the PI Point class
+"""
+from OSIsoftPy._base import _base
 
-class _piPoint(_piBase):
+class _point(_base):
+    """PI Point class"""
     def __init__(self, piWebApiDomain, session, webId):
-        super(_piPoint,self)._session(session)
+        super(_point,self)._session(session)
         self._webId = webId
         self._piWebApiDomain = piWebApiDomain
         self._fetchTagInfo()
 
     def _fetchTagInfo(self):
-        r = super(_piPoint,self).Request('points/' + self._webId)
+        """gathers the PI tag information"""
+        r = super(_point,self).Request('points/' + self._webId)
         self._name = r['Name']
         self._id = r['Id']
         self._future = r['Future']
@@ -34,30 +41,33 @@ class _piPoint(_piBase):
         return self._pointType
 
     def CurrentValue(self):
-        return self._dataPointUnpacker(super(_piPoint,self).Request('streams/' + self._webId + '/value'))
+        """queries the current value for the pi point"""
+        return self._dataPointUnpacker(super(_point,self).Request('streams/' + self._webId + '/value'))
 
     def RecordedValues(self, start = "*-1d",end = "*", boundary = "Inside", maxCount = 1000):
-        queryParamaterString = super(_piPoint,self)._buildQueryParamaterString([
+        """queries the recorded values for the pi point"""
+        queryParamaterString = super(_point,self)._buildQueryParamaterString([
             ('startTime',start),
             ('endTime',end),
             ('boundaryType',boundary),
             ('maxCount',maxCount)
         ])
 
-        r = super(_piPoint,self).Request('streams/' + self._webId + '/recorded' + queryParamaterString)
+        r = super(_point,self).Request('streams/' + self._webId + '/recorded' + queryParamaterString)
         result = {}
         for item in r['Items']:
             result.update(self._dataPointUnpacker(item))
         return result
 
     def InterpolatedValues(self, start = "*-1d",end = "*", interval = "1h"):
-        queryParamaterString = super(_piPoint,self)._buildQueryParamaterString([
+        """queries the interpolated values for the pi point"""
+        queryParamaterString = super(_point,self)._buildQueryParamaterString([
             ('startTime',start),
             ('endTime',end),
             ('interval',interval)
         ])
 
-        r = super(_piPoint,self).Request('streams/' + self._webId + '/interpolated' + queryParamaterString)
+        r = super(_point,self).Request('streams/' + self._webId + '/interpolated' + queryParamaterString)
         result = {}
         for item in r['Items']:
             result.update(self._dataPointUnpacker(item))

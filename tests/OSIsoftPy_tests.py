@@ -1,7 +1,7 @@
 from __future__ import print_function
 
 from nose.tools import *
-from OSIsoftPy.piClient import pi_client
+from OSIsoftPy.client import client
 from time import sleep
 from rx.core import Scheduler
 
@@ -32,7 +32,7 @@ testPoint2Class = 'classic'
 def test_piclient_unknown_auth():
 # bad authenticationType throws error
     try:
-        client = pi_client(piWebApi, authenticationType='BAD', verifySSL=verifySSL)
+        piclient = client(piWebApi, authenticationType='BAD', verifySSL=verifySSL)
     except ValueError as e:
         pass
 
@@ -40,20 +40,20 @@ def test_piclient_basic_auth():
 # test basic authenticationType
     if not testBasicAuth:
         return
-    client = pi_client(piWebApi,'ak-piwebapi-svc','DP$28GhMyp*!E&gc','basic',verifySSL=verifySSL)
+    piclient = client(piWebApi,'ak-piwebapi-svc','DP$28GhMyp*!E&gc','basic',verifySSL=verifySSL)
     pass
 
 def test_piclient_kerberos_auth():
 # test kerberos authentication
     if not testKerberosAuth:
         return
-    client = pi_client(piWebApi, authenticationType='kerberos', verifySSL=verifySSL)
+    piclient = client(piWebApi, authenticationType='kerberos', verifySSL=verifySSL)
     pass
 
 def test_piclient_host_name():
 # verify the pi client cleans up the host name
-    client = pi_client(piWebApi + '/piwebapi/', authenticationType='kerberos', verifySSL=verifySSL)
-    assert client.Host() == piWebApi
+    piclient = client(piWebApi + '/piwebapi/', authenticationType='kerberos', verifySSL=verifySSL)
+    assert piclient.Host() == piWebApi
 
 
 
@@ -340,6 +340,6 @@ def fetch_test_server():
 
 def fetch_test_client():
     if useBasic:
-        return pi_client(piWebApi,'ak-piwebapi-svc','DP$28GhMyp*!E&gc','basic',verifySSL=verifySSL)
+        return client(piWebApi,'ak-piwebapi-svc','DP$28GhMyp*!E&gc','basic',verifySSL=verifySSL)
     else:
-        return pi_client(piWebApi, authenticationType='kerberos', verifySSL=verifySSL)
+        return client(piWebApi, authenticationType='kerberos', verifySSL=verifySSL)

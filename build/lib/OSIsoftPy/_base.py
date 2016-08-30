@@ -1,7 +1,5 @@
-# -*- coding: utf-8 -*-
-
 """
-PI._piBase
+OSIsoftPy._base
 ~~~~~~~~~~~~~~~~~~~
 This module contains the base class for PI objects
 """
@@ -11,7 +9,7 @@ import requests
 from requests.auth import HTTPBasicAuth
 from requests_kerberos import HTTPKerberosAuth, REQUIRED, OPTIONAL
 
-class _piBase(object):
+class _base(object):
     """The Base Pi Object"""
     def __init__(self, piWebApiDomain, userName='', password='', authenticationType='kerberos',verifySSL=True):
         self._piWebApiDomain = self.__domainNameCleanup(piWebApiDomain)
@@ -25,22 +23,26 @@ class _piBase(object):
         return self.__session;
 
     def _session(self,session):
+        """allows derived classes to set the Requests.Session client"""
         self.__session = session;
 
     def Host(self):
+        """Returns the host name"""
         return(self._piWebApiDomain)
 
     def __testConnection(self):
-
+        """tests connectivity to the piwebapi"""
         r = self.__session.get(self._piWebApiDomain + '/piwebapi')
 
         if r.status_code != 200:
             raise ValueError('Unable to connect to the PI Web API')
 
     def __domainNameCleanup(self, domainName):
+        """cleans up the provided string"""
         return re.sub(r"\/?piwebapi.*","",domainName)
 
     def __auth(self, username, password, authenticationType):
+        """creates the desired authentication object"""
         if authenticationType == 'basic':
             return HTTPBasicAuth(username, password)
         elif authenticationType == 'kerberos':
@@ -49,15 +51,19 @@ class _piBase(object):
             raise ValueError('Invalid authentication type')
 
     def Request(self, url):
+        """makes a GET request to the pi web api"""
         return self.__session.get(self._piWebApiDomain + '/piwebapi/' + url).json()
 
     def Post(self, url, payload):
+        """makes a POST request to the pi web api"""
         return self.__session.post(self._piWebApiDomain + '/piwebapi/' + url, json=payload).json()
 
     def RequestUrl(self, url):
+        """builds the full url for a request"""
         return self._piWebApiDomain + '/piwebapi/' + url
 
     def _buildQueryParamaterString(self, params):
+        """helper for derived classes building query strings"""
         if not params or len(params) == 0:
             return ''
 
