@@ -8,7 +8,7 @@ config = {
     'author': 'Alan Kenyon',
     'author_email': 'akenyon@dstcontrols.com',
     'version': '0.5.1',
-    'install_requires': ['nose'],
+    'install_requires': ['nose', 'requests', 'requests-kerberos', 'rx'],
     'packages': ['OSIsoftPy'],
     'scripts': [],
     'name': 'OSIsoftPy'

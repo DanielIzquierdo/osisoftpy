@@ -19,6 +19,9 @@ class client(_base):
 
         results = []
         for item in r['Items']:
-            results.insert(-1,_server(super(client,self).Host(), super(client,self).Session(),item['WebId']))
+            try:
+                results.insert(-1,_server(super(client,self).Host(), super(client,self).Session(),item['WebId']))
+            except Exception as e:
+                print ('Unable to retrieve server information for "' + item['Name'] + '".')
 
         return results

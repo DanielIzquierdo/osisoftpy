@@ -41,7 +41,10 @@ class _server(_base):
         results = []
 
         for tag in r['Items']:
-            results.insert(-1,_point(super(_server,self).Host(), super(_server,self).Session(),tag['WebId']))
+            try:
+                results.insert(-1,_point(super(_server,self).Host(), super(_server,self).Session(),tag['WebId']))
+            except Exception as e:
+                print ('Unable to retrieve PI Point information for "' + item['Name'] + '".')
 
         return results
 

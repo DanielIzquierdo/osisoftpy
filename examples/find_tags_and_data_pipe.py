@@ -4,8 +4,6 @@ from time import sleep
 
 # arguments
 piWebApi = 'https://applepie.dstcontrols.local'
-user = 'ak-piwebapi-svc'
-password = 'DP$28GhMyp*!E&gc'
 verifySSL = False
 
 server = client(piWebApi, authenticationType='kerberos', verifySSL=verifySSL).PIServers()[0]

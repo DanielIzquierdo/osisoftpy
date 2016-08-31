@@ -2,8 +2,6 @@ from OSIsoftPy.client import client
 
 # arguments
 piWebApi = 'https://applepie.dstcontrols.local'
-user = 'ak-piwebapi-svc'
-password = 'DP$28GhMyp*!E&gc'
 verifySSL = False
 
 servers = client(piWebApi, authenticationType='kerberos', verifySSL=verifySSL).PIServers()
