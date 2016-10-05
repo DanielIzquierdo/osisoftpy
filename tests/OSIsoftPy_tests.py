@@ -5,11 +5,16 @@ from OSIsoftPy.client import client
 from time import sleep
 from rx.core import Scheduler
 
+#silence the certificate warnings
+import requests
+from requests.packages.urllib3.exceptions import InsecureRequestWarning
+requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
+
 # test parameters
 useBasic = False
 testBasicAuth = False
 testKerberosAuth = True
-testDataPipe = True
+testDataPipe = False
 
 piWebApi = 'https://applepie.dstcontrols.local'
 user = 'ak-piwebapi-svc'
