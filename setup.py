@@ -7,7 +7,7 @@ config = {
     'description': 'OSIsoft PI Web API client',
     'author': 'Alan Kenyon',
     'author_email': 'akenyon@dstcontrols.com',
-    'version': '0.5.1',
+    'version': '0.6.0',
     'install_requires': ['nose', 'requests', 'requests-kerberos', 'rx'],
     'packages': ['OSIsoftPy'],
     'scripts': [],

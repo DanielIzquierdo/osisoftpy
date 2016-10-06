@@ -1,1 +1,4 @@
 nose
+requests
+requests-kerberos
+rx

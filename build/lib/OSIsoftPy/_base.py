@@ -56,7 +56,14 @@ class _base(object):
 
     def Post(self, url, payload):
         """makes a POST request to the pi web api"""
-        return self.__session.post(self._piWebApiDomain + '/piwebapi/' + url, json=payload).json()
+        r = self.__session.post(self._piWebApiDomain + '/piwebapi/' + url, json=payload)
+
+        if r.status_code >= 300:
+            return r.status_code
+        try:
+            return r.json()
+        except Exception as e:
+            return None
 
     def RequestUrl(self, url):
         """builds the full url for a request"""
