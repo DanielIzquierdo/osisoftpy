@@ -73,6 +73,24 @@ class _point(_base):
             result.update(self._dataPointUnpacker(item))
         return result
 
+    def UpdateValue(self, data, updateOption="Insert", bufferOption="BufferIfPossible"):
+        """update the point with the provided value"""
+        queryParamaterString = super(_point,self)._buildQueryParamaterString([
+            ('updateOption',updateOption),
+            ('bufferOption',bufferOption)
+        ])
+
+        return super(_point,self).Post('streams/' + self._webId + '/value' + queryParamaterString, data)
+
+    def UpdateValues(self, data, updateOption="Insert", bufferOption="BufferIfPossible"):
+        """update the point with the provided value"""
+        queryParamaterString = super(_point,self)._buildQueryParamaterString([
+            ('updateOption',updateOption),
+            ('bufferOption',bufferOption)
+        ])
+
+        return super(_point,self).Post('streams/' + self._webId + '/recorded' + queryParamaterString, data)
+
     def _dataPointUnpacker(self, item):
         return {
             item['Timestamp']:{

@@ -97,6 +97,16 @@ class _server(_base):
             ('interval',interval)
         ],'interpolated')))
 
+    def UpdateValues(self, data, updateOption="Insert", bufferOption="BufferIfPossible"):
+        """Update multiple tags"""
+        sanitizedData = self._processData(data)
+
+        for rawTag in sanitizedData.keys():
+            sanitizedTag = self._sanitizeTags([rawTag])[0]
+            if sanitizedTag:
+                sanitizedData[rawTag].sort(key=lambda tag: tag.get('Timestamp'))
+                sanitizedTag.UpdateValues(sanitizedData[rawTag], updateOption, bufferOption)
+
     def _sanitizeTags(self,rawTags):
         tags = []
 
@@ -133,6 +143,18 @@ class _server(_base):
                     results[str(j['Timestamp'])] = {tags[i].Name(): j['Value']}
 
         return results
+
+    def _processData(self, data):
+        processed = {}
+
+        for timeKey in data.keys():
+            for tagKey in data[timeKey].keys():
+                if tagKey not in processed:
+                    processed[tagKey] = []
+
+                processed[tagKey].append({'Timestamp': timeKey, 'Value': data[timeKey][tagKey], 'Questionable': 'false', 'Good': 'true'})
+
+        return processed
 
     def Name(self):
         return self._name

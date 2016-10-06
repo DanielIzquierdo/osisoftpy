@@ -4,6 +4,8 @@ from nose.tools import *
 from OSIsoftPy.client import client
 from time import sleep
 from rx.core import Scheduler
+import datetime
+import random
 
 #silence the certificate warnings
 import requests
@@ -22,6 +24,7 @@ password = 'DP$28GhMyp*!E&gc'
 verifySSL = False
 serverCount = 1
 serverName = 'banoffee.dstcontrols.local'
+floatingPointPrecision = 0.00001
 
 testPoint = 'SINUSOID'
 testPointType = 'Float32'
@@ -30,6 +33,34 @@ testPointClass = 'classic'
 testPoint2 = 'SINUSOIDU'
 testPoint2Type = 'Float32'
 testPoint2Class = 'classic'
+
+testPoint3 = 'AlansPythonTestTag'
+testPoint3Type = 'Float32'
+testPoint3Class = 'classic'
+
+testPoint4 = 'AlansPythonTestTag2'
+testPoint4Type = 'Float32'
+testPoint4Class = 'classic'
+
+# # ENABLE THIS CODE FOR HTTP LOGGING
+# import logging
+#
+# # These two lines enable debugging at httplib level (requests->urllib3->http.client)
+# # You will see the REQUEST, including HEADERS and DATA, and RESPONSE with HEADERS but without DATA.
+# # The only thing missing will be the response.body which is not logged.
+# try:
+#     import http.client as http_client
+# except ImportError:
+#     # Python 2
+#     import httplib as http_client
+# http_client.HTTPConnection.debuglevel = 1
+#
+# # You must initialize logging, otherwise you'll not see debug output.
+# logging.basicConfig()
+# logging.getLogger().setLevel(logging.DEBUG)
+# requests_log = logging.getLogger("requests.packages.urllib3")
+# requests_log.setLevel(logging.DEBUG)
+# requests_log.propagate = True
 
 # PICLIENT TESTS
 
@@ -178,7 +209,7 @@ def test_piserver_bulk_recorded():
     tags = [fetch_test_point1(), fetch_test_point2()]
 
     values = server.RecordedValues(tags,maxCount=10)
-
+    print(values)
     assert len(values) <= 20
     for key in values.keys():
         assert len(values[key]) <= 2
@@ -219,7 +250,7 @@ def test_piserver_bulk_interpolated2():
 def test_datapipe_single_subscription():
 # test data pipe
     if not testDataPipe:
-        pass
+        return
 
     results = {}
 
@@ -245,7 +276,7 @@ def test_datapipe_single_subscription():
 def test_datapipe_multiple_subscriptions():
 # test data pipe with multiple subscriptions
     if not testDataPipe:
-        pass
+        return
 
     results = {}
     results2 = {}
@@ -276,7 +307,7 @@ def test_datapipe_multiple_subscriptions():
 def test_datapipe_multiple_subscriptions2():
 # test data pipe with multiple subscriptions, test that scheduler stops after disconnect
     if not testDataPipe:
-        pass
+        return
 
     results = {}
     results2 = {}
@@ -315,6 +346,126 @@ def test_datapipe_multiple_subscriptions2():
     for key in results2.keys():
         assert len(results2[key].keys()) == 2
 
+def test_point_update():
+    point = fetch_test_point3()
+
+    now = datetime.datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%SZ')
+    value = random.random()
+    data = {
+        'Timestamp': now,
+        'Questionable': 'false',
+        'Good': 'true',
+        'Value': value
+    }
+
+    point.UpdateValue(data)
+    sleep(10)
+    current = point.CurrentValue()
+    assert len(current[now]) > 0
+    for key in current.keys():
+        assert key == now
+
+    assert abs(current[now]['Value'] - value) < floatingPointPrecision
+
+def test_point_updates():
+    point = fetch_test_point3()
+
+    now = datetime.datetime.utcnow()
+    now2 = now + datetime.timedelta(seconds=1)
+    value1 = random.random()
+    value2 = random.random()
+    data = [{
+        'Timestamp': now.strftime('%Y-%m-%dT%H:%M:%SZ'),
+        'Questionable': 'false',
+        'Good': 'true',
+        'Value': value1
+    },{
+        'Timestamp': now2.strftime('%Y-%m-%dT%H:%M:%SZ'),
+        'Questionable': 'false',
+        'Good': 'true',
+        'Value': value2
+    }]
+
+    point.UpdateValues(data)
+    sleep(10)
+    result = point.RecordedValues(now.strftime('%Y-%m-%dT%H:%M:%SZ'),now2.strftime('%Y-%m-%dT%H:%M:%SZ'))
+
+    assert len(result) == 2
+
+    for key in result:
+        assert key in [now.strftime('%Y-%m-%dT%H:%M:%SZ'), now2.strftime('%Y-%m-%dT%H:%M:%SZ')]
+
+        if key == now.strftime('%Y-%m-%dT%H:%M:%SZ'):
+            assert abs(result[key]['Value'] - value1) < floatingPointPrecision
+        if key == now2.strftime('%Y-%m-%dT%H:%M:%SZ'):
+            assert abs(result[key]['Value'] - value2) < floatingPointPrecision
+
+def test_server_updates():
+    server = fetch_test_server()
+
+    now = datetime.datetime.utcnow()
+    now2 = now + datetime.timedelta(seconds=1)
+    value1 = random.random()
+    value2 = random.random()
+    data = {
+        now.strftime('%Y-%m-%dT%H:%M:%SZ'):{
+            testPoint3: value1
+        },
+        now2.strftime('%Y-%m-%dT%H:%M:%SZ'):{
+            testPoint3: value2
+        }
+    }
+
+    server.UpdateValues(data)
+    sleep(10)
+    results = server.RecordedValues([testPoint3],now.strftime('%Y-%m-%dT%H:%M:%SZ'), now2.strftime('%Y-%m-%dT%H:%M:%SZ'))
+
+    assert results
+    assert len(results) == 2
+    for timeKey in results.keys():
+        assert timeKey in [now.strftime('%Y-%m-%dT%H:%M:%SZ'), now2.strftime('%Y-%m-%dT%H:%M:%SZ')]
+
+        if timeKey == now.strftime('%Y-%m-%dT%H:%M:%SZ'):
+            assert abs(results[timeKey][testPoint3] - value1) < floatingPointPrecision
+        if timeKey == now2.strftime('%Y-%m-%dT%H:%M:%SZ'):
+            assert abs(results[timeKey][testPoint3] - value2) < floatingPointPrecision
+
+def test_server_updates2():
+    server = fetch_test_server()
+
+    now = datetime.datetime.utcnow()
+    now2 = now + datetime.timedelta(seconds=1)
+    value1 = random.random()
+    value2 = random.random()
+    value3 = random.random()
+    value4 = random.random()
+    data = {
+        now.strftime('%Y-%m-%dT%H:%M:%SZ'):{
+            testPoint3: value1,
+            testPoint4: value3
+        },
+        now2.strftime('%Y-%m-%dT%H:%M:%SZ'):{
+            testPoint3: value2,
+            testPoint4: value4
+        }
+    }
+
+    server.UpdateValues(data)
+    sleep(10)
+    results = server.RecordedValues([testPoint3, testPoint4],now.strftime('%Y-%m-%dT%H:%M:%SZ'), now2.strftime('%Y-%m-%dT%H:%M:%SZ'))
+
+    assert results
+    assert len(results) == 2
+    for timeKey in results.keys():
+        assert timeKey in [now.strftime('%Y-%m-%dT%H:%M:%SZ'), now2.strftime('%Y-%m-%dT%H:%M:%SZ')]
+        assert len(results[timeKey])
+
+        if timeKey == now.strftime('%Y-%m-%dT%H:%M:%SZ'):
+            assert abs(results[timeKey][testPoint3] - value1) < floatingPointPrecision
+            assert abs(results[timeKey][testPoint4] - value3) < floatingPointPrecision
+        if timeKey == now2.strftime('%Y-%m-%dT%H:%M:%SZ'):
+            assert abs(results[timeKey][testPoint3] - value2) < floatingPointPrecision
+            assert abs(results[timeKey][testPoint4] - value4) < floatingPointPrecision
 
 # HELPERS
 
@@ -332,6 +483,12 @@ def fetch_test_point1():
 
 def fetch_test_point2():
     return fetch_test_server().FindPIPoint(testPoint2)
+
+def fetch_test_point3():
+    return fetch_test_server().FindPIPoint(testPoint3)
+
+def fetch_test_point4():
+    return fetch_test_server().FindPIPoint(testPoint4)
 
 def fetch_test_server():
     client = fetch_test_client()
