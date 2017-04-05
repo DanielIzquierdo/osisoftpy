@@ -1,0 +1,10 @@
+Metadata-Version: 1.0
+Name: osisoft-webapi-python-client
+Version: 1.0.0
+Summary: OSIsoft PI Web API client
+Home-page: https://gitlab.com/dstcontrols/pge-piclient-python
+Author: Andrew Pong
+Author-email: apong@dstcontrols.com
+License: MIT
+Description: UNKNOWN
+Platform: UNKNOWN
