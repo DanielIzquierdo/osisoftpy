@@ -1,10 +1,10 @@
 Metadata-Version: 1.0
 Name: OSIsoftPy
-Version: 0.6.0
+Version: 0.7.0
 Summary: OSIsoft PI Web API client
-Home-page: UNKNOWN
-Author: Alan Kenyon
-Author-email: akenyon@dstcontrols.com
-License: UNKNOWN
+Home-page: https://gitlab.com/dstcontrols/pge-piclient-python
+Author: Andrew Pong
+Author-email: apong@dstcontrols.com
+License: MIT
 Description: UNKNOWN
 Platform: UNKNOWN

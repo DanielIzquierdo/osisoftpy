@@ -1,3 +1,4 @@
+README.txt
 setup.py
 OSIsoftPy/__init__.py
 OSIsoftPy/_base.py
@@ -9,3 +10,5 @@ OSIsoftPy.egg-info/SOURCES.txt
 OSIsoftPy.egg-info/dependency_links.txt
 OSIsoftPy.egg-info/requires.txt
 OSIsoftPy.egg-info/top_level.txt
+tests/OSIsoftPy_tests.py
+tests/__init__.py

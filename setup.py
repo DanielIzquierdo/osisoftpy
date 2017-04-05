@@ -1,17 +1,25 @@
-try:
-    from setuptools import setup
-except ImportError:
-    from distutils.core import setup
+# try:
+#     from setuptools import setup
+# except ImportError:
+#     from distutils.core import setup
 
-config = {
-    'description': 'OSIsoft PI Web API client',
-    'author': 'Alan Kenyon',
-    'author_email': 'akenyon@dstcontrols.com',
-    'version': '0.6.0',
-    'install_requires': ['nose', 'requests', 'requests-kerberos', 'rx'],
-    'packages': ['OSIsoftPy'],
-    'scripts': [],
-    'name': 'OSIsoftPy'
-}
+from setuptools import setup, find_packages
 
-setup(**config)
+setup(
+    name='osisoft-webapi-python-client',
+    description='OSIsoft PI Web API client',
+    version='1.0.0',
+    url='https://gitlab.com/dstcontrols/pge-piclient-python',
+    license='MIT',
+    author='Andrew Pong',
+    author_email='apong@dstcontrols.com',
+    install_requires=[
+        'nose',
+        'requests',
+        'requests-kerberos',
+        'rx'
+    ],
+    # packages=['OSIsoftPy'],
+    packages=find_packages(),
+    scripts=[],
+)

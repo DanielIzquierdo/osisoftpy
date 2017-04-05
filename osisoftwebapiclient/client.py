@@ -5,8 +5,8 @@ OSIsoftPy.client
 ~~~~~~~~~~~~~~~~~~~
 This module contains the client used to access OSIsoft PI infrastructure and data
 """
-from OSIsoftPy._base import _base
-from OSIsoftPy._server import _server
+from osisoftwebapiclient._base import _base
+from osisoftwebapiclient._server import _server
 
 class client(_base):
     """A client to interact with the PI Web API"""
