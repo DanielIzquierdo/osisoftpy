@@ -1,7 +1,7 @@
 from __future__ import print_function
 
 from nose.tools import *
-from OSIsoftPy.client import client
+from osisoft_pi_webapi_python_client.client import client
 from time import sleep
 from rx.core import Scheduler
 import datetime
