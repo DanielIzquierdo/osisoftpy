@@ -6,13 +6,12 @@
 from setuptools import setup, find_packages
 
 setup(
-    name='osisoft-webapi-python-client',
+    name='osisoft_pi_webapi_python_client',
     description='OSIsoft PI Web API client',
-    version='1.0.0',
+    version='1.1.0',
     url='https://gitlab.com/dstcontrols/pge-piclient-python',
     license='MIT',
-    author='Andrew Pong',
-    author_email='apong@dstcontrols.com',
+    author='Andrew Pong <apong@dstcontrols.com>, Alan Kenyon <akenyon@dstcontrols.com>',
     install_requires=[
         'nose',
         'requests',
