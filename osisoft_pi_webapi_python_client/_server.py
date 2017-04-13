@@ -3,8 +3,8 @@ OSIsoftPy._server
 ~~~~~~~~~~~~~~~~~~~
 This module contains the PI Point class
 """
-from osisoftwebapiclient._base import _base
-from osisoftwebapiclient._point import _point
+from osisoft_pi_webapi_python_client._base import _base
+from osisoft_pi_webapi_python_client._point import _point
 from threading import Thread
 from time import sleep
 import rx

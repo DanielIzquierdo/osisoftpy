@@ -3,7 +3,7 @@ OSIsoftPy._point
 ~~~~~~~~~~~~~~~~~~~
 This module contains the PI Point class
 """
-from osisoftwebapiclient._base import _base
+from osisoft_pi_webapi_python_client._base import _base
 
 class _point(_base):
     """PI Point class"""
