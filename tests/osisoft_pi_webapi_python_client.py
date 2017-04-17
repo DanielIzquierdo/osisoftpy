@@ -19,6 +19,7 @@ testKerberosAuth = True
 testDataPipe = False
 
 piWebApi = 'https://dev.dstcontrols.com'
+piWebApi = 'https://applepie.dstcontrols.local/'
 user = 'ak-piwebapi-svc'
 password = 'DP$28GhMyp*!E&gc'
 verifySSL = False

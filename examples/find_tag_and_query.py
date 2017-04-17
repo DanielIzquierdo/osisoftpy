@@ -1,4 +1,4 @@
-from OSIsoftPy.client import client
+from osisoft_pi_webapi_python_client.client import client
 
 # arguments
 piWebApi = 'https://applepie.dstcontrols.local'

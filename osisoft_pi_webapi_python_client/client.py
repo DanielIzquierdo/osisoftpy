@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
-OSIsoftPy.client
+osisoft_pi_webapi_python_client.client
 ~~~~~~~~~~~~~~~~~~~
 This module contains the client used to access OSIsoft PI infrastructure and data
 """

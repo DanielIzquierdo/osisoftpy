@@ -1,5 +1,5 @@
 """
-OSIsoftPy._base
+osisoft_pi_webapi_python_client._base
 ~~~~~~~~~~~~~~~~~~~
 This module contains the base class for PI objects
 """

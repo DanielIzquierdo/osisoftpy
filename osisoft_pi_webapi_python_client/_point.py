@@ -1,5 +1,5 @@
 """
-OSIsoftPy._point
+osisoft_pi_webapi_python_client._point
 ~~~~~~~~~~~~~~~~~~~
 This module contains the PI Point class
 """
