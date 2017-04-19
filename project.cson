@@ -1,0 +1,12 @@
+{
+  title: 'PG&E OSIsoft PI client for Python'
+  group: 'PG&E'
+  paths: [
+    '~/projects/dst/pge-piclient-python'
+  ]
+  icon:
+  devMode: false
+  settings:
+    'editor.tabLength': 2
+    'editor.showInvisibles': false
+}
