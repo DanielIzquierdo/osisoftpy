@@ -1,15 +1,16 @@
 from __future__ import print_function
 
-from nose.tools import *
-from osisoft_pi_webapi_python_client.client import client
-from time import sleep
-from rx.core import Scheduler
 import datetime
 import random
+from time import sleep
 
-#silence the certificate warnings
+# silence the certificate warnings
 import requests
+from nose.tools import *
+from osisoft_pi_webapi_python_client.client import client
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
+from rx.core import Scheduler
+
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
 # test parameters
@@ -18,7 +19,7 @@ testBasicAuth = False
 testKerberosAuth = True
 testDataPipe = False
 
-piWebApi = 'https://dev.dstcontrols.com'
+# piWebApi = 'https://dev.dstcontrols.com'
 piWebApi = 'https://applepie.dstcontrols.local/'
 user = 'ak-piwebapi-svc'
 password = 'DP$28GhMyp*!E&gc'
@@ -67,51 +68,59 @@ testPoint4Class = 'classic'
 
 
 def test_piclient_unknown_auth():
-# bad authenticationType throws error
+    # bad authenticationType throws error
     try:
-        piclient = client(piWebApi, authenticationType='BAD', verifySSL=verifySSL)
+        piclient = client(piWebApi, authenticationType='BAD',
+                          verifySSL=verifySSL)
     except ValueError as e:
         pass
 
+
 def test_piclient_basic_auth():
-# test basic authenticationType
+    # test basic authenticationType
     if not testBasicAuth:
         return
-    piclient = client(piWebApi,'ak-piwebapi-svc','DP$28GhMyp*!E&gc','basic',verifySSL=verifySSL)
+    piclient = client(piWebApi, 'ak-piwebapi-svc',
+                      'DP$28GhMyp*!E&gc', 'basic', verifySSL=verifySSL)
     pass
+
 
 def test_piclient_kerberos_auth():
-# test kerberos authentication
+    # test kerberos authentication
     if not testKerberosAuth:
         return
-    piclient = client(piWebApi, authenticationType='kerberos', verifySSL=verifySSL)
+    piclient = client(piWebApi, authenticationType='kerberos',
+                      verifySSL=verifySSL)
     pass
 
-def test_piclient_host_name():
-# verify the pi client cleans up the host name
-    piclient = client(piWebApi + '/piwebapi/', authenticationType='kerberos', verifySSL=verifySSL)
-    assert piclient.Host() == piWebApi
 
+def test_piclient_host_name():
+    # verify the pi client cleans up the host name
+    piclient = client(piWebApi + '/piwebapi/',
+                      authenticationType='kerberos', verifySSL=verifySSL)
+    assert piclient.Host() == piWebApi
 
 
 # BASIC PI SERVER TESTS
 
 def test_piclient_piservers():
-# fetch servers
-    client = fetch_test_client()
+    # fetch servers
+    client = helper_fetch_client()
     servers = client.PIServers()
     assert len(servers) == serverCount
 
+
 def test_find_test_piserver():
-# examine the main server
-    server = fetch_test_server()
+    # examine the main server
+    server = helper_fetch_server()
     assert server
     assert server.Name() == serverName
 
+
 def test_find_pipoints():
-# find SINUSOID pi points
-    server = fetch_test_server()
-    points = server.FindPIPoints('SINUSOID*',0, 100)
+    # find SINUSOID pi points
+    server = helper_fetch_server()
+    points = server.FindPIPoints('SINUSOID*', 0, 100)
     assert len(points) == 2
 
     for point in points:
@@ -123,18 +132,20 @@ def test_find_pipoints():
     assert point1
     assert point2
 
+
 def test_find_pipoint():
-# find a single pi point
-    server = fetch_test_server()
+    # find a single pi point
+    server = helper_fetch_server()
     point = server.FindPIPoint(testPoint)
 
     assert point.Name() == testPoint
     assert point.PointType() == testPointType
     assert point.PointClass() == testPointClass
 
+
 def test_find_pipoint2():
-# find the other pi point
-    server = fetch_test_server()
+    # find the other pi point
+    server = helper_fetch_server()
     point = server.FindPIPoint(testPoint2)
 
     assert point.Name() == testPoint2
@@ -142,12 +153,10 @@ def test_find_pipoint2():
     assert point.PointClass() == testPoint2Class
 
 
-
-
 # PI POINT TESTS
 def test_pipoint_current():
-# get the pi point current values
-    value = fetch_test_point1().CurrentValue()
+    # get the pi point current values
+    value = helper_fetch_point1().CurrentValue()
     assert value
     time = value.keys()[0]
     valueKeys = value[time].keys()
@@ -157,46 +166,49 @@ def test_pipoint_current():
     assert 'UnitsAbbreviation' in valueKeys
     assert 'Substituted' in valueKeys
 
+
 def test_pipoint_recorded():
-# test the pi point recorded values
-    values = fetch_test_point1().RecordedValues(maxCount=10)
+    # test the pi point recorded values
+    values = helper_fetch_point1().RecordedValues(maxCount=10)
     assert values
     assert len(values) == 10
     for key in values.keys():
         assert len(values[key]) == 5
 
+
 def test_pipoint_recorded2():
-# test the pi point recorded values
-    values = fetch_test_point1().RecordedValues(maxCount=100)
+    # test the pi point recorded values
+    values = helper_fetch_point1().RecordedValues(maxCount=100)
     assert values
     assert len(values) == 100
     for key in values.keys():
         assert len(values[key]) == 5
 
+
 def test_pipoint_interpolated():
-# test the pi point interpolated values
-    values = fetch_test_point1().InterpolatedValues()
+    # test the pi point interpolated values
+    values = helper_fetch_point1().InterpolatedValues()
     assert values
     assert len(values) == 25
     for key in values.keys():
         assert len(values[key]) == 5
 
+
 def test_pipoint_interpolated2():
-# test the pi point interpolated values
-    values = fetch_test_point1().InterpolatedValues(interval='30m')
+    # test the pi point interpolated values
+    values = helper_fetch_point1().InterpolatedValues(interval='30m')
     assert values
     assert len(values) == 49
     for key in values.keys():
         assert len(values[key]) == 5
 
 
-
 # PI SERVER BULK QUERY
 
 def test_piserver_bulk_current():
-# batch query with multiple tags
-    server = fetch_test_server()
-    tags = [fetch_test_point1(), fetch_test_point2()]
+    # batch query with multiple tags
+    server = helper_fetch_server()
+    tags = [helper_fetch_point1(), helper_fetch_point2()]
 
     values = server.CurrentValues(tags)
 
@@ -204,32 +216,35 @@ def test_piserver_bulk_current():
     for key in values.keys():
         assert len(values[key]) <= 2
 
-def test_piserver_bulk_recorded():
-# batch query with multiple tags
-    server = fetch_test_server()
-    tags = [fetch_test_point1(), fetch_test_point2()]
 
-    values = server.RecordedValues(tags,maxCount=10)
+def test_piserver_bulk_recorded():
+    # batch query with multiple tags
+    server = helper_fetch_server()
+    tags = [helper_fetch_point1(), helper_fetch_point2()]
+
+    values = server.RecordedValues(tags, maxCount=10)
     print(values)
     assert len(values) <= 20
     for key in values.keys():
         assert len(values[key]) <= 2
 
-def test_piserver_bulk_recorded2():
-# batch query with multiple tags
-    server = fetch_test_server()
-    tags = [fetch_test_point1(), fetch_test_point2()]
 
-    values = server.RecordedValues(tags,maxCount=100)
+def test_piserver_bulk_recorded2():
+    # batch query with multiple tags
+    server = helper_fetch_server()
+    tags = [helper_fetch_point1(), helper_fetch_point2()]
+
+    values = server.RecordedValues(tags, maxCount=100)
 
     assert len(values) <= 200
     for key in values.keys():
         assert len(values[key]) <= 2
 
+
 def test_piserver_bulk_interpolated():
-# batch query with multiple tags
-    server = fetch_test_server()
-    tags = [fetch_test_point1(), fetch_test_point2()]
+    # batch query with multiple tags
+    server = helper_fetch_server()
+    tags = [helper_fetch_point1(), helper_fetch_point2()]
 
     values = server.InterpolatedValues(tags)
 
@@ -237,10 +252,11 @@ def test_piserver_bulk_interpolated():
     for key in values.keys():
         assert len(values[key]) == 2
 
+
 def test_piserver_bulk_interpolated2():
-# batch query with multiple tags
-    server = fetch_test_server()
-    tags = [fetch_test_point1(), fetch_test_point2()]
+    # batch query with multiple tags
+    server = helper_fetch_server()
+    tags = [helper_fetch_point1(), helper_fetch_point2()]
 
     values = server.InterpolatedValues(tags, interval='30m')
 
@@ -248,20 +264,21 @@ def test_piserver_bulk_interpolated2():
     for key in values.keys():
         assert len(values[key]) == 2
 
+
 def test_datapipe_single_subscription():
-# test data pipe
+    # test data pipe
     if not testDataPipe:
         return
 
     results = {}
 
-    server = fetch_test_server()
-    tag = fetch_test_point1()
-    tag2 = fetch_test_point2()
+    server = helper_fetch_server()
+    tag = helper_fetch_point1()
+    tag2 = helper_fetch_point2()
 
     obs = server.Observable([tag, tag2])
     connection = obs.connect()
-    d = obs.subscribe(lambda x: addToResults(results,x))
+    d = obs.subscribe(lambda x: helper_addToResults(results, x))
 
     sleep(30)
     d.dispose()
@@ -274,21 +291,22 @@ def test_datapipe_single_subscription():
     for key in results.keys():
         assert len(results[key]) == 2
 
+
 def test_datapipe_multiple_subscriptions():
-# test data pipe with multiple subscriptions
+    # test data pipe with multiple subscriptions
     if not testDataPipe:
         return
 
     results = {}
     results2 = {}
 
-    server = fetch_test_server()
-    tag = fetch_test_point1()
-    tag2 = fetch_test_point2()
+    server = helper_fetch_server()
+    tag = helper_fetch_point1()
+    tag2 = helper_fetch_point2()
 
     obs = server.Observable([tag, tag2])
-    d = obs.subscribe(lambda x: addToResults(results,x))
-    d2 = obs.subscribe(lambda x: addToResults(results2,x))
+    d = obs.subscribe(lambda x: helper_addToResults(results, x))
+    d2 = obs.subscribe(lambda x: helper_addToResults(results2, x))
 
     connection = obs.connect()
     sleep(30)
@@ -305,21 +323,23 @@ def test_datapipe_multiple_subscriptions():
     for key in results2.keys():
         assert len(results2[key].keys()) == 2
 
+
 def test_datapipe_multiple_subscriptions2():
-# test data pipe with multiple subscriptions, test that scheduler stops after disconnect
+    # test data pipe with multiple subscriptions, test that scheduler stops
+    # after disconnect
     if not testDataPipe:
         return
 
     results = {}
     results2 = {}
 
-    server = fetch_test_server()
-    tag = fetch_test_point1()
-    tag2 = fetch_test_point2()
+    server = helper_fetch_server()
+    tag = helper_fetch_point1()
+    tag2 = helper_fetch_point2()
 
     obs = server.Observable([tag, tag2])
-    d = obs.subscribe(lambda x: addToResults(results,x))
-    d2 = obs.subscribe(lambda x: addToResults(results2,x))
+    d = obs.subscribe(lambda x: helper_addToResults(results, x))
+    d2 = obs.subscribe(lambda x: helper_addToResults(results2, x))
 
     connection = obs.connect()
     sleep(30)
@@ -347,8 +367,9 @@ def test_datapipe_multiple_subscriptions2():
     for key in results2.keys():
         assert len(results2[key].keys()) == 2
 
+
 def test_point_update():
-    point = fetch_test_point3()
+    point = helper_fetch_point3()
 
     now = datetime.datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%SZ')
     value = random.random()
@@ -368,8 +389,9 @@ def test_point_update():
 
     assert abs(current[now]['Value'] - value) < floatingPointPrecision
 
+
 def test_point_updates():
-    point = fetch_test_point3()
+    point = helper_fetch_point3()
 
     now = datetime.datetime.utcnow()
     now2 = now + datetime.timedelta(seconds=1)
@@ -380,7 +402,7 @@ def test_point_updates():
         'Questionable': 'false',
         'Good': 'true',
         'Value': value1
-    },{
+    }, {
         'Timestamp': now2.strftime('%Y-%m-%dT%H:%M:%SZ'),
         'Questionable': 'false',
         'Good': 'true',
@@ -389,50 +411,58 @@ def test_point_updates():
 
     point.UpdateValues(data)
     sleep(10)
-    result = point.RecordedValues(now.strftime('%Y-%m-%dT%H:%M:%SZ'),now2.strftime('%Y-%m-%dT%H:%M:%SZ'))
+    result = point.RecordedValues(now.strftime(
+        '%Y-%m-%dT%H:%M:%SZ'), now2.strftime('%Y-%m-%dT%H:%M:%SZ'))
 
     assert len(result) == 2
 
     for key in result:
-        assert key in [now.strftime('%Y-%m-%dT%H:%M:%SZ'), now2.strftime('%Y-%m-%dT%H:%M:%SZ')]
+        assert key in [now.strftime(
+            '%Y-%m-%dT%H:%M:%SZ'), now2.strftime('%Y-%m-%dT%H:%M:%SZ')]
 
         if key == now.strftime('%Y-%m-%dT%H:%M:%SZ'):
             assert abs(result[key]['Value'] - value1) < floatingPointPrecision
         if key == now2.strftime('%Y-%m-%dT%H:%M:%SZ'):
             assert abs(result[key]['Value'] - value2) < floatingPointPrecision
 
+
 def test_server_updates():
-    server = fetch_test_server()
+    server = helper_fetch_server()
 
     now = datetime.datetime.utcnow()
     now2 = now + datetime.timedelta(seconds=1)
     value1 = random.random()
     value2 = random.random()
     data = {
-        now.strftime('%Y-%m-%dT%H:%M:%SZ'):{
+        now.strftime('%Y-%m-%dT%H:%M:%SZ'): {
             testPoint3: value1
         },
-        now2.strftime('%Y-%m-%dT%H:%M:%SZ'):{
+        now2.strftime('%Y-%m-%dT%H:%M:%SZ'): {
             testPoint3: value2
         }
     }
 
     server.UpdateValues(data)
     sleep(10)
-    results = server.RecordedValues([testPoint3],now.strftime('%Y-%m-%dT%H:%M:%SZ'), now2.strftime('%Y-%m-%dT%H:%M:%SZ'))
+    results = server.RecordedValues([testPoint3], now.strftime(
+        '%Y-%m-%dT%H:%M:%SZ'), now2.strftime('%Y-%m-%dT%H:%M:%SZ'))
 
     assert results
     assert len(results) == 2
     for timeKey in results.keys():
-        assert timeKey in [now.strftime('%Y-%m-%dT%H:%M:%SZ'), now2.strftime('%Y-%m-%dT%H:%M:%SZ')]
+        assert timeKey in [now.strftime(
+            '%Y-%m-%dT%H:%M:%SZ'), now2.strftime('%Y-%m-%dT%H:%M:%SZ')]
 
         if timeKey == now.strftime('%Y-%m-%dT%H:%M:%SZ'):
-            assert abs(results[timeKey][testPoint3] - value1) < floatingPointPrecision
+            assert abs(results[timeKey][testPoint3] -
+                       value1) < floatingPointPrecision
         if timeKey == now2.strftime('%Y-%m-%dT%H:%M:%SZ'):
-            assert abs(results[timeKey][testPoint3] - value2) < floatingPointPrecision
+            assert abs(results[timeKey][testPoint3] -
+                       value2) < floatingPointPrecision
+
 
 def test_server_updates2():
-    server = fetch_test_server()
+    server = helper_fetch_server()
 
     now = datetime.datetime.utcnow()
     now2 = now + datetime.timedelta(seconds=1)
@@ -441,11 +471,11 @@ def test_server_updates2():
     value3 = random.random()
     value4 = random.random()
     data = {
-        now.strftime('%Y-%m-%dT%H:%M:%SZ'):{
+        now.strftime('%Y-%m-%dT%H:%M:%SZ'): {
             testPoint3: value1,
             testPoint4: value3
         },
-        now2.strftime('%Y-%m-%dT%H:%M:%SZ'):{
+        now2.strftime('%Y-%m-%dT%H:%M:%SZ'): {
             testPoint3: value2,
             testPoint4: value4
         }
@@ -453,24 +483,31 @@ def test_server_updates2():
 
     server.UpdateValues(data)
     sleep(10)
-    results = server.RecordedValues([testPoint3, testPoint4],now.strftime('%Y-%m-%dT%H:%M:%SZ'), now2.strftime('%Y-%m-%dT%H:%M:%SZ'))
+    results = server.RecordedValues([testPoint3, testPoint4], now.strftime(
+        '%Y-%m-%dT%H:%M:%SZ'), now2.strftime('%Y-%m-%dT%H:%M:%SZ'))
 
     assert results
     assert len(results) == 2
     for timeKey in results.keys():
-        assert timeKey in [now.strftime('%Y-%m-%dT%H:%M:%SZ'), now2.strftime('%Y-%m-%dT%H:%M:%SZ')]
+        assert timeKey in [now.strftime(
+            '%Y-%m-%dT%H:%M:%SZ'), now2.strftime('%Y-%m-%dT%H:%M:%SZ')]
         assert len(results[timeKey])
 
         if timeKey == now.strftime('%Y-%m-%dT%H:%M:%SZ'):
-            assert abs(results[timeKey][testPoint3] - value1) < floatingPointPrecision
-            assert abs(results[timeKey][testPoint4] - value3) < floatingPointPrecision
+            assert abs(results[timeKey][testPoint3] -
+                       value1) < floatingPointPrecision
+            assert abs(results[timeKey][testPoint4] -
+                       value3) < floatingPointPrecision
         if timeKey == now2.strftime('%Y-%m-%dT%H:%M:%SZ'):
-            assert abs(results[timeKey][testPoint3] - value2) < floatingPointPrecision
-            assert abs(results[timeKey][testPoint4] - value4) < floatingPointPrecision
+            assert abs(results[timeKey][testPoint3] -
+                       value2) < floatingPointPrecision
+            assert abs(results[timeKey][testPoint4] -
+                       value4) < floatingPointPrecision
 
 # HELPERS
 
-def addToResults(result, addition):
+
+def helper_addToResults(result, addition):
     for dateKey in addition.keys():
         if dateKey not in result.keys():
             result[dateKey] = {}
@@ -479,20 +516,24 @@ def addToResults(result, addition):
             result[dateKey][tagKey] = addition[dateKey][tagKey]
 
 
-def fetch_test_point1():
-    return fetch_test_server().FindPIPoint(testPoint)
+def helper_fetch_point1():
+    return helper_fetch_server().FindPIPoint(testPoint)
 
-def fetch_test_point2():
-    return fetch_test_server().FindPIPoint(testPoint2)
 
-def fetch_test_point3():
-    return fetch_test_server().FindPIPoint(testPoint3)
+def helper_fetch_point2():
+    return helper_fetch_server().FindPIPoint(testPoint2)
 
-def fetch_test_point4():
-    return fetch_test_server().FindPIPoint(testPoint4)
 
-def fetch_test_server():
-    client = fetch_test_client()
+def helper_fetch_point3():
+    return helper_fetch_server().FindPIPoint(testPoint3)
+
+
+def helper_fetch_point4():
+    return helper_fetch_server().FindPIPoint(testPoint4)
+
+
+def helper_fetch_server():
+    client = helper_fetch_client()
     servers = client.PIServers()
     assert len(servers) == serverCount
 
@@ -501,8 +542,9 @@ def fetch_test_server():
             server = serverObject
     return server
 
-def fetch_test_client():
+
+def helper_fetch_client():
     if useBasic:
-        return client(piWebApi,'ak-piwebapi-svc','DP$28GhMyp*!E&gc','basic',verifySSL=verifySSL)
+        return client(piWebApi, 'ak-piwebapi-svc', 'DP$28GhMyp*!E&gc', 'basic', verifySSL=verifySSL)
     else:
         return client(piWebApi, authenticationType='kerberos', verifySSL=verifySSL)
