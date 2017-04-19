@@ -7,9 +7,10 @@ from time import sleep
 # silence the certificate warnings
 import requests
 from nose.tools import *
-from osisoft_pi_webapi_python_client.client import client
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
 from rx.core import Scheduler
+
+from osisoft_pi_webapi_python_client.client import client
 
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
@@ -20,7 +21,8 @@ testKerberosAuth = True
 testDataPipe = False
 
 # piWebApi = 'https://dev.dstcontrols.com'
-piWebApi = 'https://applepie.dstcontrols.local/'
+piWebApi = 'https://applepie.dstcontrols.local'
+# piWebApi = 'https://dev.dstcontrols.com'
 user = 'ak-piwebapi-svc'
 password = 'DP$28GhMyp*!E&gc'
 verifySSL = False
@@ -70,8 +72,8 @@ testPoint4Class = 'classic'
 def test_piclient_unknown_auth():
     # bad authenticationType throws error
     try:
-        piclient = client(piWebApi, authenticationType='BAD',
-                          verifySSL=verifySSL)
+        piclient = client(
+            piWebApi, authenticationType='BAD', verifySSL=verifySSL)
     except ValueError as e:
         pass
 
@@ -80,8 +82,12 @@ def test_piclient_basic_auth():
     # test basic authenticationType
     if not testBasicAuth:
         return
-    piclient = client(piWebApi, 'ak-piwebapi-svc',
-                      'DP$28GhMyp*!E&gc', 'basic', verifySSL=verifySSL)
+    piclient = client(
+        piWebApi,
+        'ak-piwebapi-svc',
+        'DP$28GhMyp*!E&gc',
+        'basic',
+        verifySSL=verifySSL)
     pass
 
 
@@ -89,19 +95,22 @@ def test_piclient_kerberos_auth():
     # test kerberos authentication
     if not testKerberosAuth:
         return
-    piclient = client(piWebApi, authenticationType='kerberos',
-                      verifySSL=verifySSL)
+    piclient = client(
+        piWebApi, authenticationType='kerberos', verifySSL=verifySSL)
     pass
 
 
 def test_piclient_host_name():
     # verify the pi client cleans up the host name
-    piclient = client(piWebApi + '/piwebapi/',
-                      authenticationType='kerberos', verifySSL=verifySSL)
+    piclient = client(
+        piWebApi + '/piwebapi/',
+        authenticationType='kerberos',
+        verifySSL=verifySSL)
     assert piclient.Host() == piWebApi
 
 
 # BASIC PI SERVER TESTS
+
 
 def test_piclient_piservers():
     # fetch servers
@@ -204,6 +213,7 @@ def test_pipoint_interpolated2():
 
 
 # PI SERVER BULK QUERY
+
 
 def test_piserver_bulk_current():
     # batch query with multiple tags
@@ -411,14 +421,17 @@ def test_point_updates():
 
     point.UpdateValues(data)
     sleep(10)
-    result = point.RecordedValues(now.strftime(
-        '%Y-%m-%dT%H:%M:%SZ'), now2.strftime('%Y-%m-%dT%H:%M:%SZ'))
+    result = point.RecordedValues(
+        now.strftime('%Y-%m-%dT%H:%M:%SZ'),
+        now2.strftime('%Y-%m-%dT%H:%M:%SZ'))
 
     assert len(result) == 2
 
     for key in result:
-        assert key in [now.strftime(
-            '%Y-%m-%dT%H:%M:%SZ'), now2.strftime('%Y-%m-%dT%H:%M:%SZ')]
+        assert key in [
+            now.strftime('%Y-%m-%dT%H:%M:%SZ'),
+            now2.strftime('%Y-%m-%dT%H:%M:%SZ')
+        ]
 
         if key == now.strftime('%Y-%m-%dT%H:%M:%SZ'):
             assert abs(result[key]['Value'] - value1) < floatingPointPrecision
@@ -444,14 +457,17 @@ def test_server_updates():
 
     server.UpdateValues(data)
     sleep(10)
-    results = server.RecordedValues([testPoint3], now.strftime(
-        '%Y-%m-%dT%H:%M:%SZ'), now2.strftime('%Y-%m-%dT%H:%M:%SZ'))
+    results = server.RecordedValues([testPoint3],
+                                    now.strftime('%Y-%m-%dT%H:%M:%SZ'),
+                                    now2.strftime('%Y-%m-%dT%H:%M:%SZ'))
 
     assert results
     assert len(results) == 2
     for timeKey in results.keys():
-        assert timeKey in [now.strftime(
-            '%Y-%m-%dT%H:%M:%SZ'), now2.strftime('%Y-%m-%dT%H:%M:%SZ')]
+        assert timeKey in [
+            now.strftime('%Y-%m-%dT%H:%M:%SZ'),
+            now2.strftime('%Y-%m-%dT%H:%M:%SZ')
+        ]
 
         if timeKey == now.strftime('%Y-%m-%dT%H:%M:%SZ'):
             assert abs(results[timeKey][testPoint3] -
@@ -483,14 +499,17 @@ def test_server_updates2():
 
     server.UpdateValues(data)
     sleep(10)
-    results = server.RecordedValues([testPoint3, testPoint4], now.strftime(
-        '%Y-%m-%dT%H:%M:%SZ'), now2.strftime('%Y-%m-%dT%H:%M:%SZ'))
+    results = server.RecordedValues([testPoint3, testPoint4],
+                                    now.strftime('%Y-%m-%dT%H:%M:%SZ'),
+                                    now2.strftime('%Y-%m-%dT%H:%M:%SZ'))
 
     assert results
     assert len(results) == 2
     for timeKey in results.keys():
-        assert timeKey in [now.strftime(
-            '%Y-%m-%dT%H:%M:%SZ'), now2.strftime('%Y-%m-%dT%H:%M:%SZ')]
+        assert timeKey in [
+            now.strftime('%Y-%m-%dT%H:%M:%SZ'),
+            now2.strftime('%Y-%m-%dT%H:%M:%SZ')
+        ]
         assert len(results[timeKey])
 
         if timeKey == now.strftime('%Y-%m-%dT%H:%M:%SZ'):
@@ -503,6 +522,7 @@ def test_server_updates2():
                        value2) < floatingPointPrecision
             assert abs(results[timeKey][testPoint4] -
                        value4) < floatingPointPrecision
+
 
 # HELPERS
 
@@ -544,7 +564,12 @@ def helper_fetch_server():
 
 
 def helper_fetch_client():
-    if useBasic:
-        return client(piWebApi, 'ak-piwebapi-svc', 'DP$28GhMyp*!E&gc', 'basic', verifySSL=verifySSL)
-    else:
-        return client(piWebApi, authenticationType='kerberos', verifySSL=verifySSL)
+    return client(piWebApi, authenticationType='kerberos', verifySSL=verifySSL)
+    # if useBasic:
+    #     return client(
+    #         piWebApi,
+    #         'ak-piwebapi-svc',
+    #         'DP$28GhMyp*!E&gc',
+    #         'basic',
+    #         verifySSL=verifySSL)
+    # else:

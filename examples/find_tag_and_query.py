@@ -4,14 +4,16 @@ from osisoft_pi_webapi_python_client.client import client
 piWebApi = 'https://applepie.dstcontrols.local'
 verifySSL = False
 
-servers = client(piWebApi, authenticationType='kerberos', verifySSL=verifySSL).PIServers()
+servers = client(
+    piWebApi, authenticationType='kerberos', verifySSL=verifySSL).PIServers()
 
 sinusoid = servers[0].FindPIPoint("SINUSOID")
 
 current = sinusoid.CurrentValue()
-recorded = sinusoid.RecordedValues(start = "*-1d",end = "*", boundary = "Inside", maxCount = 25)
-interpolated = sinusoid.InterpolatedValues(start = "*-1d",end = "*", interval = "15m")
-
+recorded = sinusoid.RecordedValues(
+    start="*-1d", end="*", boundary="Inside", maxCount=25)
+interpolated = sinusoid.InterpolatedValues(
+    start="*-1d", end="*", interval="15m")
 
 print '\n\n======================CURRENT VALUE======================\n'
 print current
