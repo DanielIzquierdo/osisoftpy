@@ -1,4 +1,10 @@
+import requests
+from requests.packages.urllib3.exceptions import InsecureRequestWarning
+
 from osisoft_pi_webapi_python_client.client import client
+
+# disable InsecureRequestWarnings
+requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
 # arguments
 piWebApi = 'https://applepie.dstcontrols.local'

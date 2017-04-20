@@ -33,6 +33,7 @@ class client(_base):
                                    super(client, self).Session(),
                                    item['WebId']))
             except Exception as e:
+                print
                 print('Unable to retrieve server information for "' +
                       item['Name'] + '".')
 
