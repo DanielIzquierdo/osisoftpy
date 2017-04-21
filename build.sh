@@ -1,5 +1,3 @@
-#!/usr/bin/env bash
-
 # install dev dependencies
 # add colors to nosetests
 pip install rednose

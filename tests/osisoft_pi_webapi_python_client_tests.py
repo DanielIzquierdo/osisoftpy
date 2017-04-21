@@ -49,11 +49,11 @@ testPoint4Class = 'classic'
 # # ENABLE THIS CODE FOR HTTP LOGGING
 # import logging
 #
-# # These two lines enable debugging at httplib level (requests->urllib3->http.Client)
+# # These two lines enable debugging at httplib level (requests->urllib3->http.client)
 # # You will see the REQUEST, including HEADERS and DATA, and RESPONSE with HEADERS but without DATA.
 # # The only thing missing will be the response.body which is not logged.
 # try:
-#     import http.Client as http_client
+#     import http.client as http_client
 # except ImportError:
 #     # Python 2
 #     import httplib as http_client
@@ -101,7 +101,7 @@ def test_piclient_kerberos_auth():
 
 
 def test_piclient_host_name():
-    # verify the pi Client cleans up the host name
+    # verify the pi client cleans up the host name
     piclient = client(
         piWebApi + '/piwebapi/',
         authenticationType='kerberos',
@@ -566,7 +566,7 @@ def helper_fetch_server():
 def helper_fetch_client():
     return client(piWebApi, authenticationType='kerberos', verifySSL=verifySSL)
     # if useBasic:
-    #     return Client(
+    #     return client(
     #         piWebApi,
     #         'ak-piwebapi-svc',
     #         'DP$28GhMyp*!E&gc',
