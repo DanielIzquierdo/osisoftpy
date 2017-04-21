@@ -3,17 +3,16 @@ osisoft_pi_webapi_python_client._server
 ~~~~~~~~~~~~~~~~~~~
 This module contains the PI Point class
 """
-from threading import Thread
-from time import sleep
 
-import rx
-from osisoft_pi_webapi_python_client._base import _base
-from osisoft_pi_webapi_python_client._point import _point
-from rx import Observable, Observer
+from rx import Observable
 from rx.core import Scheduler
 
+from osisoftpy.point import Point
+from osisoftpy.base import Base
+from osisoftpy.exceptions import OSIsoftPyException
 
-class _server(_base):
+
+class _server(Base):
     """PI Server used to query tags and execute batch queries"""
 
     def __init__(self, piWebApiDomain, session, webId):
@@ -47,8 +46,8 @@ class _server(_base):
 
         for tag in r['Items']:
             try:
-                results.insert(-1, _point(super(_server, self).Host(),
-                                          super(_server, self).Session(), tag['WebId']))
+                results.insert(-1, Point(super(_server, self).Host(),
+                                         super(_server, self).Session(), tag['WebId']))
             except Exception as e:
                 print ('Unable to retrieve PI Point information for "' +
                        item['Name'] + '".')
@@ -123,7 +122,7 @@ class _server(_base):
         tags = []
 
         for tag in rawTags:
-            if type(tag) is _point:
+            if type(tag) is Point:
                 tags.insert(-1, tag)
             elif type(tag) is str:
                 tags.insert(-1, self.FindPIPoint(tag))

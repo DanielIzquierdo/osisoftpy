@@ -1,15 +1,15 @@
 # -*- coding: utf-8 -*-
 """
-osisoft_pi_webapi_python_client.client
+osisoft_pi_webapi_python_client.Client
 ~~~~~~~~~~~~~~~~~~~
-This module contains the client used to access OSIsoft PI infrastructure and data
+This module contains the Client used to access OSIsoft PI infrastructure and data
 """
-from osisoft_pi_webapi_python_client._base import _base
-from osisoft_pi_webapi_python_client._server import _server
+from osisoftpy.base import Base
+from osisoftpy.server import _server
 
 
-class client(_base):
-    """A client to interact with the PI Web API"""
+class Client(Base):
+    """A Client to interact with the PI Web API"""
 
     def __init__(self,
                  piWebApiDomain,
@@ -17,20 +17,20 @@ class client(_base):
                  password='',
                  authenticationType='kerberos',
                  verifySSL=False):
-        super(client, self).__init__(piWebApiDomain, userName, password,
+        super(Client, self).__init__(piWebApiDomain, userName, password,
                                      authenticationType, verifySSL)
 
     def PIServers(self):
         """Retrieves the servers"""
-        r = super(client, self).Request('dataservers')
+        r = super(Client, self).Request('dataservers')
 
         results = []
         for item in r['Items']:
             try:
                 results.insert(-1,
                                _server(
-                                   super(client, self).Host(),
-                                   super(client, self).Session(),
+                                   super(Client, self).Host(),
+                                   super(Client, self).Session(),
                                    item['WebId']))
             except Exception as e:
                 print

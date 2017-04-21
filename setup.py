@@ -6,8 +6,8 @@
 from setuptools import setup, find_packages
 
 setup(
-    name='osisoft_pi_webapi_python_client',
-    description='OSIsoft PI Web API client',
+    name='osisoftpy',
+    description='OSIsoft PI Web API Client',
     version='1.2.0',
     url='https://gitlab.com/dstcontrols/pge-piclient-python',
     license='MIT',

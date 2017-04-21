@@ -1,5 +1,5 @@
 {
-  title: 'PG&E OSIsoft PI client for Python'
+  title: 'PG&E OSIsoft PI Client for Python'
   group: 'PG&E'
   paths: [
     '~/projects/dst/pge-piclient-python'

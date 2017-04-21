@@ -1,44 +1,53 @@
 """
-osisoft_pi_webapi_python_client._base
+osisoftpy._base
 ~~~~~~~~~~~~~~~~~~~
 This module contains the base class for PI objects
 """
 
 import re
 import requests
-from requests.auth import HTTPBasicAuth
+import requests.auth
+import requests.exceptions
+import sys
 from requests_kerberos import HTTPKerberosAuth, REQUIRED, OPTIONAL
+from osisoftpy.exceptions import ConnectTimeout
+import osisoftpy.exceptions
 
 
-class _base(object):
+class Base(object):
     """The Base Pi Object"""
 
-    def __init__(self, piWebApiDomain, userName='', password='', authenticationType='kerberos', verifySSL=True):
+    def __init__(self, piWebApiDomain, userName='', password='',
+                 authenticationType='kerberos', verifySSL=True):
         self._piWebApiDomain = self.__domainNameCleanup(piWebApiDomain)
         self.__session = requests.Session()
-        self.__session.auth = self.__auth(
-            userName, password, authenticationType)
+        self.__session.auth = self.__auth(userName, password,
+                                          authenticationType)
         self.__session.verify = verifySSL
         self.__testConnection()
 
     def Session(self):
-        """Retrieves the Requests.Session client"""
+        """Retrieves the Requests.Session Client"""
         return self.__session
 
     def _session(self, session):
-        """allows derived classes to set the Requests.Session client"""
+        """allows derived classes to set the Requests.Session Client"""
         self.__session = session
 
     def Host(self):
         """Returns the host name"""
-        return(self._piWebApiDomain)
+        return (self._piWebApiDomain)
 
     def __testConnection(self):
         """tests connectivity to the piwebapi"""
-        r = self.__session.get(self._piWebApiDomain + '/piwebapi')
-
-        if r.status_code != 200:
-            raise ValueError('Unable to connect to the PI Web API')
+        try:
+            r = self.__session.get(self._piWebApiDomain + '/piwebapi',
+                                   timeout=3)
+        except requests.exceptions.RequestException as e:
+            # if r.status_code != 200:
+            print e
+            sys.exit(1)
+            # raise ValueError('Unable to connect to the PI Web API')
 
     def __domainNameCleanup(self, domainName):
         """cleans up the provided string"""
@@ -47,7 +56,7 @@ class _base(object):
     def __auth(self, username, password, authenticationType):
         """creates the desired authentication object"""
         if authenticationType == 'basic':
-            return HTTPBasicAuth(username, password)
+            return requests.auth.HTTPBasicAuth(username, password)
         elif authenticationType == 'kerberos':
             return HTTPKerberosAuth(mutual_authentication=OPTIONAL)
         else:
@@ -55,12 +64,18 @@ class _base(object):
 
     def Request(self, url):
         """makes a GET request to the pi web api"""
-        return self.__session.get(self._piWebApiDomain + '/piwebapi/' + url).json()
+        try:
+            response = self.__session.get(
+                self._piWebApiDomain + '/piwebapi/' + url)
+            if not response.status_code // 100 == 2:
+                return "Error: Unexpected response {}".format(response)
+        except requests.exceptions.RequestException as e:
+            return "Error: {}".format(e)
 
     def Post(self, url, payload):
         """makes a POST request to the pi web api"""
-        r = self.__session.post(self._piWebApiDomain +
-                                '/piwebapi/' + url, json=payload)
+        r = self.__session.post(self._piWebApiDomain + '/piwebapi/' + url,
+                                json=payload)
 
         if r.status_code >= 300:
             return r.status_code
