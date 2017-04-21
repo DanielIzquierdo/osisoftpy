@@ -1,17 +1,17 @@
 import requests
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
 
-from osisoft_pi_webapi_python_client.client import client
+from osisoftpy.client import client
+
 
 # disable InsecureRequestWarnings
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
 # arguments
 piWebApi = 'https://applepie.dstcontrols.local'
-verifySSL = False
 
 servers = client(
-    piWebApi, authenticationType='kerberos', verifySSL=verifySSL).PIServers()
+    piWebApi, authenticationType='kerberos', verifySSL=False).PIServers()
 
 sinusoid = servers[0].FindPIPoint("SINUSOID")
 

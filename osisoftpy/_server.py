@@ -7,8 +7,8 @@ from threading import Thread
 from time import sleep
 
 import rx
-from osisoft_pi_webapi_python_client._base import _base
-from osisoft_pi_webapi_python_client._point import _point
+from osisoftpy._base import _base
+from osisoftpy._point import _point
 from rx import Observable, Observer
 from rx.core import Scheduler
 
