@@ -1,40 +1,40 @@
-# -*- coding: utf-8 -*-
-"""
-osisoft_pi_webapi_python_client.client
-~~~~~~~~~~~~~~~~~~~
-This module contains the client used to access OSIsoft PI infrastructure and data
-"""
-from osisoftpy._base import _base
-from osisoftpy._server import _server
+from __future__ import print_function
+
+from requests.exceptions import ConnectionError, SSLError
+from requests.models import Response
+from requests.packages import urllib3
+from requests.sessions import Session
 
 
-class client(_base):
-    """A client to interact with the PI Web API"""
+class Client(Session):
+    def __init__(self):
+        super(Client, self).__init__()
+        for adapter in self.adapters.values():
+            adapter.max_retries = 3
 
-    def __init__(self,
-                 piWebApiDomain,
-                 userName='',
-                 password='',
-                 authenticationType='kerberos',
-                 verifySSL=False):
-        super(client, self).__init__(piWebApiDomain, userName, password,
-                                     authenticationType, verifySSL)
+    # @property
+    def prefix(self, host):
+        """Return the appropriate URL prefix to prepend to requests,
+        based on the host provided in settings.
+        """
+        if '://' not in host:
+            host = 'https://%s' % host.strip('/')
+        # elif host.startswith('http://'):
+        #     raise SSLError(
+        #         'Can not verify ssl with non-https protocol. Change the '
+        #         'verify_ssl configuration setting to continue.')
+        return '%s/piwebapi/' % host.rstrip('/')
 
-    def PIServers(self):
-        """Retrieves the servers"""
-        r = super(client, self).Request('dataservers')
+    def getDataArchiveServer(self, host):
+        url = self.prefix(host)
+        self.verify = False
+        # url = '%s' % (self.prefix(host))
+        # return self.get(url).json()
+        print(url)
+        r = self.get(url)
+        print(r.status_code)
+        print(r)
+        return r.json()
 
-        results = []
-        for item in r['Items']:
-            try:
-                results.insert(-1,
-                               _server(
-                                   super(client, self).Host(),
-                                   super(client, self).Session(),
-                                   item['WebId']))
-            except Exception as e:
-                print
-                print('Unable to retrieve server information for "' +
-                      item['Name'] + '".')
 
-        return results
+client = Client()
