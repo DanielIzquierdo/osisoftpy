@@ -6,9 +6,9 @@ from requests.packages import urllib3
 from requests.sessions import Session
 
 
-class Client(Session):
+class PIClientSession(Session):
     def __init__(self):
-        super(Client, self).__init__()
+        super(PIClientSession, self).__init__()
         for adapter in self.adapters.values():
             adapter.max_retries = 3
 
