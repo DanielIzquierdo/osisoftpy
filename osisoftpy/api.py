@@ -10,7 +10,7 @@ from requests_kerberos import HTTPKerberosAuth, OPTIONAL
 from .piserver import PIServer, PIServers
 
 
-class PIWebAPI(object):
+class API(object):
     """Provide integration with the OSIsoft PI Web API.
     
     TODO: document class methods.
@@ -105,20 +105,20 @@ class PIWebAPI(object):
 
     # @property
     # def dataservers(self):
-    #     print('Getting PIWebAPI._dataservers')
+    #     print('Getting API._dataservers')
     #     return self._dataservers
     #
     # @dataservers.setter
     # def dataservers(self, dataserver):
-    #     print('Setting PIWebAPI._url')
+    #     print('Setting API._url')
     #     self._url = url
 
     @property
     def url(self):
-        print('Getting PIWebAPI._url')
+        print('Getting API._url')
         return self._url
 
     @url.setter
     def url(self, url):
-        print('Setting PIWebAPI._url')
+        print('Setting API._url')
         self._url = url

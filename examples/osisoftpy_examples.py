@@ -2,7 +2,7 @@
 import requests
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
 
-from osisoftpy.piwebapi import PIWebAPI
+from osisoftpy.api import API
 from osisoftpy.piserver import PIServer, PIServers
 
 
@@ -13,10 +13,10 @@ dev = 'https://api.osisoft.dstcontrols.local/piwebapi/'
 prod = 'https://dev.dstcontrols.com/piwebapi/'
 
 # kerberos authentication example:
-api = PIWebAPI(url=dev, verifyssl=False, authtype='kerberos')
+api = API(url=dev, verifyssl=False, authtype='kerberos')
 
 # basic authentication example:
-#api = PIWebAPI(url=dev, verifyssl=False, authtype='basic', username=None,
+#api = API(url=dev, verifyssl=False, authtype='basic', username=None,
 # password=None)
 
 # print(api)
