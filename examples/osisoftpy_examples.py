@@ -9,7 +9,15 @@ from osisoftpy.piserver import PIServer, PIServers
 
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
-api = PIWebAPI(url='https://megatron.dstcontrols.local/piwebapi/')
+dev = 'https://api.osisoft.dstcontrols.local/piwebapi/'
+prod = 'https://dev.dstcontrols.com/piwebapi/'
+
+# kerberos authentication example:
+api = PIWebAPI(url=dev, verifyssl=False, authtype='kerberos')
+
+# basic authentication example:
+#api = PIWebAPI(url=dev, verifyssl=False, authtype='basic', username=None,
+# password=None)
 
 # print(api)
 #

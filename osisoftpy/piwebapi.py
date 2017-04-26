@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
 
-from __future__ import unicode_literals
 from __future__ import print_function
+from __future__ import unicode_literals
 
 import requests
+from requests.auth import HTTPBasicAuth
 from requests_kerberos import HTTPKerberosAuth, OPTIONAL
 
 from .piserver import PIServer, PIServers
@@ -17,12 +18,32 @@ class PIWebAPI(object):
     TODO: document class parameters.
     """
 
-    def __init__(self, url='https://dev.dstcontrols.local/piwebapi/'):
-        self._dataservers = None
+    def __init__(self, url='https://dev.dstcontrols.local/piwebapi/',
+                 verifyssl=True, authtype='kerberos', username=None,
+                 password=None):
         self._url = url
+        # TODO: are adding verifyssl and authtype class friends required?
+        # self._authtype = authtype
+        # TODO: are adding username and password class friends required?
+        # self._username = username
+        # TODO: is the password field a security issue?
+        # self._password = password
+        self._dataservers = None
         self._session = requests.Session()
-        self._session.auth = HTTPKerberosAuth(mutual_authentication=OPTIONAL)
-        self._session.verify = False
+        self._session.verify = verifyssl
+        self._session.auth = self.get_credentials(authtype=authtype,
+                                                  username=username,
+                                                  password=password)
+
+    @staticmethod
+    def get_credentials(authtype, username, password):
+        if authtype.lower() == 'basic':
+            return HTTPBasicAuth(username, password)
+        elif authtype.lower() == 'kerberos':
+            return HTTPKerberosAuth(mutual_authentication=OPTIONAL)
+        else:
+            raise TypeError('Error: {0} is an invalid authentication type. '
+                            'Valid options are Basic and Kerberos.')
 
     def test_connection(self):
         r = self._session.get(self._url)
@@ -40,15 +61,15 @@ class PIWebAPI(object):
             data = r.json()
             for item in data['Items']:
                 try:
-                    pi_servers.append(PIServer(
-                        name=item['Name'],
-                        serverversion=item['ServerVersion'],
-                        webid=item['WebId'],
-                        isconnected=item['IsConnected'],
-                        id=item['Id']))
+                    pi_servers.append(PIServer(name=item['Name'],
+                                               serverversion=item[
+                                                   'ServerVersion'],
+                                               webid=item['WebId'],
+                                               isconnected=item['IsConnected'],
+                                               id=item['Id']))
                 except Exception as e:
-                    print('Unable to retrieve server information for "' +
-                          item['Name'] + '".')
+                    print('Unable to retrieve server information for "' + item[
+                        'Name'] + '".')
 
             return pi_servers
         elif r.status_code != requests.codes.ok:
@@ -56,8 +77,8 @@ class PIWebAPI(object):
 
     def get_pi_server(self, name):
         try:
-            pi_server = next((x for x in self.get_pi_servers() if x.name ==
-                              name), None)
+            pi_server = next(
+                (x for x in self.get_pi_servers() if x.name == name), None)
             return pi_server
         except Exception as e:
             print('Unable to retrieve server information for ' + name)
@@ -72,7 +93,9 @@ class PIWebAPI(object):
                     try:
                         raise ValueError('Error Getting PI points. '
                                          'ErrorCode: {0}, Source: {1}, '
-                                         'Message {2}'.format(error['ErrorCode'], error['Source'], error['Message']))
+                                         'Message {2}'.format(
+                            error['ErrorCode'], error['Source'],
+                            error['Message']))
                     except Exception as e:
                         print(e)
             else:
