@@ -1,14 +1,15 @@
 # -*- coding: utf-8 -*-
 
-from __future__ import unicode_literals
 from __future__ import print_function
+from __future__ import unicode_literals
+
 
 class Point(object):
     """The Point class provides methods for the available PI points"""
 
     def __init__(self, name=None, description=None, uniqueid=None, webid=None,
                  datatype=None):
-        # type: (string, string, string, string, string) -> object
+        # type: (str, str, str, str, str) -> object
 
         """
 
@@ -38,29 +39,58 @@ class Point(object):
                                      self._datatype, self._current_value)
 
     @property
-    def name(self): return self._name
+    def name(self):
+        return self._name
+
+    @name.setter
+    def name(self, name):
+        self._name = name
 
     @property
-    def description(self): return self._description
+    def description(self):
+        return self._description
+
+    @description.setter
+    def description(self, description):
+        self._description = description
 
     @property
-    def uniqueid(self): return self._uniqueid
+    def uniqueid(self):
+        return self._uniqueid
+
+    @uniqueid.setter
+    def uniqueid(self, uniqueid):
+        self._uniqueid = uniqueid
 
     @property
-    def webid(self): return self._webid
+    def webid(self):
+        return self._webid
+
+    @webid.setter
+    def webid(self, webid):
+        self._webid = webid
 
     @property
-    def datatype(self): return self._datatype
+    def datatype(self):
+        return self._datatype
+
+    @datatype.setter
+    def datatype(self, datatype):
+        self._datatype = datatype
 
     @property
-    def current_value(self): return self._current_value
+    def current_value(self):
+        return self._current_value
 
     @current_value.setter
     def current_value(self, current_value):
         self._current_value = current_value
 
+    # TODO: NOT IMPLEMENTED
     @property
-    def interpolated_values(self): return self._interpolated_values
+    def interpolated_values(self):
+        # raise NotImplementedError()
+        return self._interpolated_values
 
     @property
     def recorded_values(self): return self._recorded_values

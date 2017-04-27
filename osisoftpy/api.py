@@ -44,6 +44,8 @@ class API(object):
     def __init__(self, url='https://dev.dstcontrols.local/piwebapi/',
                  verifyssl=True, authtype='kerberos', username=None,
                  password=None):
+        # type: (str, bool, str, Union[None, None, None, str], Union[None, None, None, str]) -> None
+
         self._url = url
         log.info('Instantiating the OSIsoftPy API with the following '
                  'arguments: URL: %s, VerifySSL: %s, AuthType: %s, '
@@ -171,10 +173,14 @@ class API(object):
                     try:
                         log.debug('Instantiating "%s" as OSIsoftPy.Point...',
                                   i['Name'])
-                        point = Point(name=i['Name'],
-                                      description=i['Description'],
-                                      uniqueid=i['UniqueID'], webid=i['WebID'],
-                                      datatype=i['DataType'])
+                        point = Point()
+                        point.name = i['Name']
+                        if 'description' in i:
+                            point.description = i['description']
+                        point.uniqueid = i['UniqueID']
+                        point.webid = i['WebID']
+                        point.datatype = i['DataType']
+
                         points.append(point)
                     except Exception as e:
                         log.error('Exception while instantiating PI '

@@ -3,8 +3,6 @@
 from __future__ import unicode_literals
 from __future__ import print_function
 
-import collections
-
 
 class DataArchive(object):
     """The DataServer class provides methods for the available dataservers"""
@@ -23,23 +21,26 @@ class DataArchive(object):
 
         :rtype: DataArchive object
         """
-        self._name = name
-        self._serverversion = serverversion
-        self._webid = webid
-        self._isconnected = isconnected
-        self._id = id
+        self.name = name
+        self.serverversion = serverversion
+        self.webid = webid
+        self.isconnected = isconnected
+        self.id = id
 
-    @property
-    def name(self): return self._name
+    def __getattr__(self, key):
+        try:
+            return self.__dict__[key]
+        except KeyError:
+            msg = '"{}" object has no attribute "{}"'
+            raise AttributeError(msg.format(type(self).__name__, key))
 
-    @property
-    def serverversion(self): return self._serverversion
+    def __setattr__(self, key, value):
+        try:
+            self.__dict__[key] = value
+        except KeyError:
+            msg = '"{}" object has no attribute "{}"'
+            raise AttributeError(msg.format(type(self).__name__, key))
+        except ValueError:
+            msg = 'Invalid value "{}" for "{}" object attribute "{}"'
+            raise AttributeError(msg.format(value, type(self).__name__, key))
 
-    @property
-    def webid(self): return self._webid
-
-    @property
-    def isconnected(self): return self._isconnected
-
-    @property
-    def id(self): return self._id

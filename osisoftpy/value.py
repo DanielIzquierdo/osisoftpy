@@ -13,7 +13,7 @@ class Value(object):
                  value=None,
                  unitsabbreviation=None, good=False, questionable=False,
                  substituted=False):
-        # type: (string, string, string, string, bool, bool, bool) -> None
+        # type: (str, str, str, str, bool, bool, bool) -> None
 
         """
 

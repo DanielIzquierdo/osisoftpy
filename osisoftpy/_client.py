@@ -29,7 +29,7 @@ class client(_base):
             try:
                 results.insert(-1,
                                _server(
-                                   super(client, self).Host(),
+                                   super(client, self).≈(),
                                    super(client, self).Session(),
                                    item['WebId']))
             except Exception as e:

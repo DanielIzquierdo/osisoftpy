@@ -17,7 +17,7 @@ query = 'name:sinusoid or name:cdt158'
 query = '*'
 # query = 'name:sinusoid'
 
-points = api.get_points(query=query, count=8,
+points = api.get_points(query=query, count=1,
                         scope='pi:{}'.format(da_server.name))
 
 points_with_current_value = api.get_values(points=points,
@@ -27,3 +27,9 @@ for point in points_with_current_value:
     message = 'The current value for {} is {} as of {}'
     print(message.format(point.name, point.current_value.value,
                          point.current_value.timestamp))
+
+for points in points:
+    print(getattr(point, 'name'))
+
+
+    point.name
