@@ -3,11 +3,16 @@
 from __future__ import print_function
 from __future__ import unicode_literals
 
+import logging
+
 import requests
 from requests.auth import HTTPBasicAuth
 from requests_kerberos import HTTPKerberosAuth, OPTIONAL
 
-from .piserver import PIServer, PIServers
+from .dataarchive import DataArchive, DataArchives
+from .point import Point, Points
+
+log = logging.getLogger(__name__)
 
 
 class API(object):
@@ -18,10 +23,30 @@ class API(object):
     TODO: document class parameters.
     """
 
+    @property
+    def url(self):
+        return self._url
+
+    @url.setter
+    def url(self, url):
+        pass
+
+    @property
+    def isconnected(self):
+        return self._isconnected
+
+    @isconnected.setter
+    def isconnected(self, isconnected):
+        pass
+
     def __init__(self, url='https://dev.dstcontrols.local/piwebapi/',
                  verifyssl=True, authtype='kerberos', username=None,
                  password=None):
         self._url = url
+        log.info('Instantiating the OSIsoftPy API with the following '
+                 'arguments: URL: %s, VerifySSL: %s, AuthType: %s, '
+                 'Username: %s', url, verifyssl, authtype, username)
+        # self.url = url
         # TODO: are adding verifyssl and authtype class friends required?
         # self._authtype = authtype
         # TODO: are adding username and password class friends required?
@@ -29,14 +54,27 @@ class API(object):
         # TODO: is the password field a security issue?
         # self._password = password
         self._dataservers = None
+        log.debug('Creating Requests Session object. VerifySSL: %s, '
+                  'AuthType: %s', verifyssl, authtype)
         self._session = requests.Session()
         self._session.verify = verifyssl
         self._session.auth = self.get_credentials(authtype=authtype,
                                                   username=username,
                                                   password=password)
+        self._isconnected = self.test_connection()
+        if self.isconnected:
+            log.info('OSIsoftPy API instantiation success using %s '
+                     'against %s; API.isconnected: %s', authtype, self.url,
+                     self.isconnected)
+        else:
+            log.error('OSIsoftPy API instantiatian failed using %s against '
+                      '%s; API.isconnected: %s', authtype, self.url,
+                      self.isconnected, exc_info=True)
 
     @staticmethod
     def get_credentials(authtype, username, password):
+        log.debug('Creating %s authentication object for Requests...',
+                  authtype)
         if authtype.lower() == 'basic':
             return HTTPBasicAuth(username, password)
         elif authtype.lower() == 'kerberos':
@@ -46,79 +84,120 @@ class API(object):
                             'Valid options are Basic and Kerberos.')
 
     def test_connection(self):
-        r = self._session.get(self._url)
+        """
+
+        :rtype: bool
+        """
+        log.debug('Testing connection to PI Web API...')
+        r = self._session.get(self.url)
         if r.status_code == requests.codes.ok:
-            print('Connection OK')
-            print(r.headers)
-            print(r.json())
-        elif r.status_code != requests.codes.ok:
-            r.raise_for_status()
+            log.debug('PI Web API connection OK, returning True')
+            return True
+        log.debug('PI Web API connection error, Returning False')
+        r.raise_for_status()
+        return False
 
-    def get_pi_servers(self):
-        r = self._session.get(self._url + 'dataservers')
-        if r.status_code == requests.codes.ok:
-            pi_servers = PIServers(PIServer)
-            data = r.json()
-            for item in data['Items']:
-                try:
-                    pi_servers.append(PIServer(name=item['Name'],
-                                               serverversion=item[
-                                                   'ServerVersion'],
-                                               webid=item['WebId'],
-                                               isconnected=item['IsConnected'],
-                                               id=item['Id']))
-                except Exception as e:
-                    print('Unable to retrieve server information for "' + item[
-                        'Name'] + '".')
-
-            return pi_servers
-        elif r.status_code != requests.codes.ok:
-            r.raise_for_status()
-
-    def get_pi_server(self, name):
-        try:
-            pi_server = next(
-                (x for x in self.get_pi_servers() if x.name == name), None)
-            return pi_server
-        except Exception as e:
-            print('Unable to retrieve server information for ' + name)
-
-    def get_pi_points(self, query, count=10):
-        payload = {'q': query, 'count': count}
-        r = self._session.get(self.url + 'search/query', params=payload)
+    def get_data_archive_servers(self):
+        log.debug('Retrieving all PI Data Archive servers from %s', self.url)
+        r = self._session.get(self.url + 'dataservers')
         if r.status_code == requests.codes.ok:
             data = r.json()
-            if len(data['Errors']) > 0:
-                for error in data['Errors']:
+            if len(data['Items']) > 0:
+                log.debug('HTTP %s - Instantiating OSIsoftPy.DataArchives()',
+                          r.status_code)
+                servers = DataArchives(DataArchive)
+                log.debug('Staging %s PI server(s) for instantiation...',
+                          data['Items'].__len__().__str__())
+                for i in data['Items']:
                     try:
-                        raise ValueError('Error Getting PI points. '
-                                         'ErrorCode: {0}, Source: {1}, '
-                                         'Message {2}'.format(
-                            error['ErrorCode'], error['Source'],
-                            error['Message']))
+                        log.debug('Instantiating "%s" as '
+                                  'OSIsoftPy.DataArchive...', i['Name'])
+                        server = DataArchive(name=i['Name'],
+                                             serverversion=i['ServerVersion'],
+                                             webid=i['WebId'],
+                                             isconnected=i['IsConnected'],
+                                             id=i['Id'])
+                        servers.append(server)
                     except Exception as e:
-                        print(e)
+                        log.error('Unable to retrieve server info for '
+                                  '"%s"', i['Name'], exc_info=True)
+                log.debug('PI Data Archive server retrieval success! %s PI '
+                          'server(s) were '
+                          'found and instantiated.',
+                          servers.__len__().__str__())
+                return servers
+        r.raise_for_status()
+
+    def get_data_archive_server(self, name):
+        log.debug('Getting PI Data Archive server named "%s" from %s', name,
+                  self.url)
+        try:
+            pi_servers = self.get_data_archive_servers()
+            log.debug('Searching for a PI Data Archive server named "%s"...',
+                      name)
+            pi_server = next((x for x in pi_servers if x.name == name), None)
+            if pi_server:
+                log.debug(
+                    'Found a PI Data Archive named "%s" with WebID "%s" on '
+                    '%s', pi_server.name, pi_server.webid, self.url)
+                return pi_server
             else:
-                return data
-        elif r.status_code != requests.codes.ok:
+                log.error('No PI Data Archive named "%s" was found on %s',
+                          name, self.url, exc_info=True)
+        except Exception as e:
+            log.error(
+                'Exception while searching for a PI Data Archive named "%s" '
+                'from %s', name, self.url, exc_info=True)
+
+    def get_points(self, query, count=10, scope='*'):
+        payload = {'q': query, 'count': count, 'scope': scope}
+        log.debug('Executing Query against PI Web API Indexed Search with '
+                  'the following parameters: Query: "%s", Count: "%s". Payload: %s',
+                  query, count, payload)
+        r = self._session.get(self.url + 'search/query', params=payload)
+        log.debug(r)
+        if r.status_code != requests.codes.ok:
             r.raise_for_status()
+        else:
+            data = r.json()
+            if len(data['Items']) > 0:
+                log.debug('HTTP %s - Instantiating OSIsoftPy.Points()',
+                          r.status_code)
+                points = Points(Point)
+                log.debug('Staging %s PI point(s) for instantiation...',
+                          data['Items'].__len__().__str__())
+                for i in data['Items']:
+                    try:
+                        log.debug('Instantiating "%s" as OSIsoftPy.Point...',
+                                  i['Name'])
+                        point = Point(name=i['Name'],
+                                      description=i['Description'],
+                                      uniqueid=i['UniqueID'], webid=i['WebID'],
+                                      datatype=i['DataType'])
+                        points.append(point)
+                    except Exception as e:
+                        log.error('Exception while instantiating PI '
+                                  'point for '
+                                  '"%s". Raw JSON: %s', i['Name'], i,
+                                  exc_info=True)
+                log.debug('PI Point retrieval success! %s PI '
+                          'point(s) were '
+                          'found and instantiated.',
+                          points.__len__().__str__())
 
-    # @property
-    # def dataservers(self):
-    #     print('Getting API._dataservers')
-    #     return self._dataservers
-    #
-    # @dataservers.setter
-    # def dataservers(self, dataserver):
-    #     print('Setting API._url')
-    #     self._url = url
+                if len(data['Errors']) != 0:
+                    for error in data['Errors']:
+                        try:
+                            log.warning('The PI Web API returned the '
+                                        'following error while instantiating '
+                                             'PI points. '
+                                             'ErrorCode: {0}, Source: {1}, '
+                                             'Message {2}'.format(
+                                error['ErrorCode'], error['Source'],
+                                error['Message']))
+                        except Exception as e:
+                            log.error('Exception encounted while '
+                                      'instantiating '
+                                      'PI points!', exc_info=True)
 
-    @property
-    def url(self):
-        print('Getting API._url')
-        return self._url
-
-    @url.setter
-    def url(self, url):
-        print('Setting API._url')
-        self._url = url
+                return points

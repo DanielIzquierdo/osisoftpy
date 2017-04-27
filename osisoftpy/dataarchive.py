@@ -6,7 +6,7 @@ from __future__ import print_function
 import collections
 
 
-class PIServer(object):
+class DataArchive(object):
     """The DataServer class provides methods for the available dataservers"""
 
     def __init__(self, name=None, serverversion=None, webid=None,
@@ -21,7 +21,7 @@ class PIServer(object):
         :type isconnected: PI server connection status
         :type id: PI server ID
 
-        :rtype: PIServer object
+        :rtype: DataArchive object
         """
         self._name = name
         self._serverversion = serverversion
@@ -44,7 +44,7 @@ class PIServer(object):
     @property
     def id(self): return self._id
 
-class PIServers(collections.MutableSequence):
+class DataArchives(collections.MutableSequence):
     def __init__(self, types, *args):
         self.types = types
         self.list = list()
