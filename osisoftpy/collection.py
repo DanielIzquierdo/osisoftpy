@@ -38,3 +38,4 @@ class Collection(collections.MutableSequence):
 
     def __str__(self):
         return str(self.list)
+

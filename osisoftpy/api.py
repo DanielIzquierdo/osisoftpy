@@ -231,7 +231,7 @@ class API(object):
                                       good=data['Good'],
                                       questionable=data['Questionable'],
                                       substituted=data['Substituted'])
-                        point.values.append(value)
+                        point.current_value = value
                     except Exception as e:
                         log.error('Exception while instantiating current value'
                                   'from %s for %s. Raw JSON: %s',

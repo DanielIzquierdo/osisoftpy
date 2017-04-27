@@ -3,10 +3,6 @@
 from __future__ import unicode_literals
 from __future__ import print_function
 
-from .value import Value
-from .collection import Collection
-
-
 class Point(object):
     """The Point class provides methods for the available PI points"""
 
@@ -28,13 +24,18 @@ class Point(object):
         self._uniqueid = uniqueid
         self._webid = webid
         self._datatype = datatype
-        self._values = Collection(Value)
+        self._current_value = None
+        self._interpolated_values = None
+        self._recorded_values = None
+        self._plot_values = None
+        self._summary_values = None
+        self._end_value = None
 
     def __repr__(self):
         representation = 'Point("{}", "{}", "{}", "{}", "{}", "{}")'
         return representation.format(self._name, self._description,
                                      self._uniqueid, self._webid,
-                                     self._datatype, self._values)
+                                     self._datatype, self._current_value)
 
     @property
     def name(self): return self._name
@@ -52,4 +53,23 @@ class Point(object):
     def datatype(self): return self._datatype
 
     @property
-    def values(self): return self._values
+    def current_value(self): return self._current_value
+
+    @current_value.setter
+    def current_value(self, current_value):
+        self._current_value = current_value
+
+    @property
+    def interpolated_values(self): return self._interpolated_values
+
+    @property
+    def recorded_values(self): return self._recorded_values
+
+    @property
+    def plot_values(self): return self._plot_values
+
+    @property
+    def summary_values(self): return self._summary_values
+
+    @property
+    def end_value(self): return self._end_value
