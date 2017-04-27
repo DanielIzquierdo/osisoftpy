@@ -203,6 +203,8 @@ class API(object):
 
                 return points
 
+    # TODO: get_values() probably shouldn't return a sequence of Points if
+    # we're just providing a single Point object.
     def get_values(self, points, calculationtype, start=None, end=None,
                    boundary=None, maxcount=None, interval=None):
         if calculationtype.lower() == 'current':
