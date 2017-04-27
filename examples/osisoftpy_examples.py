@@ -1,13 +1,13 @@
 import pprint
-import requests
-from requests.packages.urllib3.exceptions import InsecureRequestWarning
+# import requests
+
+# from requests.packages.urllib3.exceptions import InsecureRequestWarning
 
 from osisoftpy.api import API
-from osisoftpy.dataarchive import DataArchive, DataArchives
 
 # requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
-prettyprint = pprint.PrettyPrinter(indent=4)
+pp = pprint.PrettyPrinter(indent=4)
 
 dev = 'https://api.osisoft.dstcontrols.local/piwebapi/'
 prod = 'https://dev.dstcontrols.com/piwebapi/'
@@ -25,13 +25,28 @@ api = API(url=eecs, verifyssl=True, authtype='basic', username='albertxu',
           password='Welcome2pi')
 
 pi_server = api.get_data_archive_server('sbb03.eecs.berkeley.edu')
-prettyprint.pprint(pi_server.name)
-print(pi_server.name)
+
+# print(pi_server.name)
 
 query = 'name:sinusoid or name:cdt158'
 query = '*'
-points = api.get_points(query=query, count=600,
+query = 'name:sinusoid'
+
+points = api.get_points(query=query, count=8,
                         scope='pi:{}'.format(pi_server.name))
+
+for point in points:
+    pp.pprint(point)
+
+current_values = api.get_values(points=points, calculationtype='current')
+
+for point in current_values:
+    pp.pprint(point)
+    # print('The current value for {0} is {1} as of {2}'.format(
+    #     point.name,
+    #     point.values['current'].value,
+    #     point.values['current'].timestamp))
+
 #
 # pi_servers = api.get_pi_servers()
 #

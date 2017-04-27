@@ -9,8 +9,10 @@ import requests
 from requests.auth import HTTPBasicAuth
 from requests_kerberos import HTTPKerberosAuth, OPTIONAL
 
-from .dataarchive import DataArchive, DataArchives
-from .point import Point, Points
+from .collection import Collection
+from .dataarchive import DataArchive
+from .point import Point
+from .value import Value
 
 log = logging.getLogger(__name__)
 
@@ -105,7 +107,7 @@ class API(object):
             if len(data['Items']) > 0:
                 log.debug('HTTP %s - Instantiating OSIsoftPy.DataArchives()',
                           r.status_code)
-                servers = DataArchives(DataArchive)
+                servers = Collection(validtypes=DataArchive)
                 log.debug('Staging %s PI server(s) for instantiation...',
                           data['Items'].__len__().__str__())
                 for i in data['Items']:
@@ -155,7 +157,6 @@ class API(object):
                   'the following parameters: Query: "%s", Count: "%s". Payload: %s',
                   query, count, payload)
         r = self._session.get(self.url + 'search/query', params=payload)
-        log.debug(r)
         if r.status_code != requests.codes.ok:
             r.raise_for_status()
         else:
@@ -163,7 +164,7 @@ class API(object):
             if len(data['Items']) > 0:
                 log.debug('HTTP %s - Instantiating OSIsoftPy.Points()',
                           r.status_code)
-                points = Points(Point)
+                points = Collection(validtypes=Point)
                 log.debug('Staging %s PI point(s) for instantiation...',
                           data['Items'].__len__().__str__())
                 for i in data['Items']:
@@ -190,9 +191,9 @@ class API(object):
                         try:
                             log.warning('The PI Web API returned the '
                                         'following error while instantiating '
-                                             'PI points. '
-                                             'ErrorCode: {0}, Source: {1}, '
-                                             'Message {2}'.format(
+                                        'PI points. '
+                                        'ErrorCode: {0}, Source: {1}, '
+                                        'Message {2}'.format(
                                 error['ErrorCode'], error['Source'],
                                 error['Message']))
                         except Exception as e:
@@ -201,3 +202,44 @@ class API(object):
                                       'PI points!', exc_info=True)
 
                 return points
+
+    def get_values(self, points, calculationtype, start=None, end=None,
+                   boundary=None, maxcount=None, interval=None):
+        if calculationtype.lower() == 'current':
+            for point in points:
+                log.debug('Retrieving current value for %s...', point.name)
+                endpoint = '{0}streams/{1}/value'.format(self.url, point.webid)
+                r = self._session.get(endpoint)
+                if r.status_code != requests.codes.ok:
+                    r.raise_for_status()
+                else:
+                    data = r.json()
+                    log.debug('HTTP %s - Instantiating OSIsoftPy.Values()',
+                              r.status_code)
+                    log.debug('Staging PI point value for '
+                              'instantiation...')
+                    try:
+                        log.debug('Instantiating current value from %s for '
+                                  '%s as an OSIsoftPy.Value...',
+                                  data['Timestamp'], point.name)
+                        value = Value(calculationtype=calculationtype.lower(),
+                                      datatype=point.datatype,
+                                      timestamp=data['Timestamp'],
+                                      value=data['Value'],
+                                      unitsabbreviation=data[
+                                          'UnitsAbbreviation'],
+                                      good=data['Good'],
+                                      questionable=data['Questionable'],
+                                      substituted=data['Substituted'])
+                        point.values.append(value)
+                    except Exception as e:
+                        log.error('Exception while instantiating current value'
+                                  'from %s for %s. Raw JSON: %s',
+                                  data['Timestamp'], point.name, data,
+                                  exc_info=True)
+                    log.debug(
+                        'PI point value retrieval success! Current value '
+                        'from %s for %s was found and instantiated.',
+                        data['Timestamp'], point.name)
+
+            return points
