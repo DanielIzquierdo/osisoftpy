@@ -5,9 +5,10 @@ This module contains the base class for PI objects
 """
 
 import re
+
 import requests
 from requests.auth import HTTPBasicAuth
-from requests_kerberos import HTTPKerberosAuth, REQUIRED, OPTIONAL
+from requests_kerberos import HTTPKerberosAuth, OPTIONAL
 
 
 class _base(object):
@@ -38,7 +39,7 @@ class _base(object):
         r = self.__session.get(self._piWebApiDomain + '/piwebapi')
 
         if r.status_code != 200:
-            raise ValueError('Unable to connect to the PI Web API')
+            raise ValueError('Unable to connect to the PI Web PIWebAPI')
 
     def __domainNameCleanup(self, domainName):
         """cleans up the provided string"""

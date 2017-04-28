@@ -1,8 +1,5 @@
 from __future__ import print_function
 
-from requests.exceptions import ConnectionError, SSLError
-from requests.models import Response
-from requests.packages import urllib3
 from requests.sessions import Session
 
 

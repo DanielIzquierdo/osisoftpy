@@ -9,7 +9,7 @@ from osisoftpy._server import _server
 
 
 class client(_base):
-    """A client to interact with the PI Web API"""
+    """A client to interact with the PI Web PIWebAPI"""
 
     def __init__(self,
                  piWebApiDomain,

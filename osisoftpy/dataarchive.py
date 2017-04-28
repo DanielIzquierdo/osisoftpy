@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
-from __future__ import unicode_literals
 from __future__ import print_function
+from __future__ import unicode_literals
 
 
 class DataArchive(object):
@@ -15,7 +15,7 @@ class DataArchive(object):
         :param name: PI server name
         :type name: string
         :type serverversion: PI server version
-        :type webid: PI server webid for use with the PI Web API
+        :type webid: PI server webid for use with the PI Web PIWebAPI
         :type isconnected: PI server connection status
         :type id: PI server ID
 

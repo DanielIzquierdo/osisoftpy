@@ -3,14 +3,12 @@ osisoft_pi_webapi_python_client._server
 ~~~~~~~~~~~~~~~~~~~
 This module contains the PI Point class
 """
-from threading import Thread
-from time import sleep
 
-import rx
+from rx import Observable
+from rx.core import Scheduler
+
 from osisoftpy._base import _base
 from osisoftpy._point import _point
-from rx import Observable, Observer
-from rx.core import Scheduler
 
 
 class _server(_base):
@@ -128,7 +126,7 @@ class _server(_base):
             elif type(tag) is str:
                 tags.insert(-1, self.FindPIPoint(tag))
             else:
-                raise ValueError('Unable to connect to the PI Web API')
+                raise ValueError('Unable to connect to the PI Web PIWebAPI')
 
         return tags
 

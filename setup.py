@@ -7,7 +7,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='osisoftpy',
-    description='OSIsoft PI Web API client',
+    description='OSIsoft PI Web PIWebAPI client',
     version='1.2.0',
     url='https://gitlab.com/dstcontrols/pge-piclient-python',
     license='MIT',
