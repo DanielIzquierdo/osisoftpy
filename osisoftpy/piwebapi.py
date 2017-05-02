@@ -11,11 +11,74 @@ from requests_kerberos import HTTPKerberosAuth, OPTIONAL
 
 from .base import Base
 from .dataarchive import DataArchive
+from .exceptions import OSIsoftPyException
 from .point import Point
 from .structures import TypedList
 from .value import Value
 
 log = logging.getLogger(__name__)
+
+
+def get_endpoint(url=None, point=None, calculationtype=None):
+    # type: (str, osisoftpy.point.Point, str) -> osisoftpy.structures.TypedList
+
+    """
+
+    :param url: 
+    :param point: 
+    :param calculationtype: 
+    :return: 
+    """
+    endpoints = {'current': 'value', 'interpolated': 'interpolated',
+                 'recorded': 'recorded', 'plot': None, 'summary': None,
+                 'end': None, }
+
+    return '{}/streams/{}/{}'.format(url, point.webid,
+                                     endpoints.get(calculationtype))
+
+
+def parse_point_data(point=None, calculationtype=None, data=None):
+    # type: (osisoftpy.point.Point, str, str) -> osisoftpy.structures.TypedList()
+    """
+
+    :param point: 
+    :param calculationtype: 
+    :param data: 
+    :return: 
+    """
+    log.debug('Arguments: %s, %s, %s', point, calculationtype, data)
+    values = TypedList(Value)
+    if 'Items' in data:
+        log.debug('Instantiating multiple values for PI point %s...',
+                  point.name)
+        for item in data['Items']:
+            value = Value()
+            value.calculationtype = calculationtype
+            value.datatype = point.datatype
+            value.timestamp = item['Timestamp']
+            value.value = item['Value']
+            value.unitsabbreviation = item['UnitsAbbreviation']
+            value.good = item['Good']
+            value.questionable = item['Questionable']
+            value.substituted = item['Substituted']
+            values.append(value)
+    else:
+        log.debug('Instantiating single value from %s for %s...', data['Timestamp'], point.name)
+        value = Value()
+        value.calculationtype = calculationtype
+        value.datatype = point.datatype
+        value.timestamp = data['Timestamp']
+        value.value = data['Value']
+        value.unitsabbreviation = data['UnitsAbbreviation']
+        value.good = data['Good']
+        value.questionable = data['Questionable']
+        value.substituted = data['Substituted']
+        values.append(value)
+
+    log.debug('Value instantiation success - %s %s value(s) were '
+              'instantiated for %s!',
+              values.__len__().__str__(), calculationtype, point.name)
+    return values
 
 
 class PIWebAPI(Base):
@@ -26,7 +89,7 @@ class PIWebAPI(Base):
     TODO: document class parameters.
     """
 
-    def __init__(self, url='https://dev.dstcontrols.local/piwebapi/',
+    def __init__(self, url='https://dev.dstcontrols.local/piwebapi',
                  verifyssl=True, authtype='kerberos', username=None,
                  password=None):
         # type: (str, bool, str, Union[None, None, None, str], Union[None, None, None, str]) -> None
@@ -98,7 +161,7 @@ class PIWebAPI(Base):
         :return: 
         """
         log.debug('Retrieving all PI Data Archive servers from %s', self.url)
-        r = self.session.get(self.url + 'dataservers')
+        r = self.session.get(self.url + '/dataservers')
         if r.status_code == requests.codes.ok:
             data = r.json()
             if len(data['Items']) > 0:
@@ -128,8 +191,10 @@ class PIWebAPI(Base):
         r.raise_for_status()
 
     def get_data_archive_server(self, name):
+        # type: (str) -> OSIsoftPy.DataArchive
         """
 
+        :return: 
         :param name: 
         :return: 
         """
@@ -154,6 +219,7 @@ class PIWebAPI(Base):
                 'from %s', name, self.url, exc_info=True)
 
     def get_points(self, query, count=10, scope='*'):
+        # type: (str, int, str) -> osisoftpy.structures.TypedList
         """
 
         :param query: 
@@ -166,7 +232,7 @@ class PIWebAPI(Base):
             'Executing Query against PI Web PIWebAPI Indexed Search with '
             'the following parameters: Query: "%s", Count: "%s". Payload: %s',
             query, count, payload)
-        r = self.session.get(self.url + 'search/query', params=payload)
+        r = self.session.get(self.url + '/search/query', params=payload)
         if r.status_code != requests.codes.ok:
             r.raise_for_status()
         else:
@@ -217,58 +283,67 @@ class PIWebAPI(Base):
 
                 return points
 
-    def get_values(self, points, calculationtype, start=None, end=None,
-                   boundary=None, maxcount=None, interval=None):
+    def get_values(self, points, calculationtype=None, start=None, end=None,
+                   boundary=None, maxcount=None, interval=None, append=False,
+                   overwrite=False):
+        # type: (Point, str, str, str, str, int, float, bool, bool) -> osisoftpy.structures.TypedList
         """
 
         :param points: 
-        :param calculationtype: 
+        :param calctype: 
         :param start: 
         :param end: 
         :param boundary: 
         :param maxcount: 
         :param interval: 
+        :param append: 
+        :param overwrite: 
         :return: 
         """
-        # TODO: get_values() probably shouldn't return a sequence of Points if
-        # we're just providing a single Point object.
-        # TODO: param to toggle between append and overwrite TypedList(Value)
+        calctype = calculationtype.lower()
+        calctype_attribute = calctype + '_value'
 
-        if calculationtype.lower() == 'current':
-            for point in points:
-                log.debug('Retrieving current value for %s...', point.name)
-                endpoint = '{0}streams/{1}/value'.format(self.url, point.webid)
+        for point in points:
+            log.debug('Retrieving %s data for %s...', calctype, point.name)
+            endpoint = get_endpoint(self.url, point, calctype)
+            try:
                 r = self.session.get(endpoint)
                 if r.status_code != requests.codes.ok:
                     r.raise_for_status()
-                else:
-                    data = r.json()
-                    log.debug('HTTP %s - Instantiating OSIsoftPy.Values()',
-                              r.status_code)
-                    log.debug('Staging PI point value for '
-                              'instantiation...')
-                    try:
-                        log.debug('Instantiating current value from %s for '
-                                  '%s as an OSIsoftPy.Value...',
-                                  data['Timestamp'], point.name)
-                        value = Value(calculationtype=calculationtype.lower(),
-                                      datatype=point.datatype,
-                                      timestamp=data['Timestamp'],
-                                      value=data['Value'],
-                                      unitsabbreviation=data[
-                                          'UnitsAbbreviation'],
-                                      good=data['Good'],
-                                      questionable=data['Questionable'],
-                                      substituted=data['Substituted'])
-                        point.current_value = value
-                    except Exception as e:
-                        log.error('Exception while instantiating current value'
-                                  'from %s for %s. Raw JSON: %s',
-                                  data['Timestamp'], point.name, data,
-                                  exc_info=True)
-                    log.debug(
-                        'PI point value retrieval success! Current value '
-                        'from %s for %s was found and instantiated.',
-                        data['Timestamp'], point.name)
+            except OSIsoftPyException as e:
+                log.error('Exception while retrieving recorded values'
+                          'from %s for %s. Raw JSON: %s', endpoint, point.name,
+                          exc_info=True)
 
-            return points
+            data = r.json()
+            log.debug('HTTP %s - Instantiating OSIsoftPy.Values()',
+                      r.status_code)
+            log.debug('Staging PI point value for '
+                      'instantiation...')
+            try:
+                point_values = parse_point_data(point, calctype, data)
+            except OSIsoftPyException as e:
+                log.error('Exception while instantiating PI Point value(s)'
+                          'for %s. Raw JSON: %s', point.name, data,
+                          exc_info=True)
+            if calctype == 'current' or 'end':
+                if overwrite:
+                    setattr(point, calctype_attribute, point_values[0])
+                else:
+                    log.error('Error saving new point value - overwrite '
+                              'is set to False.')
+            else:
+                if overwrite:
+                    setattr(point, calctype_attribute, point_values)
+                elif append:
+                    current_values = getattr(point, calctype_attribute)
+                    for new_value in point_values:
+                        current_values.append(new_value)
+                    setattr(point, calctype_attribute, current_values)
+                else:
+                    # TODO: allow both to be false if no data exists.
+                    log.error('Error saving new point value(s) - both '
+                              'overwrite and append booleans are set to '
+                              'False.')
+
+        return points

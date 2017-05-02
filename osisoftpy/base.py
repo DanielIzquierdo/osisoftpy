@@ -9,15 +9,9 @@ log = logging.getLogger(__name__)
 
 
 class Base(object):
-    """
-    
-    """
 
     def __init__(self):
 
-        """
-
-        """
         msg = 'Classes which inherit osisoftpy.Base must implement __init__'
         log.error(msg, exc_info=True)
         raise NotImplementedError()

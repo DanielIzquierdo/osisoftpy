@@ -2,6 +2,8 @@
 
 import logging
 
+import colorlog
+
 # Set default logging handler to avoid "No handler found" warnings.
 try:  # Python 2.7+
     from logging import NullHandler
@@ -10,22 +12,30 @@ except ImportError:
         def emit(self, record):
             pass
 
-loglevel = logging.DEBUG
-logformat = '[%(filename)s:%(lineno)s - %(funcName)20s() ] %(levelname).1s %(message)s'
-
 # Configure logging
-log = logging.getLogger(__name__)
+loglevel = logging.DEBUG
+logformat = '%(log_color)s[%(filename)s:%(lineno)s - %(funcName)5s() ] %(' \
+            'levelname).1s %(message_log_color)s%(message)s'
+logcolors = {'DEBUG': 'cyan', 'INFO': 'green', 'WARNING': 'yellow',
+             'ERROR': 'red', 'CRITICAL': 'red,bg_white'}
+logmessagecolors = {
+    'message': {'DEBUG': 'white', 'INFO': 'white', 'WARNING': 'yellow',
+                'ERROR': 'red', 'CRITICAL': 'red'}}
 
+formatter = colorlog.ColoredFormatter(logformat, datefmt=None, reset=True,
+                                      log_colors=logcolors,
+                                      secondary_log_colors=logmessagecolors,
+                                      style='%')
 
-handler = logging.StreamHandler()
+handler = colorlog.StreamHandler()
 handler.setLevel(loglevel)
-handler.setFormatter(logging.Formatter(logformat))
+handler.setFormatter(formatter)
 
-log.setLevel(loglevel)
-log.addHandler(handler)
-log.addHandler(NullHandler())
+logger = colorlog.getLogger(__name__)
+logger.setLevel(loglevel)
+logger.addHandler(handler)
+logger.addHandler(NullHandler())
 
-# log.debug('debug message')
-# log.info('info message')
-# log.warn('warn message')
-
+# logger.debug('debug message')
+# logger.info('info message')
+# logger.warn('warn message')

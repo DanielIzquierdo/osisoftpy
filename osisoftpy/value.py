@@ -3,9 +3,11 @@
 from __future__ import print_function
 from __future__ import unicode_literals
 
+from .base import Base
 
-class Value(object):
-    """The Point class provides methods for the available PI points"""
+
+class Value(Base):
+    """The Value class provides methods for the available PI points"""
 
     def __init__(self, calculationtype=None, datatype=None, timestamp=None,
                  value=None,
@@ -24,41 +26,19 @@ class Value(object):
         :param substituted: 
         :rtype: None
         """
-        self._calculationtype = calculationtype
-        self._timestamp = timestamp
-        self._value = value
-        self._unitsabbreviation = unitsabbreviation
-        self._good = good
-        self._questionable = questionable
-        self._substituted = substituted
+        self.calculationtype = calculationtype
+        self.datatype = datatype
+        self.timestamp = timestamp
+        self.value = value
+        self.unitsabbreviation = unitsabbreviation
+        self.good = good
+        self.questionable = questionable
+        self.substituted = substituted
 
     def __repr__(self):
         representation = 'Point("{}", "{}", "{}", "{}", "{}", "{}", "{}")'
-        return representation.format(self._calculationtype, self._timestamp,
-                                     self._value, self._unitsabbreviation,
-                                     self._good, self._questionable,
-                                     self._substituted)
-
-    @property
-    def calculationtype(self): return self._calculationtype
-
-    @property
-    def datatype(self): return self._datatype
-
-    @property
-    def timestamp(self): return self._timestamp
-
-    @property
-    def value(self): return self._value
-
-    @property
-    def unitsabbreviation(self): return self._unitsabbreviation
-
-    @property
-    def good(self): return self._good
-
-    @property
-    def questionable(self): return self._questionable
-
-    @property
-    def substituted(self): return self._substituted
+        return representation.format(self.calculationtype,
+                                     self.datatype, self.timestamp,
+                                     self.value, self.unitsabbreviation,
+                                     self.good, self.questionable,
+                                     self.substituted)
