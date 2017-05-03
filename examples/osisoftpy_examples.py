@@ -13,7 +13,7 @@ sample_query.single_tag = 'name:sinusoid'
 sample_query.multi_tag = 'name:sinusoid or name:cdt158 or name:cd*'
 sample_query.partial_tag = 'name:sinusoid*'
 sample_query.wildcard = '*SPF_environment_sensor*'
-sample_query.calctypes = ['current', 'interpolated', 'recorded', 'plot']
+sample_query.calctypes = ['current', 'interpolated', 'recorded', 'plot', 'summary']
 
 # Basic authentication example:
 api = PIWebAPI(url=eecs, verifyssl=True, authtype='basic', username='albertxu',

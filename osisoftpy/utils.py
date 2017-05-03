@@ -118,6 +118,8 @@ def get_point_values(point, calculationtype, data):
             value = Value()
             value.calculationtype = calculationtype
             value.datatype = point.datatype
+            if 'Type' in item and 'Value' in item:
+                item = item['Value']
             value.timestamp = item['Timestamp']
             value.value = item['Value']
             value.unitsabbreviation = item['UnitsAbbreviation']
@@ -125,6 +127,7 @@ def get_point_values(point, calculationtype, data):
             value.questionable = item['Questionable']
             value.substituted = item['Substituted']
             values.append(value)
+
     else:
         log.debug('Instantiating single value from %s for %s...',
                   data['Timestamp'], point.name)
