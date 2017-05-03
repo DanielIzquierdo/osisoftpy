@@ -34,5 +34,3 @@ class Point(Base):
         self.plot_values = None
         self.summary_values = None
         self.end_value = None
-
-

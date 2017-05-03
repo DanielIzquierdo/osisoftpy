@@ -10,6 +10,7 @@ from requests.auth import HTTPBasicAuth
 from requests_kerberos import HTTPKerberosAuth, OPTIONAL
 
 from .base import Base
+from .utils import get_endpoint, get_point_values, get_attribute
 from .dataarchive import DataArchive
 from .exceptions import OSIsoftPyException
 from .point import Point
@@ -17,68 +18,6 @@ from .structures import TypedList
 from .value import Value
 
 log = logging.getLogger(__name__)
-
-
-def get_endpoint(url=None, point=None, calculationtype=None):
-    # type: (str, osisoftpy.point.Point, str) -> osisoftpy.structures.TypedList
-
-    """
-
-    :param url: 
-    :param point: 
-    :param calculationtype: 
-    :return: 
-    """
-    endpoints = {'current': 'value', 'interpolated': 'interpolated',
-                 'recorded': 'recorded', 'plot': None, 'summary': None,
-                 'end': None, }
-
-    return '{}/streams/{}/{}'.format(url, point.webid,
-                                     endpoints.get(calculationtype))
-
-
-def parse_point_data(point=None, calculationtype=None, data=None):
-    # type: (osisoftpy.point.Point, str, str) -> osisoftpy.structures.TypedList()
-    """
-
-    :param point: 
-    :param calculationtype: 
-    :param data: 
-    :return: 
-    """
-    log.debug('Arguments: %s, %s, %s', point, calculationtype, data)
-    values = TypedList(Value)
-    if 'Items' in data:
-        log.debug('Instantiating multiple values for PI point %s...',
-                  point.name)
-        for item in data['Items']:
-            value = Value()
-            value.calculationtype = calculationtype
-            value.datatype = point.datatype
-            value.timestamp = item['Timestamp']
-            value.value = item['Value']
-            value.unitsabbreviation = item['UnitsAbbreviation']
-            value.good = item['Good']
-            value.questionable = item['Questionable']
-            value.substituted = item['Substituted']
-            values.append(value)
-    else:
-        log.debug('Instantiating single value from %s for %s...', data['Timestamp'], point.name)
-        value = Value()
-        value.calculationtype = calculationtype
-        value.datatype = point.datatype
-        value.timestamp = data['Timestamp']
-        value.value = data['Value']
-        value.unitsabbreviation = data['UnitsAbbreviation']
-        value.good = data['Good']
-        value.questionable = data['Questionable']
-        value.substituted = data['Substituted']
-        values.append(value)
-
-    log.debug('Value instantiation success - %s %s value(s) were '
-              'instantiated for %s!',
-              values.__len__().__str__(), calculationtype, point.name)
-    return values
 
 
 class PIWebAPI(Base):
@@ -116,7 +55,7 @@ class PIWebAPI(Base):
         if self.test_connection():
             log.info('OSIsoftPy PIWebAPI instantiation success using %s '
                      'against %s', authtype, self.url)
-            self.dataservers = TypedList(DataArchive)
+            self.dataservers = TypedList(validtypes=DataArchive)
         else:
             log.error(
                 'OSIsoftPy PIWebAPI instantiatian failed using %s against '
@@ -238,8 +177,7 @@ class PIWebAPI(Base):
         else:
             data = r.json()
             if len(data['Items']) > 0:
-                log.debug('HTTP %s - Instantiating OSIsoftPy.Points()',
-                          r.status_code)
+                log.debug('HTTP %s - Instantiating PI points', r.status_code)
                 points = TypedList(validtypes=Point)
                 log.debug('Staging %s PI point(s) for instantiation...',
                           data['Items'].__len__().__str__())
@@ -301,7 +239,12 @@ class PIWebAPI(Base):
         :return: 
         """
         calctype = calculationtype.lower()
-        calctype_attribute = calctype + '_value'
+
+        is_single_value = True if calctype == 'current' or calctype == 'end' \
+            else False
+
+        log.debug('Calculation type: %s, Single value: %s', calctype,
+                  is_single_value)
 
         for point in points:
             log.debug('Retrieving %s data for %s...', calctype, point.name)
@@ -321,29 +264,61 @@ class PIWebAPI(Base):
             log.debug('Staging PI point value for '
                       'instantiation...')
             try:
-                point_values = parse_point_data(point, calctype, data)
+                new_values = get_point_values(point, calctype, data)
+                log.debug('%s %s value(s) were instantiated for %s.',
+                          new_values.__len__().__str__(), calctype,
+                          point.name)
             except OSIsoftPyException as e:
                 log.error('Exception while instantiating PI Point value(s)'
                           'for %s. Raw JSON: %s', point.name, data,
                           exc_info=True)
-            if calctype == 'current' or 'end':
-                if overwrite:
-                    setattr(point, calctype_attribute, point_values[0])
-                else:
-                    log.error('Error saving new point value - overwrite '
-                              'is set to False.')
-            else:
-                if overwrite:
-                    setattr(point, calctype_attribute, point_values)
-                elif append:
-                    current_values = getattr(point, calctype_attribute)
-                    for new_value in point_values:
-                        current_values.append(new_value)
-                    setattr(point, calctype_attribute, current_values)
-                else:
-                    # TODO: allow both to be false if no data exists.
-                    log.error('Error saving new point value(s) - both '
-                              'overwrite and append booleans are set to '
-                              'False.')
+            current_values = TypedList(validtypes=Value)
 
+            if is_single_value:
+                try:
+                    value = getattr(point, get_attribute(calctype))
+                    log.debug('Storing %s value.', calctype)
+                    current_values.append(value)
+                except TypeError as e:
+                    log.warning('TypeError encountered - the attribute %s is '
+                                'empty for %s, which will raise an '
+                                'exception when trying to iterate.',
+                                get_attribute(calctype), point.name,
+                                exc_info=False)
+            else:
+                try:
+                    for value in getattr(point, get_attribute(calctype)):
+                        log.debug('Storing %s value for PI point %s, attribute: %s',
+                                  calctype, point.name, get_attribute(calctype))
+                        current_values.append(value)
+                except TypeError as e:
+                    log.warning('TypeError encountered - the attribute %s is '
+                                'empty for %s, which will raise an '
+                                'exception when trying to iterate.',
+                                get_attribute(calctype), point.name,
+                                exc_info=False)
+
+            log.debug('PI point %s currently has %s %s values.', point.name,
+                      current_values.__len__().__str__(), calctype)
+
+            if is_single_value and overwrite:
+                log.debug('Single point value - overwriting existing %s '
+                          'value, Single value: %s.', calctype,
+                          is_single_value)
+                setattr(point, get_attribute(calctype), new_values[0])
+            elif not is_single_value and overwrite:
+                log.debug('Multiple point values - overwriting %s existing '
+                          '%s values, Single value: %s.',
+                          current_values.__len__().__str__(),
+                          calctype, is_single_value)
+                setattr(point, get_attribute(calctype), new_values)
+            elif not is_single_value and append:
+                for new_value in new_values:
+                    getattr(point, get_attribute(calctype)).append(new_value)
+            else:
+                # TODO: allow both to be false if no data exists.
+                log.error('Error saving %s new %s point value(s) for PI '
+                          'point %s. Single value: %s, Overwrite: %s, Append: '
+                          '%s.', new_values.__len__().__str__(), calctype,
+                          point.name, is_single_value, overwrite, append)
         return points

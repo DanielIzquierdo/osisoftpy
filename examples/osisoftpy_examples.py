@@ -1,3 +1,5 @@
+
+
 # -*- coding: utf-8 -*-
 
 from osisoftpy.piwebapi import PIWebAPI
@@ -22,12 +24,26 @@ pi_server = api.get_data_archive_server('sbb03.eecs.berkeley.edu')
 points = api.get_points(query=sample_query.single_tag, count=10,
                         scope='pi:{}'.format(pi_server.name))
 
+points = api.get_values(points=points, calculationtype='current',
+                        overwrite=True, )
+
 points = api.get_values(points=points, calculationtype='recorded',
                         overwrite=True, )
 
 for point in points:
-    print(point.name)
-    print(point.current_value)
+    print('1 current value was returned for {}'.format(point.name))
+    print('{} value at {}: {}'.format(point.name,
+                                       point.current_value.timestamp,
+                                      point.current_value.value))
+
+
+
+    print('{} {} value(s) were returned for {}'.format(
+        point.recorded_values.__len__().__str__(),
+                                                       point.recorded_values[0].calculationtype, point.name))
+    for value in point.recorded_values:
+        print('{} value at {}: {}'.format(point.name, value.timestamp,
+                                          value.value))
     # print(point.current_value.value)
 
     # kerberos authentication example:

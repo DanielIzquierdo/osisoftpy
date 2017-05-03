@@ -28,7 +28,8 @@ class TypedList(collections.MutableSequence):
 
     def validate_type(self, value):
         if not isinstance(value, self.validtypes):
-            raise TypeError(value)
+            raise TypeError('The object "{}" is not of type "{}"'.format(
+                value, self.validtypes))
 
     def __getitem__(self, key):
         return self.list[key]
