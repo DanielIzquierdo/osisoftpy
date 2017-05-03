@@ -16,9 +16,10 @@ class TypedList(collections.MutableSequence):
     """
 
     def __init__(self, validtypes, *args):
-        # type: (object, object) -> None
+        # type: (any, *str) -> None
         """
 
+        :rtype: list
         :param validtypes: Provide a type for this TypedList object
         :param args: 
         """

@@ -10,11 +10,23 @@ log = logging.getLogger(__name__)
 
 class Base(object):
 
+    """
+        This is the Base osisoftpy object which other objects inherit from.
+    """
+
     def __init__(self):
 
         msg = 'Classes which inherit osisoftpy.Base must implement __init__'
         log.error(msg, exc_info=True)
         raise NotImplementedError()
+
+    def __len__(self):
+        # type: () -> int
+        """
+
+        :return: Number of items in this object. Returns 1 for objects.
+        """
+        return 1
 
     #
     # def __getattr__(self, key):

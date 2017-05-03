@@ -40,3 +40,5 @@ class Value(Base):
                                      self.timestamp, self.value,
                                      self.unitsabbreviation, self.good,
                                      self.questionable, self.substituted)
+
+

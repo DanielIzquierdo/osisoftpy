@@ -6,34 +6,33 @@ from __future__ import unicode_literals
 import logging
 
 import requests
-from requests.auth import HTTPBasicAuth
-from requests_kerberos import HTTPKerberosAuth, OPTIONAL
 
 from .base import Base
-from .utils import get_endpoint, get_point_values, get_attribute
 from .dataarchive import DataArchive
 from .exceptions import OSIsoftPyException
 from .point import Point
 from .structures import TypedList
+from .utils import (get_endpoint, get_point_values, get_attribute,
+                    get_credentials, test_connectivity)
 from .value import Value
 
 log = logging.getLogger(__name__)
 
 
 class PIWebAPI(Base):
-    """Provide integration with the OSIsoft PI Web PIWebAPI.
-    
-    TODO: document class methods.
-    
-    TODO: document class parameters.
+    """Provide integration with the OSIsoft PI Web API.
+
     """
 
     def __init__(self, url='https://dev.dstcontrols.local/piwebapi',
                  verifyssl=True, authtype='kerberos', username=None,
                  password=None):
-        # type: (str, bool, str, Union[None, None, None, str], Union[None, None, None, str]) -> None
+        # type: (str, bool, str, str, str) -> None
 
+        """
 
+        :rtype: None
+        """
         log.info('Instantiating the OSIsoftPy PIWebAPI with the following '
                  'arguments: URL: %s, VerifySSL: %s, AuthType: %s, '
                  'Username: %s', url, verifyssl, authtype, username)
@@ -47,12 +46,11 @@ class PIWebAPI(Base):
 
         self.session = requests.Session()
         self.session.verify = verifyssl
-        self.session.auth = self.get_credentials(authtype=self.authtype,
-                                                 username=username,
-                                                 password=password)
-        # self.isconnected = self.test_connection()
+        self.session.auth = get_credentials(authtype=self.authtype,
+                                            username=username,
+                                            password=password)
 
-        if self.test_connection():
+        if test_connectivity(self.url, self.session):
             log.info('OSIsoftPy PIWebAPI instantiation success using %s '
                      'against %s', authtype, self.url)
             self.dataservers = TypedList(validtypes=DataArchive)
@@ -61,40 +59,8 @@ class PIWebAPI(Base):
                 'OSIsoftPy PIWebAPI instantiatian failed using %s against '
                 '%s', authtype, self.url, exc_info=True)
 
-    @staticmethod
-    def get_credentials(authtype, username, password):
-        """
-
-        :param authtype: 
-        :param username: 
-        :param password: 
-        :return: 
-        """
-        log.debug('Creating %s authentication object for Requests...',
-                  authtype)
-        if authtype.lower() == 'basic':
-            return HTTPBasicAuth(username, password)
-        elif authtype.lower() == 'kerberos':
-            return HTTPKerberosAuth(mutual_authentication=OPTIONAL)
-        else:
-            raise TypeError('Error: {0} is an invalid authentication type. '
-                            'Valid options are Basic and Kerberos.')
-
-    def test_connection(self):
-        """
-
-        :rtype: bool
-        """
-        log.debug('Testing connection to PI Web PIWebAPI...')
-        r = self.session.get(self.url)
-        if r.status_code == requests.codes.ok:
-            log.debug('PI Web PIWebAPI connection OK, returning True')
-            return True
-        log.debug('PI Web PIWebAPI connection error, Returning False')
-        r.raise_for_status()
-        return False
-
     def get_data_archive_servers(self):
+        # type: () -> osisoftpy.structures.TypedList[DataArchive]
         """
 
         :return: 
@@ -119,7 +85,7 @@ class PIWebAPI(Base):
                                              isconnected=i['IsConnected'],
                                              id=i['Id'])
                         servers.append(server)
-                    except Exception as e:
+                    except OSIsoftPyException as e:
                         log.error('Unable to retrieve server info for '
                                   '"%s"', i['Name'], exc_info=True)
                 log.debug('PI Data Archive server retrieval success! %s PI '
@@ -158,7 +124,7 @@ class PIWebAPI(Base):
                 'from %s', name, self.url, exc_info=True)
 
     def get_points(self, query, count=10, scope='*'):
-        # type: (str, int, str) -> osisoftpy.structures.TypedList
+        # type: (str, int, str) -> osisoftpy.structures.TypedList[Point]
         """
 
         :param query: 
@@ -224,11 +190,14 @@ class PIWebAPI(Base):
     def get_values(self, points, calculationtype=None, start=None, end=None,
                    boundary=None, maxcount=None, interval=None, append=False,
                    overwrite=False):
-        # type: (Point, str, str, str, str, int, float, bool, bool) -> osisoftpy.structures.TypedList
+        # type: (osisoftpy.structures.TypedList[Point], str, str, str, str,
+        # int, str, bool, bool) -> osisoftpy.structures.TypedList[Value]
+
         """
 
+        :rtype: osisoftpy.structures.TypedList[Point]
         :param points: 
-        :param calctype: 
+        :param calculationtype: 
         :param start: 
         :param end: 
         :param boundary: 
@@ -266,8 +235,7 @@ class PIWebAPI(Base):
             try:
                 new_values = get_point_values(point, calctype, data)
                 log.debug('%s %s value(s) were instantiated for %s.',
-                          new_values.__len__().__str__(), calctype,
-                          point.name)
+                          new_values.__len__().__str__(), calctype, point.name)
             except OSIsoftPyException as e:
                 log.error('Exception while instantiating PI Point value(s)'
                           'for %s. Raw JSON: %s', point.name, data,
@@ -288,8 +256,9 @@ class PIWebAPI(Base):
             else:
                 try:
                     for value in getattr(point, get_attribute(calctype)):
-                        log.debug('Storing %s value for PI point %s, attribute: %s',
-                                  calctype, point.name, get_attribute(calctype))
+                        log.debug(
+                            'Storing %s value for PI point %s, attribute: %s',
+                            calctype, point.name, get_attribute(calctype))
                         current_values.append(value)
                 except TypeError as e:
                     log.warning('TypeError encountered - the attribute %s is '
@@ -309,8 +278,8 @@ class PIWebAPI(Base):
             elif not is_single_value and overwrite:
                 log.debug('Multiple point values - overwriting %s existing '
                           '%s values, Single value: %s.',
-                          current_values.__len__().__str__(),
-                          calctype, is_single_value)
+                          current_values.__len__().__str__(), calctype,
+                          is_single_value)
                 setattr(point, get_attribute(calctype), new_values)
             elif not is_single_value and append:
                 for new_value in new_values:
