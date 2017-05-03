@@ -16,7 +16,7 @@ setup(
         'nose',
         'requests',
         'requests-kerberos',
-        'rx', 'colorlog'
+        'rx', 'colorlog', 'six', 'arrow'
     ],
     # packages=['OSIsoftPy'],
     packages=find_packages(),

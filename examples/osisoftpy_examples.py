@@ -1,8 +1,14 @@
 # -*- coding: utf-8 -*-
 
-from pprint import pprint
+import arrow
+
 from osisoftpy.piwebapi import PIWebAPI
 from osisoftpy.utils import get_attribute, get_count
+
+# Friendly US datetime format:
+human_datetime_format = 'YYYY-MM-DD HH:mm:ss ZZ'
+iso8601_datetime_format = 'YYYY-MM-DDTHH:mm:ss.SSSSSSSZ'
+#                          2017-05-01T20:59:44.6226961Z
 
 dev = 'https://api.osisoft.dstcontrols.local/piwebapi/'
 prod = 'https://dev.dstcontrols.com/piwebapi/'
@@ -14,8 +20,8 @@ sample_query.single_tag = 'name:sinusoid'
 sample_query.multi_tag = 'name:sinusoid or name:cdt158 or name:cd*'
 sample_query.partial_tag = 'name:sinusoid*'
 sample_query.wildcard = '*SPF_environment_sensor*'
-sample_query.calctypes = ['current', 'interpolated', 'recorded', 'plot',
-                          'summary']
+sample_query.calctypes = ['current', 'interpolated', 'interpolatedattimes',
+                          'recorded', 'recordedattime', 'plot', 'summary']
 
 # Basic authentication example:
 api = PIWebAPI(url=eecs, verifyssl=True, authtype='basic', username='albertxu',
@@ -28,10 +34,11 @@ pi_server = api.get_data_archive_server('sbb03.eecs.berkeley.edu')
 points = api.get_points(query=sample_query.single_tag, count=100,
                         scope='pi:{}'.format(pi_server.name))
 
+lastmonth = arrow.utcnow().replace(months=-1).datetime
 # gets data for the provided PI point objects
 for calctype in sample_query.calctypes:
     points = api.get_values(points=points, calculationtype=calctype,
-                            overwrite=True)
+                            time=lastmonth, overwrite=False, append=True)
 
 # This is just a simple object to track how many total values are returned
 # across all points and calculation types which are requested.
@@ -47,7 +54,9 @@ setattr(totalizer, 'tags', 0)
 
 for point in points:
     totalizer.tags += 1
-    for calctype in sample_query.calctypes:
+
+    for calctype in [x for x in sample_query.calctypes if
+                     not x.endswith(('attimes', 'attime'))]:
 
         values = getattr(point, get_attribute(calctype))
 

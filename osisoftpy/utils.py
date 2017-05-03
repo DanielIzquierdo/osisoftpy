@@ -11,10 +11,13 @@ from __future__ import print_function
 from __future__ import unicode_literals
 
 import logging
+import re
 
+import arrow
 import requests
 from requests.auth import HTTPBasicAuth
 from requests_kerberos import HTTPKerberosAuth, OPTIONAL
+from six import string_types
 
 from .point import Point
 from .structures import TypedList
@@ -43,7 +46,7 @@ def get_credentials(authtype, username, password):
 
 
 def test_connectivity(url, session):
-    # type: (str, requests.Session) -> bool
+    # type: (string_types, requests.Session) -> bool
 
     """
 
@@ -62,7 +65,7 @@ def test_connectivity(url, session):
 
 
 def get_endpoint(url, point, calculationtype):
-    # type: (str, Point, str) -> unicode
+    # type: (string_types, Point, string_types) -> string_types
     """
 
     :type url: str
@@ -72,8 +75,9 @@ def get_endpoint(url, point, calculationtype):
     :return: URL
     """
     endpoints = {'current': 'value', 'interpolated': 'interpolated',
-                 'recorded': 'recorded', 'plot': 'plot', 'summary': 'summary',
-                 'end': 'end', }
+                 'interpolatedattimes': 'interpolatedattimes',
+                 'recorded': 'recorded', 'recordedattime': 'recordedattime',
+                 'plot': 'plot', 'summary': 'summary', 'end': 'end', }
     return '{}/streams/{}/{}'.format(url, point.webid,
                                      endpoints.get(calculationtype))
 
@@ -87,7 +91,9 @@ def get_attribute(calculationtype):
     """
     attributes = dict(current='current_value',
                       interpolated='interpolated_values',
-                      recorded='recorded_values', plot='plot_values',
+                      interpolatedattimes='interpolated_values',
+                      recorded='recorded_values',
+                      recordedattime='recorded_values', plot='plot_values',
                       summary='summary_values', end='end_value')
 
     return attributes.get(calculationtype)
@@ -106,6 +112,22 @@ def get_count(obj):
         return 1 if obj is not None else 0
 
 
+def iterfy(iterable):
+    # type: (any) -> list
+    """
+
+    :param iterable: 
+    :return: 
+    """
+    if isinstance(iterable, string_types):
+        iterable = [iterable]
+    try:
+        iter(iterable)
+    except TypeError:
+        iterable = [iterable]
+    return iterable
+
+
 def get_point_values(point, calculationtype, data):
     # type: (Point, str, str) -> TypedList[Point]
     """
@@ -115,6 +137,8 @@ def get_point_values(point, calculationtype, data):
     :param data: 
     :return: 
     """
+    calculationtype = re.sub('attimes?$', '', calculationtype)
+
     values = TypedList(Value)
     if 'Items' in data:
         log.debug('Instantiating multiple values for PI point %s...',
@@ -125,7 +149,7 @@ def get_point_values(point, calculationtype, data):
             value.datatype = point.datatype
             if 'Type' in item and 'Value' in item:
                 item = item['Value']
-            value.timestamp = item['Timestamp']
+            value.timestamp = arrow.get(item['Timestamp']).datetime
             value.value = item['Value']
             value.unitsabbreviation = item['UnitsAbbreviation']
             value.good = item['Good']
@@ -139,7 +163,7 @@ def get_point_values(point, calculationtype, data):
         value = Value()
         value.calculationtype = calculationtype
         value.datatype = point.datatype
-        value.timestamp = data['Timestamp']
+        value.timestamp = arrow.get(data['Timestamp']).datetime
         value.value = data['Value']
         value.unitsabbreviation = data['UnitsAbbreviation']
         value.good = data['Good']

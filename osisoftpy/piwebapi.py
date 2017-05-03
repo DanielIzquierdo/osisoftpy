@@ -12,8 +12,8 @@ from .dataarchive import DataArchive
 from .exceptions import OSIsoftPyException
 from .point import Point
 from .structures import TypedList
-from .utils import (get_endpoint, get_point_values, get_attribute,
-                    get_credentials, test_connectivity, get_count)
+from .utils import get_attribute, get_count, get_credentials, get_endpoint, \
+    get_point_values, iterfy, test_connectivity
 from .value import Value
 
 log = logging.getLogger(__name__)
@@ -185,25 +185,23 @@ class PIWebAPI(Base):
 
                 return points
 
-    def get_values(self, points, calculationtype=None, start=None, end=None,
-                   boundary=None, maxcount=None, interval=None, append=False,
-                   overwrite=False):
-        # type: (TypedList, str, str, str, str, int, float, bool, bool) -> TypedList
-
-        """
-
-        :rtype: osisoftpy.structures.TypedList[Point]
-        :param points: 
-        :param calculationtype: 
-        :param start: 
-        :param end: 
-        :param boundary: 
-        :param maxcount: 
-        :param interval: 
-        :param append: 
-        :param overwrite: 
-        :return: 
-        """
+    def get_values(self, points, calculationtype=None, starttime='*-1d',
+                   endtime='*', boundary=None, boundarytype=None,
+                   maxcount='1000', desiredunits=None, interval=None,
+                   intervals='24', retrievalmode='Auto', summarytype='Total',
+                   calculationbasis='TimeWeighted', timetype='Auto',
+                   summaryduration=None, sampletype='ExpressionRecordedValues',
+                   sampleinterval=None, time=None, filterexpression=None,
+                   includefilteredvalues=False, sortorder='Ascending',
+                   append=False, overwrite=False):
+        # starttime is Time String
+        # endtime is Time String
+        # interval is AFTimeSpan
+        # desiredUnits is a uom, cannot be specified for PI points
+        # fiterexpression is filtering like * or SINU*
+        # includefilteredvalues bool: Specify 'true' to indicate that values which fail the filter criteria are present in the returned data at the times where they occurred with a value set to a 'Filtered' enumeration value with bad status. Repeated consecutive failures are omitted.
+        # sortorder default is 'Ascending'
+        # summaryDuration The duration of each summary interval. If specified in hours, minutes, seconds, or milliseconds, the summary durations will be evenly spaced UTC time intervals. Longer interval types are interpreted using wall clock rules and are time zone dependent.
         # TODO: add starttime parameter
         # TODO: add endtime parameter
         # TODO: add boundary parameter
@@ -216,12 +214,54 @@ class PIWebAPI(Base):
         log.debug('Calculation type: %s, Single value: %s', calctype,
                   is_single_value)
 
-        for point in points:
+        for point in iterfy(points):
             log.debug('Retrieving %s data for %s...', calctype, point.name)
+
+            if calctype == 'current':
+                payload = {'time': time}
+            elif calctype == 'interpolated':
+                payload = {'startTime': starttime, 'endTime': endtime,
+                           'interval': interval,
+                           'filterExpression': filterexpression,
+                           'includeFilteredValues': includefilteredvalues}
+            elif calctype == 'interpolatedattimes':
+                payload = {'time': time, 'filterExpression': filterexpression,
+                           'includeFilteredValues': includefilteredvalues,
+                           'sortOrder': sortorder}
+            elif calctype == 'recorded':
+                payload = {'startTime': starttime, 'endTime': endtime,
+                           'boundaryType': boundarytype,
+                           'filterExpression': filterexpression,
+                           'includeFilteredValues': includefilteredvalues,
+                           'maxCount': maxcount}
+            elif calctype == 'recordedattime':
+                payload = {'time': time, 'retrievalMode': retrievalmode}
+            elif calctype == 'plot':
+                payload = {'startTime': starttime, 'endTime': endtime,
+                           'intervals': intervals}
+            elif calctype == 'summary':
+                payload = {'startTime': starttime, 'endTime': endtime,
+                           'summaryType': summarytype,
+                           'calculationBasis': calculationbasis,
+                           'timeType': timetype,
+                           'summaryDuration': summaryduration,
+                           'sampleType': sampletype,
+                           'sampleInterval': sampleinterval,
+                           'filterExpression': filterexpression}
+            elif calctype == 'end':
+                payload = {}
+            else:
+                log.debug('This %s request has no URL parameters', calctype)
+
             endpoint = get_endpoint(self.url, point, calctype)
+
             # TODO: add queryParamater generator function here?
             try:
-                r = self.session.get(endpoint)
+                log.debug('Instantiating %s request for PI point %s to '
+                          'endpoint %s with the following parameters: %s',
+                          calctype, point.name, endpoint, payload)
+
+                r = self.session.get(endpoint, params=payload)
                 if r.status_code != requests.codes.ok:
                     r.raise_for_status()
             except OSIsoftPyException as e:
@@ -277,6 +317,12 @@ class PIWebAPI(Base):
                           'value, Single value: %s.', calctype,
                           is_single_value)
                 setattr(point, get_attribute(calctype), new_values[0])
+            elif is_single_value and append:
+                log.debug('Single point value - append is true but cannot '
+                          'append...overwriting existing %s '
+                          'value, Single value: %s.', calctype,
+                          is_single_value)
+                setattr(point, get_attribute(calctype), new_values[0])
             elif not is_single_value and overwrite:
                 log.debug('Multiple point values - overwriting %s existing '
                           '%s values, Single value: %s.',
@@ -284,7 +330,8 @@ class PIWebAPI(Base):
                 setattr(point, get_attribute(calctype), new_values)
             elif not is_single_value and append:
                 for new_value in new_values:
-                    getattr(point, get_attribute(calctype)).append(new_value)
+                    current_values.append(new_value)
+                setattr(point, get_attribute(calctype), current_values)
             else:
                 # TODO: allow both to be false if no data exists.
                 log.error('Error saving %s new %s point value(s) for PI '
