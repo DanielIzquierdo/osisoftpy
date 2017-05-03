@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
 
-
-
 """
 osisoftpy.utils
 ~~~~~~~~~~~~~~
@@ -26,6 +24,7 @@ log = logging.getLogger(__name__)
 
 
 def get_credentials(authtype, username, password):
+    # type: (str, str, str) -> requests.auth.HTTPBasicAuth
     """
 
     :param authtype: 
@@ -61,25 +60,31 @@ def test_connectivity(url, session):
     r.raise_for_status()
     return False
 
+
 def get_endpoint(url, point, calculationtype):
-    # type: (str, Point, str) -> TypedList[Point]
+    # type: (str, Point, str) -> unicode
     """
 
     :type url: str
     :param url: 
     :param point: 
     :param calculationtype: 
-    :return: 
+    :return: URL
     """
     endpoints = {'current': 'value', 'interpolated': 'interpolated',
                  'recorded': 'recorded', 'plot': 'plot', 'summary': 'summary',
                  'end': 'end', }
-
     return '{}/streams/{}/{}'.format(url, point.webid,
                                      endpoints.get(calculationtype))
 
 
 def get_attribute(calculationtype):
+    # type: (str) -> str
+    """
+
+    :param calculationtype: 
+    :return: 
+    """
     attributes = dict(current='current_value',
                       interpolated='interpolated_values',
                       recorded='recorded_values', plot='plot_values',
@@ -96,7 +101,7 @@ def get_count(obj):
     :return: int
     """
     try:
-        return obj.__len__().__str__()
+        return obj.__len__()
     except TypeError:
         return 1 if obj is not None else 0
 
@@ -143,6 +148,6 @@ def get_point_values(point, calculationtype, data):
         values.append(value)
 
     log.debug('Value instantiation success - %s %s value(s) were '
-              'instantiated for %s!', values.__len__().__str__(),
-              calculationtype, point.name)
+              'instantiated for %s!', get_count(values), calculationtype,
+              point.name)
     return values

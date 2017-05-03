@@ -34,11 +34,11 @@ class Value(Base):
         self.questionable = questionable
         self.substituted = substituted
 
-    def __repr__(self):
-        representation = 'Point("{}", "{}", "{}", "{}", "{}", "{}", "{}", "{}"'
-        return representation.format(self.calculationtype, self.datatype,
-                                     self.timestamp, self.value,
-                                     self.unitsabbreviation, self.good,
-                                     self.questionable, self.substituted)
+    # def __repr__(self):
+    #     representation = 'Point("{}", "{}", "{}", "{}", "{}", "{}", "{}", "{}"'
+    #     return representation.format(self.calculationtype, self.datatype,
+    #                                  self.timestamp, self.value,
+    #                                  self.unitsabbreviation, self.good,
+    #                                  self.questionable, self.substituted)
 
 

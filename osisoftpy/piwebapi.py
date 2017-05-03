@@ -13,7 +13,7 @@ from .exceptions import OSIsoftPyException
 from .point import Point
 from .structures import TypedList
 from .utils import (get_endpoint, get_point_values, get_attribute,
-                    get_credentials, test_connectivity)
+                    get_credentials, test_connectivity, get_count)
 from .value import Value
 
 log = logging.getLogger(__name__)
@@ -74,7 +74,7 @@ class PIWebAPI(Base):
                           r.status_code)
                 servers = TypedList(validtypes=DataArchive)
                 log.debug('Staging %s PI server(s) for instantiation...',
-                          data['Items'].__len__().__str__())
+                          get_count(data['Items']))
                 for i in data['Items']:
                     try:
                         log.debug('Instantiating "%s" as '
@@ -90,8 +90,7 @@ class PIWebAPI(Base):
                                   '"%s"', i['Name'], exc_info=True)
                 log.debug('PI Data Archive server retrieval success! %s PI '
                           'server(s) were '
-                          'found and instantiated.',
-                          servers.__len__().__str__())
+                          'found and instantiated.', get_count(servers))
                 return servers
         r.raise_for_status()
 
@@ -146,7 +145,7 @@ class PIWebAPI(Base):
                 log.debug('HTTP %s - Instantiating PI points', r.status_code)
                 points = TypedList(validtypes=Point)
                 log.debug('Staging %s PI point(s) for instantiation...',
-                          data['Items'].__len__().__str__())
+                          get_count(data['Items']))
                 for i in data['Items']:
                     try:
                         log.debug('Instantiating "%s" as OSIsoftPy.Point...',
@@ -167,8 +166,7 @@ class PIWebAPI(Base):
                                   exc_info=True)
                 log.debug('PI Point retrieval success! %s PI '
                           'point(s) were '
-                          'found and instantiated.',
-                          points.__len__().__str__())
+                          'found and instantiated.', get_count(points))
 
                 if len(data['Errors']) != 0:
                     for error in data['Errors']:
@@ -190,8 +188,7 @@ class PIWebAPI(Base):
     def get_values(self, points, calculationtype=None, start=None, end=None,
                    boundary=None, maxcount=None, interval=None, append=False,
                    overwrite=False):
-        # type: (osisoftpy.structures.TypedList[Point], str, str, str, str,
-        # int, str, bool, bool) -> osisoftpy.structures.TypedList[Value]
+        # type: (TypedList, str, str, str, str, int, float, bool, bool) -> TypedList
 
         """
 
@@ -207,6 +204,10 @@ class PIWebAPI(Base):
         :param overwrite: 
         :return: 
         """
+        # TODO: add starttime parameter
+        # TODO: add endtime parameter
+        # TODO: add boundary parameter
+        # TODO: add interval parameter
         calctype = calculationtype.lower()
 
         is_single_value = True if calctype == 'current' or calctype == 'end' \
@@ -218,6 +219,7 @@ class PIWebAPI(Base):
         for point in points:
             log.debug('Retrieving %s data for %s...', calctype, point.name)
             endpoint = get_endpoint(self.url, point, calctype)
+            # TODO: add queryParamater generator function here?
             try:
                 r = self.session.get(endpoint)
                 if r.status_code != requests.codes.ok:
@@ -235,7 +237,7 @@ class PIWebAPI(Base):
             try:
                 new_values = get_point_values(point, calctype, data)
                 log.debug('%s %s value(s) were instantiated for %s.',
-                          new_values.__len__().__str__(), calctype, point.name)
+                          get_count(new_values), calctype, point.name)
             except OSIsoftPyException as e:
                 log.error('Exception while instantiating PI Point value(s)'
                           'for %s. Raw JSON: %s', point.name, data,
@@ -268,7 +270,7 @@ class PIWebAPI(Base):
                                 exc_info=False)
 
             log.debug('PI point %s currently has %s %s values.', point.name,
-                      current_values.__len__().__str__(), calctype)
+                      get_count(current_values), calctype)
 
             if is_single_value and overwrite:
                 log.debug('Single point value - overwriting existing %s '
@@ -278,8 +280,7 @@ class PIWebAPI(Base):
             elif not is_single_value and overwrite:
                 log.debug('Multiple point values - overwriting %s existing '
                           '%s values, Single value: %s.',
-                          current_values.__len__().__str__(), calctype,
-                          is_single_value)
+                          get_count(current_values), calctype, is_single_value)
                 setattr(point, get_attribute(calctype), new_values)
             elif not is_single_value and append:
                 for new_value in new_values:
@@ -288,6 +289,6 @@ class PIWebAPI(Base):
                 # TODO: allow both to be false if no data exists.
                 log.error('Error saving %s new %s point value(s) for PI '
                           'point %s. Single value: %s, Overwrite: %s, Append: '
-                          '%s.', new_values.__len__().__str__(), calctype,
-                          point.name, is_single_value, overwrite, append)
+                          '%s.', get_count(new_values), calctype, point.name,
+                          is_single_value, overwrite, append)
         return points
