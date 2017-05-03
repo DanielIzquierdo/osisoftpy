@@ -11,5 +11,8 @@ pip install dist/osisoft_pi_webapi_python_client-1.2.0-py2.py3-none-any.whl --fo
 # install bdist_wheel
 pip install dist/osisoft_pi_webapi_python_client-1.1.0-py2.py3-none-any.whl
 
+# build docs
+sphinx-build -b html docs/source docs/build
+
 # run tests
 nosetests --rednose
