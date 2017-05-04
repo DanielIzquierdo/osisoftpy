@@ -20,7 +20,7 @@ Some blah blah about what this file is for...
 """
 import logging
 from six import iteritems
-from .utils import stringify_kwargs
+from .utils import star, stringify_kwargs
 
 log = logging.getLogger(__name__)
 
@@ -32,7 +32,7 @@ def create_object(factory, dict_):
     :param dict_: 
     :return: 
     """
-    kwargs = dict(map(lambda (k, v): (k.lower(), v), iteritems(dict_)))
+    kwargs = dict(map(star(lambda k, v: (k.lower(), v)), iteritems(dict_)))
     point = factory.create(**kwargs)
     return point
 
