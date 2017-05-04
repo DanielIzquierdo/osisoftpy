@@ -2,7 +2,7 @@
 
 import arrow
 
-from osisoftpy.piwebapi import PIWebAPI
+from osisoftpy.webapi import WebAPI
 from osisoftpy.utils import get_attribute, get_count
 
 # Friendly US datetime format:
@@ -17,8 +17,8 @@ webid = 'E06p4VDYuL1Ua-zPLKSAbL4ADGzt6vtB5RGAvwBQVpk9KwLkNSMTEuQklNRy5EQ19CUkFOQ
 eecs = 'https://sbb03.eecs.berkeley.edu/piwebapi/'
 
 # Basic authentication example:
-api = PIWebAPI(url=eecs, verifyssl=True, authtype='basic', username='albertxu',
-               password='Welcome2pi')
+api = WebAPI(url=eecs, verifyssl=True, authtype='basic', username='albertxu',
+             password='Welcome2pi')
 
 # returns a PI Data Archive server object
 pi_server = api.get_data_archive_server('sbb03.eecs.berkeley.edu')

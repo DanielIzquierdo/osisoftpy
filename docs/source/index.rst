@@ -12,7 +12,7 @@ Welcome to osisoftpy's documentation!
 
 .. automodule:: osisoftpy.piwebapi
 
-.. autoclass:: PIWebAPI
+.. autoclass:: WebAPI
     :members:
 
 

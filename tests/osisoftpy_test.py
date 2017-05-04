@@ -14,7 +14,25 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 """
-osisoftpy.api
+osisoftpy.tests.osisoftpy_test.py
 ~~~~~~~~~~~~
-This module implements the OSIsoftPy API.
+Some blah blah about what this file is for...
 """
+import pytest
+
+
+def add_one(x):
+    return x + 1
+
+
+def test_four_add_one():
+    assert add_one(4) == 5
+
+
+def raise_system_exit():
+    raise SystemExit(1)
+
+
+def test_raise_system_exit():
+    with pytest.raises(SystemExit):
+        raise_system_exit()

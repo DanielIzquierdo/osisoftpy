@@ -14,7 +14,7 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 """
-osisoftpy.api
+osisoftpy.__init__.py
 ~~~~~~~~~~~~
-This module implements the OSIsoftPy API.
+Some blah blah about what this file is for...
 """

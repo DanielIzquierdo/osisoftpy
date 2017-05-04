@@ -63,12 +63,12 @@ def test_connectivity(url, session):
     :param session: Requests session object
     :return: Boolean to indicate connectivity state
     """
-    log.debug('Testing connection to PI Web PIWebAPI...')
+    log.debug('Testing connection to PI Web WebAPI...')
     r = session.get(url)
     if r.status_code == requests.codes.ok:
-        log.debug('PI Web PIWebAPI connection OK, returning True')
+        log.debug('PI Web WebAPI connection OK, returning True')
         return True
-    log.debug('PI Web PIWebAPI connection error, Returning False')
+    log.debug('PI Web WebAPI connection error, Returning False')
     r.raise_for_status()
     return False
 

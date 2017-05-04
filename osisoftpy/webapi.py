@@ -21,7 +21,7 @@ from .value import Value
 log = logging.getLogger(__name__)
 
 
-class PIWebAPI(Base):
+class WebAPI(Base):
     """Provide integration with the OSIsoft PI Web API.
 
     """
@@ -35,7 +35,7 @@ class PIWebAPI(Base):
 
         :rtype: None
         """
-        log.info('Instantiating the OSIsoftPy PIWebAPI with the following '
+        log.info('Instantiating the OSIsoftPy WebAPI with the following '
                  'arguments: URL: %s, VerifySSL: %s, AuthType: %s, '
                  'Username: %s', url, verifyssl, authtype, username)
 
@@ -53,12 +53,12 @@ class PIWebAPI(Base):
                                             password=password)
 
         if test_connectivity(self.url, self.session):
-            log.info('OSIsoftPy PIWebAPI instantiation success using %s '
+            log.info('OSIsoftPy WebAPI instantiation success using %s '
                      'against %s', authtype, self.url)
             self.dataservers = TypedList(validtypes=DataArchive)
         else:
             log.error(
-                'OSIsoftPy PIWebAPI instantiatian failed using %s against '
+                'OSIsoftPy WebAPI instantiatian failed using %s against '
                 '%s', authtype, self.url, exc_info=True)
 
     def get_data_archive_servers(self):
@@ -137,7 +137,7 @@ class PIWebAPI(Base):
         """
         payload = {'q': query, 'count': count, 'scope': scope}
         log.debug(
-            'Executing Query against PI Web PIWebAPI Indexed Search with '
+            'Executing Query against PI Web WebAPI Indexed Search with '
             'the following parameters: Query: "%s", Count: "%s". Payload: %s',
             query, count, payload)
         r = self.session.get(self.url + '/search/query', params=payload)
@@ -160,7 +160,7 @@ class PIWebAPI(Base):
             if len(data['Errors']) != 0:
                 for error in data['Errors']:
                     try:
-                        log.warning('The PI Web PIWebAPI returned the '
+                        log.warning('The PI Web WebAPI returned the '
                                     'following error while instantiating '
                                     'PI points. '
                                     'ErrorCode: {0}, Source: {1}, '

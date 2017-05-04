@@ -22,7 +22,7 @@ Examples of how to use the osisoftpy package.
 
 import arrow
 
-from osisoftpy.piwebapi import PIWebAPI
+from osisoftpy.webapi import WebAPI
 from osisoftpy.utils import get_attribute, get_count
 
 # Friendly US datetime format:
@@ -45,8 +45,8 @@ sample_query.calctypes = ['current', 'interpolated', 'interpolatedattimes',
                           'recorded', 'recordedattime', 'plot', 'summary']
 
 # Basic authentication example:
-api = PIWebAPI(url=eecs, verifyssl=True, authtype='basic', username='albertxu',
-               password='Welcome2pi')
+api = WebAPI(url=eecs, verifyssl=True, authtype='basic', username='albertxu',
+             password='Welcome2pi')
 
 # returns a PI Data Archive server object
 pi_server = api.get_data_archive_server('sbb03.eecs.berkeley.edu')
