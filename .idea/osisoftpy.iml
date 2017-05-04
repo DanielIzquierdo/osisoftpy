@@ -2,7 +2,7 @@
 <module type="JAVA_MODULE" version="4">
   <component name="FacetManager">
     <facet type="Python" name="Python">
-      <configuration sdkName="Python 2.7.13 (/usr/local/bin/python2.7)" />
+      <configuration sdkName="" />
     </facet>
   </component>
   <component name="NewModuleRootManager" inherit-compiler-output="true">
@@ -11,9 +11,8 @@
       <sourceFolder url="file://$MODULE_DIR$/tests" isTestSource="true" />
       <sourceFolder url="file://$MODULE_DIR$/osisoftpy" isTestSource="false" />
     </content>
-    <orderEntry type="inheritedJdk" />
+    <orderEntry type="jdk" jdkName="Python 3.6.1 virtualenv at ~/Projects/dst/osisoftpy/env" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="library" name="Python 2.7.13 (/usr/local/bin/python2.7) interpreter library" level="application" />
   </component>
   <component name="PackageRequirementsSettings">
     <option name="requirementsPath" value="" />
