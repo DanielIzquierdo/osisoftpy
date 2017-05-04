@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/pge-piclient-python.iml" filepath="$PROJECT_DIR$/.idea/pge-piclient-python.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/osisoftpy.iml" filepath="$PROJECT_DIR$/.idea/osisoftpy.iml" />
     </modules>
   </component>
 </project>

@@ -6,10 +6,12 @@ from __future__ import unicode_literals
 import logging
 
 import requests
+from six import iterlists
 
 from .base import Base
 from .dataarchive import DataArchive
 from .exceptions import OSIsoftPyException
+from .factory import Factory, create_object
 from .point import Point
 from .structures import TypedList
 from .utils import get_attribute, get_count, get_credentials, get_endpoint, \
@@ -72,6 +74,7 @@ class PIWebAPI(Base):
             if len(data['Items']) > 0:
                 log.debug('HTTP %s - Instantiating OSIsoftPy.DataArchives()',
                           r.status_code)
+                factory = Factory(DataArchive)
                 servers = TypedList(validtypes=DataArchive)
                 log.debug('Staging %s PI server(s) for instantiation...',
                           get_count(data['Items']))
@@ -79,11 +82,12 @@ class PIWebAPI(Base):
                     try:
                         log.debug('Instantiating "%s" as '
                                   'OSIsoftPy.DataArchive...', i['Name'])
-                        server = DataArchive(name=i['Name'],
-                                             serverversion=i['ServerVersion'],
-                                             webid=i['WebId'],
-                                             isconnected=i['IsConnected'],
-                                             id=i['Id'])
+                        server = factory.create(name=i['Name'],
+                                                serverversion=i[
+                                                    'ServerVersion'],
+                                                webid=i['WebId'],
+                                                isconnected=i['IsConnected'],
+                                                id=i['Id'])
                         servers.append(server)
                     except OSIsoftPyException as e:
                         log.error('Unable to retrieve server info for '
@@ -141,49 +145,34 @@ class PIWebAPI(Base):
             r.raise_for_status()
         else:
             data = r.json()
-            if len(data['Items']) > 0:
-                log.debug('HTTP %s - Instantiating PI points', r.status_code)
-                points = TypedList(validtypes=Point)
-                log.debug('Staging %s PI point(s) for instantiation...',
-                          get_count(data['Items']))
-                for i in data['Items']:
+            log.debug('HTTP %s - Instantiating %s PI points', r.status_code,
+                      get_count(data.get('Items', None)))
+            factory = Factory(Point)
+            items = list(map(lambda x: create_object(factory, x),
+                             data.get('Items', None)))
+            points = TypedList(Point)
+            for point in items:
+                points.append(point)
+            log.debug('PI Point retrieval success! %s PI '
+                      'point(s) were '
+                      'found and instantiated.', get_count(points))
+
+            if len(data['Errors']) != 0:
+                for error in data['Errors']:
                     try:
-                        log.debug('Instantiating "%s" as OSIsoftPy.Point...',
-                                  i['Name'])
-                        point = Point()
-                        point.name = i['Name']
-                        if 'description' in i:
-                            point.description = i['description']
-                        point.uniqueid = i['UniqueID']
-                        point.webid = i['WebID']
-                        point.datatype = i['DataType']
-
-                        points.append(point)
+                        log.warning('The PI Web PIWebAPI returned the '
+                                    'following error while instantiating '
+                                    'PI points. '
+                                    'ErrorCode: {0}, Source: {1}, '
+                                    'Message {2}'.format(
+                            error['ErrorCode'], error['Source'],
+                            error['Message']))
                     except Exception as e:
-                        log.error('Exception while instantiating PI '
-                                  'point for '
-                                  '"%s". Raw JSON: %s', i['Name'], i,
-                                  exc_info=True)
-                log.debug('PI Point retrieval success! %s PI '
-                          'point(s) were '
-                          'found and instantiated.', get_count(points))
+                        log.error('Exception encounted while '
+                                  'instantiating '
+                                  'PI points!', exc_info=True)
 
-                if len(data['Errors']) != 0:
-                    for error in data['Errors']:
-                        try:
-                            log.warning('The PI Web PIWebAPI returned the '
-                                        'following error while instantiating '
-                                        'PI points. '
-                                        'ErrorCode: {0}, Source: {1}, '
-                                        'Message {2}'.format(
-                                error['ErrorCode'], error['Source'],
-                                error['Message']))
-                        except Exception as e:
-                            log.error('Exception encounted while '
-                                      'instantiating '
-                                      'PI points!', exc_info=True)
-
-                return points
+            return points
 
     def get_values(self, points, calculationtype=None, starttime='*-1d',
                    endtime='*', boundary=None, boundarytype=None,

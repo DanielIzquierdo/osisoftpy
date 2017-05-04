@@ -1,0 +1,3 @@
+<component name="DependencyValidationManager">
+  <scope name="osisoftpy" pattern="file[osisoftpy]:osisoftpy//*||file[osisoftpy]:tests//*||file:setup.py" />
+</component>

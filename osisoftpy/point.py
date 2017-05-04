@@ -1,37 +1,51 @@
 # -*- coding: utf-8 -*-
 
-from __future__ import print_function
-from __future__ import unicode_literals
-
+#    Copyright 2017 DST Controls
+#
+#    Licensed under the Apache License, Version 2.0 (the "License");
+#    you may not use this file except in compliance with the License.
+#    You may obtain a copy of the License at
+#
+#    http://www.apache.org/licenses/LICENSE-2.0
+#
+#    Unless required by applicable law or agreed to in writing, software
+#    distributed under the License is distributed on an "AS IS" BASIS,
+#    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#    See the License for the specific language governing permissions and
+#    limitations under the License.
+"""This module contains the class definition for the Point class, 
+which represents a PI System Point it's described by the PI Web API."""
 
 from .base import Base
 
 
 class Point(Base):
-    """The Point class provides methods for the available PI points"""
+    """An :class:`OSIsoftPy <osisoftpy.dataarchive.Point>` object.
+    
+    Representation of a PI System Point as described by the PI Web API. 
+    
+    :param name: Point name
+    :param description: Description for the PI Point
+    :param webid: Unique GUID for the Point created by the PI Web API
+    :param uniqueid: Unique GUID for the Point created by the PI System
+    :param datatype: PI Point datatype
+    
+    :return: :class:`OSIsoftPy <osisoftpy.dataarchive.Point>` object
+    :rtype: osisoftpy.dataarchive.Point
+    """
+    valid_attr = set(['name', 'description', 'uniqueid', 'webid', 'datatype'])
 
-    def __init__(self, name=None, description=None, uniqueid=None, webid=None,
-                 datatype=None):
-        # type: (str, str, str, str, str) -> object
-
-        """
-
-        :rtype: Point object
-        :param name: 
-        :param description: 
-        :param uniqueid: 
-        :param webid: 
-        :param datatype: 
-        """
-
-        self.name = name
-        self.description = description
-        self.uniqueid = uniqueid
-        self.webid = webid
-        self.datatype = datatype
+    def __init__(self, **kwargs):
+        keys = Point.get_valid_attr()
+        self.__dict__.update((k, False) for k in keys)
+        self.__dict__.update((k, v) for k, v in kwargs.items() if k in keys)
         self.current_value = None
         self.interpolated_values = None
         self.recorded_values = None
         self.plot_values = None
         self.summary_values = None
         self.end_value = None
+
+    @classmethod
+    def get_valid_attr(cls):
+        return cls.valid_attr

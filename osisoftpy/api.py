@@ -14,30 +14,10 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 """
-osisoftpy.base
+osisoftpy.api
 ~~~~~~~~~~~~
-This module contains the Base class from which the interesting osisoftpy 
-classes are derived, such as the WebAPI, DataArchive, AssetFramework, Point, 
-and Value classes.
+This module implements the OSIsoftPy API.
 """
 
-from __future__ import print_function
-from __future__ import unicode_literals
+from .factory import DataArchiveFactory
 
-import logging
-
-log = logging.getLogger(__name__)
-
-
-class Base(object):
-    """
-        This is the Base osisoftpy object which other objects inherit from.
-    """
-
-    def __len__(self):
-        # type: () -> int
-        """
-
-        :return: Number of items in this object. Returns 1 for objects.
-        """
-        return 1

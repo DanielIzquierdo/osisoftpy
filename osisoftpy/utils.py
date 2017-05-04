@@ -26,6 +26,15 @@ from .value import Value
 log = logging.getLogger(__name__)
 
 
+def stringify_kwargs(**kwargs):
+    """
+    Return a concatenated string of the keys and values of the kwargs
+    :param kwargs: kwargs to be combined into a single string
+    :return: String representation of the kwargs
+    """
+    return(','.join('{0}={1!r}'.format(k,v) for k,v in kwargs.items()))
+
+
 def get_credentials(authtype, username, password):
     # type: (str, str, str) -> requests.auth.HTTPBasicAuth
     """
@@ -126,7 +135,6 @@ def iterfy(iterable):
     except TypeError:
         iterable = [iterable]
     return iterable
-
 
 def get_point_values(point, calculationtype, data):
     # type: (Point, str, str) -> TypedList[Point]
