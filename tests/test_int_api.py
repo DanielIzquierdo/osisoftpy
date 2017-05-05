@@ -29,41 +29,41 @@ params = utils.params
 
 def test_get_webapi_without_url():
     with pytest.raises(TypeError) as e:
-        osisoftpy.json()
+        osisoftpy.getjson()
     e.match('url')
 
 
 def test_get_webapi_with_invalid_url():
     with pytest.raises(requests.exceptions.MissingSchema) as e:
-        osisoftpy.json('foobar')
+        osisoftpy.getjson('foobar')
     e.match('Invalid URL')
 
 
 def test_get_webapi_with_valid_url_no_credentials():
-    r = osisoftpy.json(params.url)
+    r = osisoftpy.getjson(params.url)
     assert r.status_code == requests.codes.unauthorized
 
 
 def test_get_webapi_valid_url_basic_missing_credentials():
-    r = osisoftpy.json(params.url, authtype=params.authtype)
+    r = osisoftpy.getjson(params.url, authtype=params.authtype)
     assert r.status_code == requests.codes.unauthorized
 
 
 def test_get_webapi_valid_url_basic_missing_password():
-    r = osisoftpy.json(params.url, authtype=params.authtype,
-                       username=params.username)
+    r = osisoftpy.getjson(params.url, authtype=params.authtype,
+                          username=params.username)
     assert r.status_code == requests.codes.unauthorized
 
 
 def test_get_webapi_valid_url_basic_missing_username():
-    r = osisoftpy.json(params.url, authtype=params.authtype,
-                       password=params.password)
+    r = osisoftpy.getjson(params.url, authtype=params.authtype,
+                          password=params.password)
     assert r.status_code == requests.codes.unauthorized
 
 
 def test_get_webapi_valid_url_basic_valid_credentials():
-    r = osisoftpy.json(params.url, authtype=params.authtype,
-                       username=params.username,
-                       password=params.password)
+    r = osisoftpy.getjson(params.url, authtype=params.authtype,
+                          username=params.username,
+                          password=params.password)
     assert r.status_code == requests.codes.ok
     assert r.json().get('Links').get('Self').startswith(params.url)

@@ -19,6 +19,8 @@ osisoftpy.tests.test_int_api.py
 Some blah blah about what this file is for...
 """
 
+from requests.sessions import Session
+import pytest
 import osisoftpy
 from osisoftpy.webapi import PIWebAPI
 from . import utils
@@ -26,16 +28,44 @@ from . import utils
 params = utils.params
 
 
-def test_get_webapi_returns_PIWebAPI_object():
-    webapi = osisoftpy.webapi(params.url, authtype=params.authtype,
-                              username=params.username,
-                              password=params.password)
+def _get_webapi():
+    return osisoftpy.webapi(params.url,
+                            authtype=params.authtype,
+                            username=params.username,
+                            password=params.password)
+
+
+def test_get_piwebapi_object():
+    webapi = _get_webapi()
     assert type(webapi) == PIWebAPI
 
 
-def test_PIWebAPI_for_self_url():
-    webapi = osisoftpy.webapi(params.url, authtype=params.authtype,
-                              username=params.username,
-                              password=params.password)
+def test_piwebapi_has_session():
+    webapi = _get_webapi()
     print(', '.join("%s: %s" % item for item in vars(webapi).items()))
-    assert webapi.url == params.url + '/'
+    assert type(webapi.session) == Session
+
+
+def test_piwebapi_has_links():
+    webapi = _get_webapi()
+    print(', '.join("%s: %s" % item for item in vars(webapi).items()))
+    assert type(webapi.links) == dict
+
+
+def test_piwebapi_has_self_url():
+    webapi = _get_webapi()
+    assert webapi.links.get('Self') == params.url + '/'
+
+
+def test_piwebapi_has_search_url():
+    webapi = _get_webapi()
+    assert webapi.links.get('Search') == params.url + '/search'
+
+
+def test_piwebapi_has_search_method():
+    webapi = _get_webapi()
+    with pytest.raises(NotImplementedError) as e:
+        webapi.get_valid_attr()
+        print(webapi.search())
+
+

@@ -25,17 +25,18 @@ from .utils import stringify_kwargs
 log = logging.getLogger(__name__)
 
 
-def create_thing(factory, dict_):
+def create_thing(factory, dict_, session):
     """
     Return an object created with factory
     :param factory: 
     :param dict_: 
+    :param session: 
     :return: 
     """
     kwargs = dict(map(lambda k_v: (k_v[0].lower().replace('self', 'url'), k_v[1]), iteritems(dict_)))
+    kwargs.update({'session': session})
     thing = factory.create(**kwargs)
-    log.debug(thing)
-    print(type(thing))
+    log.debug('Created %s', thing)
     return thing
 
 
