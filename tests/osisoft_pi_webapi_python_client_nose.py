@@ -14,7 +14,7 @@ from osisoft_pi_webapi_python_client.client import client
 
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
-# test parameters
+# params parameters
 useBasic = False
 testBasicAuth = False
 testKerberosAuth = True
@@ -79,7 +79,7 @@ def test_piclient_unknown_auth():
 
 
 def test_piclient_basic_auth():
-    # test basic authenticationType
+    # params basic authenticationType
     if not testBasicAuth:
         return
     piclient = client(
@@ -92,7 +92,7 @@ def test_piclient_basic_auth():
 
 
 def test_piclient_kerberos_auth():
-    # test kerberos authentication
+    # params kerberos authentication
     if not testKerberosAuth:
         return
     piclient = client(
@@ -177,7 +177,7 @@ def test_pipoint_current():
 
 
 def test_pipoint_recorded():
-    # test the pi point recorded values
+    # params the pi point recorded values
     values = helper_fetch_point1().RecordedValues(maxCount=10)
     assert values
     assert len(values) == 10
@@ -186,7 +186,7 @@ def test_pipoint_recorded():
 
 
 def test_pipoint_recorded2():
-    # test the pi point recorded values
+    # params the pi point recorded values
     values = helper_fetch_point1().RecordedValues(maxCount=100)
     assert values
     assert len(values) == 100
@@ -195,7 +195,7 @@ def test_pipoint_recorded2():
 
 
 def test_pipoint_interpolated():
-    # test the pi point interpolated values
+    # params the pi point interpolated values
     values = helper_fetch_point1().InterpolatedValues()
     assert values
     assert len(values) == 25
@@ -204,7 +204,7 @@ def test_pipoint_interpolated():
 
 
 def test_pipoint_interpolated2():
-    # test the pi point interpolated values
+    # params the pi point interpolated values
     values = helper_fetch_point1().InterpolatedValues(interval='30m')
     assert values
     assert len(values) == 49
@@ -276,7 +276,7 @@ def test_piserver_bulk_interpolated2():
 
 
 def test_datapipe_single_subscription():
-    # test data pipe
+    # params data pipe
     if not testDataPipe:
         return
 
@@ -303,7 +303,7 @@ def test_datapipe_single_subscription():
 
 
 def test_datapipe_multiple_subscriptions():
-    # test data pipe with multiple subscriptions
+    # params data pipe with multiple subscriptions
     if not testDataPipe:
         return
 
@@ -335,7 +335,7 @@ def test_datapipe_multiple_subscriptions():
 
 
 def test_datapipe_multiple_subscriptions2():
-    # test data pipe with multiple subscriptions, test that scheduler stops
+    # params data pipe with multiple subscriptions, params that scheduler stops
     # after disconnect
     if not testDataPipe:
         return

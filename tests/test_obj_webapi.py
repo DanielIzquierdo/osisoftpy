@@ -18,28 +18,24 @@ osisoftpy.tests.test_int_api.py
 ~~~~~~~~~~~~
 Some blah blah about what this file is for...
 """
-import pytest
-import requests
 
 import osisoftpy
 from osisoftpy.webapi import PIWebAPI
+from . import utils
 
-test = type('Test', (object,), {})()
-test.url = 'https://sbb03.eecs.berkeley.edu/piwebapi'
-test.authtype = 'basic'
-test.username = 'albertxu'
-test.password = 'Welcome2pi'
+params = utils.params
 
 
 def test_get_webapi_returns_PIWebAPI_object():
-    webapi = osisoftpy.webapi(test.url, authtype=test.authtype,
-                              username=test.username,
-                              password=test.password)
+    webapi = osisoftpy.webapi(params.url, authtype=params.authtype,
+                              username=params.username,
+                              password=params.password)
     assert type(webapi) == PIWebAPI
 
+
 def test_PIWebAPI_for_self_url():
-    webapi = osisoftpy.webapi(test.url, authtype=test.authtype,
-                              username=test.username,
-                              password=test.password)
+    webapi = osisoftpy.webapi(params.url, authtype=params.authtype,
+                              username=params.username,
+                              password=params.password)
     print(', '.join("%s: %s" % item for item in vars(webapi).items()))
-    assert webapi.url == test.url + '/'
+    assert webapi.url == params.url + '/'
