@@ -35,7 +35,9 @@ def get_result(url, session=None, **kwargs):
             s.auth = s.auth or _get_auth(kwargs.get('authtype', None),
                                        kwargs.get('username', None),
                                        kwargs.get('password', None))
-            return s.get(url), s
+            r = s.get(url, params=kwargs.get('params', None)), s
+            log.debug(r[0].json())
+            return r
     except Exception as e:
         raise e
 

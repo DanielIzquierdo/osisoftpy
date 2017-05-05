@@ -38,6 +38,10 @@ class PIWebAPI(Base):
         r = get_result(self.links.get('Search'), self.session,  **kwargs)
         return r[0]
 
+    def query(self, **kwargs):
+        r = get_result(self.links.get('Search') + '/query', self.session,  **kwargs)
+        return r[0]
+
 
 
 class WebAPI(Base):
