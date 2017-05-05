@@ -66,7 +66,7 @@ def _get_auth(authtype, username=None, password=None):
 def _get_webapi(url, **kwargs):
     r = _get_result(url, **kwargs)
     factory = Factory(PIWebAPI)
-    return create_thing(factory, r.json())
+    return create_thing(factory, r.json().get('Links', None))
 
 
 def _get_json(url, **kwargs):

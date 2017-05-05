@@ -21,7 +21,7 @@ log = logging.getLogger(__name__)
 
 
 class PIWebAPI(Base):
-    valid_attr = set(['links'])
+    valid_attr = set(['url', 'assetservers', 'dataservers', 'search', 'system'])
 
     def __init__(self, **kwargs):
         keys = PIWebAPI.get_valid_attr()

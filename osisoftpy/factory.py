@@ -32,7 +32,7 @@ def create_thing(factory, dict_):
     :param dict_: 
     :return: 
     """
-    kwargs = dict(map(lambda k_v: (k_v[0].lower(), k_v[1]), iteritems(dict_)))
+    kwargs = dict(map(lambda k_v: (k_v[0].lower().replace('self', 'url'), k_v[1]), iteritems(dict_)))
     thing = factory.create(**kwargs)
     log.debug(thing)
     print(type(thing))
