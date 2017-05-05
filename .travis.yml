@@ -10,4 +10,4 @@ python:
 install:
   - pip install -q -e .
 script:
-  - pytest
+  - py.test
