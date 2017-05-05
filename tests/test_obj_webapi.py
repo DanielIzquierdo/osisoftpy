@@ -19,8 +19,10 @@ osisoftpy.tests.test_int_api.py
 Some blah blah about what this file is for...
 """
 
-from requests.sessions import Session
 import pytest
+import requests
+from requests.sessions import Session
+
 import osisoftpy
 from osisoftpy.webapi import PIWebAPI
 from . import utils
@@ -61,11 +63,9 @@ def test_piwebapi_has_search_url():
     webapi = _get_webapi()
     assert webapi.links.get('Search') == params.url + '/search'
 
-
-def test_piwebapi_has_search_method():
+def test_piwebapi_get_search():
     webapi = _get_webapi()
-    with pytest.raises(NotImplementedError) as e:
-        webapi.get_valid_attr()
-        print(webapi.search())
-
-
+    r = webapi.search()
+    assert r.status_code == requests.codes.ok
+    assert r.json().get('Links').get('Self').startswith(
+        webapi.links.get('Search'))

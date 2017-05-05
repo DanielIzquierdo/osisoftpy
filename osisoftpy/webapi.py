@@ -15,7 +15,7 @@ from .factory import Factory, create_thing
 from .point import Point
 from .structures import TypedList
 from .utils import get_attribute, get_count, get_credentials, get_endpoint, \
-    get_point_values, iterfy, test_connectivity, stringify_kwargs
+    get_point_values, iterfy, test_connectivity, stringify_kwargs, get_result
 from .value import Value
 
 log = logging.getLogger(__name__)
@@ -34,8 +34,10 @@ class PIWebAPI(Base):
     def get_valid_attr(cls):
         return cls.valid_attr
 
-    def search(self):
-        raise NotImplementedError
+    def search(self, **kwargs):
+        r = get_result(self.links.get('Search'), self.session,  **kwargs)
+        return r[0]
+
 
 
 class WebAPI(Base):

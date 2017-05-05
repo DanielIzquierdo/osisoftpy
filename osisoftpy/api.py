@@ -20,9 +20,7 @@ This module implements the OSIsoftPy API.
 """
 import logging
 
-import requests
-import requests_kerberos
-
+from .utils import get_result
 from .factory import Factory, create_thing
 from .webapi import PIWebAPI
 
@@ -44,7 +42,7 @@ def response(url, **kwargs):
 
 
 def _get_webapi(url, **kwargs):
-    r = _get_result(url, **kwargs)
+    r = get_result(url, **kwargs)
     json = r[0].json()
     session = r[1]
     factory = Factory(PIWebAPI)
@@ -52,26 +50,5 @@ def _get_webapi(url, **kwargs):
 
 
 def _get_response(url, **kwargs):
-    r = _get_result(url, **kwargs)
+    r = get_result(url, **kwargs)
     return r[0]
-
-
-def _get_result(url, session=None, **kwargs):
-    try:
-        s = session or requests.session()
-        with s:
-            s.verify = kwargs.get('verifyssl', True)
-            s.auth = _get_auth(kwargs.get('authtype', None),
-                               kwargs.get('username', None),
-                               kwargs.get('password', None))
-            return s.get(url), s
-    except Exception as e:
-        raise e
-
-
-def _get_auth(authtype, username=None, password=None):
-    if authtype == 'kerberos':
-        return requests_kerberos.HTTPKerberosAuth(
-            mutual_authentication=requests_kerberos.OPTIONAL)
-    else:
-        return requests.auth.HTTPBasicAuth(username, password)

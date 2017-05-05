@@ -15,8 +15,7 @@ import re
 
 import arrow
 import requests
-from requests.auth import HTTPBasicAuth
-from requests_kerberos import HTTPKerberosAuth, OPTIONAL
+import requests_kerberos
 from six import string_types
 
 from .point import Point
@@ -24,6 +23,29 @@ from .structures import TypedList
 from .value import Value
 
 log = logging.getLogger(__name__)
+
+
+def get_result(url, session=None, **kwargs):
+    try:
+        s = session or requests.session()
+        log.debug(s)
+        with s:
+            s.verify = kwargs.get('verifyssl', True)
+            log.debug(s.auth)
+            s.auth = s.auth or _get_auth(kwargs.get('authtype', None),
+                                       kwargs.get('username', None),
+                                       kwargs.get('password', None))
+            return s.get(url), s
+    except Exception as e:
+        raise e
+
+
+def _get_auth(authtype, username=None, password=None):
+    if authtype == 'kerberos':
+        return requests_kerberos.HTTPKerberosAuth(
+            mutual_authentication=requests_kerberos.OPTIONAL)
+    else:
+        return requests.auth.HTTPBasicAuth(username, password)
 
 
 def stringify_kwargs(**kwargs):
