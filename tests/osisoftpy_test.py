@@ -19,20 +19,79 @@ osisoftpy.tests.osisoftpy_test.py
 Some blah blah about what this file is for...
 """
 import pytest
+import requests
+
+import osisoftpy
+from osisoftpy.webapi import PIWebAPI
+
+test = type('Test', (object,), {})()
+test.url = 'https://sbb03.eecs.berkeley.edu/piwebapi'
+test.authtype = 'basic'
+test.username = 'albertxu'
+test.password = 'Welcome2pi'
 
 
 def add_one(x):
     return x + 1
 
 
-def test_four_add_one():
-    assert add_one(4) == 5
-
-
 def raise_system_exit():
     raise SystemExit(1)
+
+
+def test_four_add_one():
+    assert add_one(4) == 5
 
 
 def test_raise_system_exit():
     with pytest.raises(SystemExit):
         raise_system_exit()
+
+
+def test_get_webapi_without_url():
+    with pytest.raises(TypeError) as e:
+        osisoftpy.json()
+    e.match('url')
+
+
+def test_get_webapi_with_invalid_url():
+    with pytest.raises(requests.exceptions.MissingSchema) as e:
+        osisoftpy.json('foobar')
+    e.match('Invalid URL')
+
+
+def test_get_webapi_with_valid_url_no_credentials():
+    r = osisoftpy.json(test.url)
+    assert r.status_code == requests.codes.unauthorized
+
+
+def test_get_webapi_valid_url_basic_missing_credentials():
+    r = osisoftpy.json(test.url, authtype=test.authtype)
+    assert r.status_code == requests.codes.unauthorized
+
+
+def test_get_webapi_valid_url_basic_missing_password():
+    r = osisoftpy.json(test.url, authtype=test.authtype,
+                         username=test.username)
+    assert r.status_code == requests.codes.unauthorized
+
+
+def test_get_webapi_valid_url_basic_missing_username():
+    r = osisoftpy.json(test.url, authtype=test.authtype,
+                         password=test.password)
+    assert r.status_code == requests.codes.unauthorized
+
+
+def test_get_webapi_valid_url_basic_valid_credentials():
+    r = osisoftpy.json(test.url, authtype=test.authtype,
+                         username=test.username,
+                         password=test.password)
+    assert r.status_code == requests.codes.ok
+    assert r.json().get('Links').get('Self').startswith(test.url)
+
+
+def test_get_webapi_returns_PIWebAPI_object():
+    webapi = osisoftpy.webapi(test.url, authtype=test.authtype,
+                              username=test.username,
+                              password=test.password)
+    assert type(webapi) == PIWebAPI

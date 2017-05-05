@@ -20,21 +20,23 @@ Some blah blah about what this file is for...
 """
 import logging
 from six import iteritems
-from .utils import star, stringify_kwargs
+from .utils import stringify_kwargs
 
 log = logging.getLogger(__name__)
 
 
-def create_object(factory, dict_):
+def create_thing(factory, dict_):
     """
     Return an object created with factory
     :param factory: 
     :param dict_: 
     :return: 
     """
-    kwargs = dict(map(star(lambda k, v: (k.lower(), v)), iteritems(dict_)))
-    point = factory.create(**kwargs)
-    return point
+    kwargs = dict(map(lambda k_v: (k_v[0].lower(), k_v[1]), iteritems(dict_)))
+    thing = factory.create(**kwargs)
+    log.debug(thing)
+    print(type(thing))
+    return thing
 
 
 class Factory(object):

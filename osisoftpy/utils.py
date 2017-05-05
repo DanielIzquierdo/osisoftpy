@@ -26,18 +26,10 @@ from .value import Value
 log = logging.getLogger(__name__)
 
 
-def star(f):
-    """
-    Hack to unpack a tuple under python3
-    :param f: 
-    :return: 
-    """
-    return lambda args: f(*args)
-
-
 def stringify_kwargs(**kwargs):
     """
     Return a concatenated string of the keys and values of the kwargs
+    Source: http://stackoverflow.com/a/39623935
     :param kwargs: kwargs to be combined into a single string
     :return: String representation of the kwargs
     """

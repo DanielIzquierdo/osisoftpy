@@ -6,12 +6,11 @@ from __future__ import unicode_literals
 import logging
 
 import requests
-from six import iterlists
 
 from .base import Base
 from .dataarchive import DataArchive
 from .exceptions import OSIsoftPyException
-from .factory import Factory, create_object
+from .factory import Factory, create_thing
 from .point import Point
 from .structures import TypedList
 from .utils import get_attribute, get_count, get_credentials, get_endpoint, \
@@ -19,6 +18,22 @@ from .utils import get_attribute, get_count, get_credentials, get_endpoint, \
 from .value import Value
 
 log = logging.getLogger(__name__)
+
+
+class PIWebAPI(Base):
+    valid_attr = set(['links'])
+
+    def __init__(self, **kwargs):
+        keys = PIWebAPI.get_valid_attr()
+        self.__dict__.update((k, False) for k in keys)
+        self.__dict__.update((k, v) for k, v in kwargs.items() if k in keys)
+
+    @classmethod
+    def get_valid_attr(cls):
+        return cls.valid_attr
+
+    def search(self):
+        raise NotImplementedError
 
 
 class WebAPI(Base):
@@ -148,7 +163,7 @@ class WebAPI(Base):
             log.debug('HTTP %s - Instantiating %s PI points', r.status_code,
                       get_count(data.get('Items', None)))
             factory = Factory(Point)
-            items = list(map(lambda x: create_object(factory, x),
+            items = list(map(lambda x: create_thing(factory, x),
                              data.get('Items', None)))
             points = TypedList(Point)
             for point in items:

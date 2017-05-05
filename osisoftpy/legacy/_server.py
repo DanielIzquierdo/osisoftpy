@@ -126,7 +126,7 @@ class _server(_base):
             elif type(tag) is str:
                 tags.insert(-1, self.FindPIPoint(tag))
             else:
-                raise ValueError('Unable to connect to the PI Web WebAPI')
+                raise ValueError('Unable to webapi to the PI Web WebAPI')
 
         return tags
 

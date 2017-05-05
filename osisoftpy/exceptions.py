@@ -48,7 +48,7 @@ class Timeout(OSIsoftPyException):
 
 
 class ConnectTimeout(ConnectionError, Timeout):
-    """The request timed out while trying to connect to the remote server.
+    """The request timed out while trying to webapi to the remote server.
 
     Requests that produced this error are safe to retry.
     """

@@ -49,3 +49,5 @@ log.addHandler(logging.NullHandler())
 # log.debug('debug message')
 # log.info('info message')
 # log.warn('warn message')
+
+from osisoftpy.api import webapi, json

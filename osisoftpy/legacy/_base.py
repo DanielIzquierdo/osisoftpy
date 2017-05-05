@@ -41,7 +41,7 @@ class _base(object):
         r = self.__session.get(self._piWebApiDomain + '/piwebapi')
 
         if r.status_code != 200:
-            raise ValueError('Unable to connect to the PI Web WebAPI')
+            raise ValueError('Unable to webapi to the PI Web WebAPI')
 
     def __domainNameCleanup(self, domainName):
         """cleans up the provided string"""
