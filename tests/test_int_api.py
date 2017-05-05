@@ -30,7 +30,7 @@ params = utils.params
 def test_get_webapi_without_url():
     with pytest.raises(TypeError) as e:
         osisoftpy.response()
-    e.match('url')
+    e.match('argument')
 
 
 def test_get_webapi_with_invalid_url():
