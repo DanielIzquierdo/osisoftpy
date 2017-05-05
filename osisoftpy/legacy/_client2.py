@@ -26,7 +26,7 @@ class PIClientSession(Session):
         url = self.prefix(host)
         self.verify = False
         # url = '%s' % (self.prefix(host))
-        # return self.get(url).getjson()
+        # return self.get(url).response()
         print(url)
         r = self.get(url)
         print(r.status_code)

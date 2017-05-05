@@ -36,27 +36,24 @@ def webapi(url, **kwargs):
         raise e
 
 
-def getjson(url, **kwargs):
+def response(url, **kwargs):
     try:
-        return _get_json(url, **kwargs)
+        return _get_response(url, **kwargs)
     except Exception as e:
         raise e
 
 
 def _get_webapi(url, **kwargs):
     r = _get_result(url, **kwargs)
-    response = r[0].json()
+    json = r[0].json()
     session = r[1]
-    log.debug('Response: %s, Session: %s', response, session)
-    log.debug('Response type: %s, Links type: %s', type(response),
-              type(response.get('Links')))
     factory = Factory(PIWebAPI)
-    # return create_thing(factory, r[0].json().get('Links', None), r[1])
-    return create_thing(factory, response, session)
+    return create_thing(factory, json, session)
 
 
-def _get_json(url, **kwargs):
-    return _get_result(url, **kwargs)[0]
+def _get_response(url, **kwargs):
+    r = _get_result(url, **kwargs)
+    return r[0]
 
 
 def _get_result(url, session=None, **kwargs):

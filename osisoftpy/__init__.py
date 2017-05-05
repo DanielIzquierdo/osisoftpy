@@ -50,4 +50,4 @@ log.addHandler(logging.NullHandler())
 # log.info('info message')
 # log.warn('warn message')
 
-from osisoftpy.api import webapi, getjson
+from osisoftpy.api import webapi, response
