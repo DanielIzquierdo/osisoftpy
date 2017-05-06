@@ -13,3 +13,8 @@ install:
   - pip install -q -e .
 script:
   - python -m pytest
+notifications:
+  slack:
+    rooms:
+      - dstcontrols:SUPzxzw8n9xyevY5kUkajRAm#pge
+      - dstcontrols:SUPzxzw8n9xyevY5kUkajRAm#ops
