@@ -20,20 +20,20 @@ Some blah blah about what this file is for...
 """
 import logging
 from six import iteritems
-from .utils import stringify_kwargs
+from .utils import stringify
 
 log = logging.getLogger(__name__)
 
 
-def create_thing(factory, dict_, session):
+def create(factory, params, session):
     """
     Return an object created with factory
     :param factory: 
-    :param dict_: 
+    :param params: 
     :param session: 
     :return: 
     """
-    kwargs = dict(map(lambda k_v: (k_v[0].lower().replace('self', 'url'), k_v[1]), iteritems(dict_)))
+    kwargs = dict(map(lambda k_v: (k_v[0].lower().replace('self', 'url'), k_v[1]), iteritems(params)))
     kwargs.update({'session': session})
     thing = factory.create(**kwargs)
     log.debug('Created %s', thing)
@@ -41,28 +41,11 @@ def create_thing(factory, dict_, session):
 
 
 class Factory(object):
-    """ Construct :class:`DataArchive <osisoftpy.dataarchive.DataArchive>`
-    objects.
-    
-    :param type: (optional) the :class:`DataArchive <osisoftpy.dataarchive.DataArchive>`-based class to construct from.
-        Defaults to :class:`DataArchive <osisoftpy.dataarchive.DataArchive>`.
-    """
 
     def __init__(self, type_):
         log.debug('Factory initialized.')
         self.type = type_
 
     def create(self, **kwargs):
-        """ Return a :class:`DataArchive <osisoftpy.dataarchive.DataArchive>` object.
-        serverversion
-        :param name: PI Data Archive server name
-        :param webid: PI Data Archive Web ID
-        :param serverversion: PI Data Archive software version
-        :param isconnected: Connection status between the PI Web API and the PI Data Archive
-        :param id: PI Data Archive ID
-        
-        """
-        log.debug('Constructing %s, args are %s.', self.type,
-                  stringify_kwargs(**kwargs))
-
+        log.debug('Creating %s, kwargs: %s', self.type, stringify(**kwargs))
         return self.type(**kwargs)

@@ -23,7 +23,7 @@ Examples of how to use the osisoftpy package.
 import arrow
 from osisoftpy.utils import get_attribute, get_count
 
-from webapi import WebAPI
+from monstrosity import Monstrosity
 
 # Friendly US datetime format:
 human_datetime_format = 'YYYY-MM-DD HH:mm:ss ZZ'
@@ -45,8 +45,8 @@ sample_query.calctypes = ['current', 'interpolated', 'interpolatedattimes',
                           'recorded', 'recordedattime', 'plot', 'summary']
 
 # Basic authentication example:
-api = WebAPI(url=eecs, verifyssl=True, authtype='basic', username='albertxu',
-             password='Welcome2pi')
+api = Monstrosity(url=eecs, verifyssl=True, authtype='basic', username='albertxu',
+                  password='Welcome2pi')
 
 # returns a PI Data Archive server object
 pi_server = api.get_data_archive_server('sbb03.eecs.berkeley.edu')

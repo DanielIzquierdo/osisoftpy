@@ -21,48 +21,49 @@ Tests for the `osisoftpy.webapi` module.
 """
 
 import re
-
+import pytest
 import osisoftpy
 import requests
+from .conftest import query
 
 
-def test_get_piwebapi_object(webapi):
-    assert type(webapi) == osisoftpy.PIWebAPI
+def test_get_webapi_object(webapi):
+    assert type(webapi) == osisoftpy.WebAPI
 
 
-def test_piwebapi_has_session(webapi):
+def test_webapi_has_session(webapi):
     print(', '.join("%s: %s" % item for item in vars(webapi).items()))
     assert type(webapi.session) == requests.Session
 
 
-def test_piwebapi_has_links(webapi):
+def test_webapi_has_links(webapi):
     print(', '.join("%s: %s" % item for item in vars(webapi).items()))
     assert type(webapi.links) == dict
 
 
-def test_piwebapi_has_self_url(webapi, url):
+def test_webapi_has_self_url(webapi, url):
     assert webapi.links.get('Self') == url + '/'
 
 
-def test_piwebapi_has_search_url(webapi, url):
+def test_webapi_has_search_url(webapi, url):
     assert webapi.links.get('Search') == url + '/search'
 
 
-def test_piwebapi_search_method(webapi):
+def test_webapi_search_method(webapi):
     r = webapi.search()
     assert r.status_code == requests.codes.ok
     assert r.json().get('Links').get('Self').startswith(
         webapi.links.get('Search'))
 
 
-def test_piwebapi_query_method(webapi):
+def test_webapi_query_method(webapi):
     r = webapi.query()
     assert r.status_code == requests.codes.ok
     assert 'Query parameter must be specified' in r.json().get('Errors')[
         0].get('Message')
 
 
-def test_piwebapi_query_sinusoid(webapi):
+def test_webapi_query_sinusoid(webapi):
     tag = 'sinusoid'
     payload = {"q": "name:{}".format(tag), "count": 10}
     r = webapi.query(params=payload)
@@ -71,3 +72,19 @@ def test_piwebapi_query_sinusoid(webapi):
     assert r.json().get('Items')[0].get('Name').lower() == 'sinusoid'
     assert bool(
         re.match(r.json().get('Items')[0].get('Name'), tag, re.IGNORECASE))
+
+
+def test_webapi_points_sinusoid(webapi):
+    tag = 'sinusoid'
+    payload = {"q": "name:{}".format(tag), "count": 10}
+    r = webapi.points(params=payload)
+    assert all(isinstance(x, osisoftpy.Point) for x in r)
+
+
+@pytest.mark.parametrize('query', query())
+def test_webapi_points_query(webapi, query):
+    payload = {"q": query, "count": 1000}
+    points = webapi.points(params=payload)
+    assert all(isinstance(x, osisoftpy.Point) for x in points)
+    msg = '{} points were retrieved with the query "{}"'
+    print(msg.format(points.__len__(), query))

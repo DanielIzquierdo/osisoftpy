@@ -20,9 +20,9 @@ This module implements the OSIsoftPy API.
 """
 import logging
 
-from .utils import get_result
-from .factory import Factory, create_thing
-from .webapi import PIWebAPI
+from internal import get
+from osisoftpy.factory import Factory, create
+from osisoftpy.webapi import WebAPI
 
 log = logging.getLogger(__name__)
 
@@ -42,13 +42,10 @@ def response(url, **kwargs):
 
 
 def _get_webapi(url, **kwargs):
-    r = get_result(url, **kwargs)
-    json = r[0].json()
-    session = r[1]
-    factory = Factory(PIWebAPI)
-    return create_thing(factory, json, session)
+    r = get(url, **kwargs)
+    return create(Factory(WebAPI), r.response.json(), r.session)
 
 
 def _get_response(url, **kwargs):
-    r = get_result(url, **kwargs)
-    return r[0]
+    r = get(url, **kwargs)
+    return r.response

@@ -18,28 +18,11 @@ import requests
 import requests_kerberos
 from six import string_types
 
-from .point import Point
-from .structures import TypedList
-from .value import Value
+from osisoftpy.point import Point
+from osisoftpy.structures import TypedList
+from osisoftpy.value import Value
 
 log = logging.getLogger(__name__)
-
-
-def get_result(url, session=None, **kwargs):
-    try:
-        s = session or requests.session()
-        log.debug(s)
-        with s:
-            s.verify = kwargs.get('verifyssl', True)
-            log.debug(s.auth)
-            s.auth = s.auth or _get_auth(kwargs.get('authtype', None),
-                                       kwargs.get('username', None),
-                                       kwargs.get('password', None))
-            r = s.get(url, params=kwargs.get('params', None)), s
-            log.debug(r[0].json())
-            return r
-    except Exception as e:
-        raise e
 
 
 def _get_auth(authtype, username=None, password=None):
@@ -50,7 +33,7 @@ def _get_auth(authtype, username=None, password=None):
         return requests.auth.HTTPBasicAuth(username, password)
 
 
-def stringify_kwargs(**kwargs):
+def stringify(**kwargs):
     """
     Return a concatenated string of the keys and values of the kwargs
     Source: http://stackoverflow.com/a/39623935

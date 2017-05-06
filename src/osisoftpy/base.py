@@ -37,7 +37,7 @@ class Base(object):
     valid_attr = set()
 
     def __init__(self, **kwargs):
-        keys = self.get_keys()
+        keys = self.keys()
         self.__dict__.update((k, False) for k in keys)
         self.__dict__.update((k, v) for k, v in kwargs.items() if k in keys)
 
@@ -50,5 +50,5 @@ class Base(object):
         return 1
 
     @classmethod
-    def get_keys(cls):
+    def keys(cls):
         return cls.valid_attr

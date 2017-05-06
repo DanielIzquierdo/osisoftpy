@@ -19,42 +19,30 @@ osisoftpy.__init__
 
 """
 
+import logging
+
 __author__ = 'Andrew Pong'
 __email__ = 'apong@dstcontrols.com'
 __version__ = '1.2.0'
 
-from .api import webapi, response
 
 # Set default logging handler to avoid "No handler found" warnings.
-import logging
 try:  # Python 2.7+
     from logging import NullHandler
 except ImportError:
     class NullHandler(logging.Handler):
         def emit(self, record):
             pass
-import colorlog
 
 # Configure logging
 loglevel = logging.DEBUG
-logformat = '%(log_color)s[%(filename)s:%(lineno)s - %(funcName)5s() ] %(' \
-            'levelname).1s %(message_log_color)s%(message)s'
-logcolors = {'DEBUG': 'cyan', 'INFO': 'green', 'WARNING': 'yellow',
-             'ERROR': 'red', 'CRITICAL': 'red,bg_white'}
-logmessagecolors = {
-    'message': {'DEBUG': 'white', 'INFO': 'white', 'WARNING': 'yellow',
-                'ERROR': 'red', 'CRITICAL': 'red'}}
+fmt = '[%(filename)s:%(lineno)s %(funcName)5s() ] %(levelname).1s %(message)s'
 
-formatter = colorlog.ColoredFormatter(logformat, datefmt=None, reset=True,
-                                      log_colors=logcolors,
-                                      secondary_log_colors=logmessagecolors,
-                                      style='%')
-
-handler = colorlog.StreamHandler()
+handler = logging.StreamHandler()
 handler.setLevel(loglevel)
-handler.setFormatter(formatter)
+handler.setFormatter(logging.Formatter(fmt))
 
-log = colorlog.getLogger(__name__)
+log = logging.getLogger(__name__)
 log.setLevel(loglevel)
 log.addHandler(handler)
 log.addHandler(logging.NullHandler())
@@ -63,6 +51,6 @@ log.addHandler(logging.NullHandler())
 # log.info('info message')
 # log.warn('warn message')
 
-
-from .api import webapi, response
-from .webapi import PIWebAPI
+from osisoftpy.api import (webapi, response)
+from osisoftpy.webapi import (WebAPI)
+from osisoftpy.point import (Point)

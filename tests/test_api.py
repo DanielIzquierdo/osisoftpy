@@ -21,26 +21,32 @@ Tests for the `osisoftpy.api` module.
 """
 import pytest
 import requests
+from .conftest import credentials
 
 import osisoftpy
-
 
 def test_get_webapi_without_url():
     with pytest.raises(TypeError) as e:
         osisoftpy.response()
     e.match('argument')
 
-
-def test_get_webapi_with_invalid_url():
+@pytest.mark.parametrize('url', ['fizz', 'buzz', 'localhst', 'http'])
+def test_get_webapi_with_invalid_url(url):
     with pytest.raises(requests.exceptions.MissingSchema) as e:
-        osisoftpy.response('foobar')
+        osisoftpy.response(url)
     e.match('Invalid URL')
 
-
-def test_get_webapi_with_valid_url_no_credentials(url):
-    r = osisoftpy.response(url)
-    assert r.status_code == requests.codes.unauthorized
-
+@pytest.mark.parametrize('authtype, username, password', credentials().unknown)
+def test_get_webapi_with_credentials(url, authtype, username, password):
+    cred = authtype, username, password
+    r = osisoftpy.response(url, authtype=cred[0],
+                           username=cred[1],
+                           password=cred[2])
+    if cred in credentials().valid:
+        assert r.status_code == requests.codes.ok
+        assert r.json().get('Links').get('Self').startswith(url)
+    else:
+        assert r.status_code == requests.codes.unauthorized
 
 def test_get_webapi_valid_url_basic_missing_credentials(url, authtype):
     r = osisoftpy.response(url, authtype=authtype)

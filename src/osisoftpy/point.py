@@ -13,10 +13,13 @@
 #    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
-"""This module contains the class definition for the Point class, 
+"""
+osisoftpy.point
+~~~~~~~~~~~~
+This module contains the class definition for the Point class, 
 which represents a PI System Point it's described by the PI Web API."""
 
-from .base import Base
+from osisoftpy.base import Base
 
 
 class Point(Base):
@@ -34,7 +37,7 @@ class Point(Base):
     :rtype: osisoftpy.dataarchive.Point
     """
 
-    valid_attr = set(['name', 'description', 'uniqueid', 'webid', 'datatype'])
+    valid_attr = {'name', 'description', 'uniqueid', 'webid', 'datatype'}
 
     def __init__(self, **kwargs):
         super(self.__class__, self).__init__(**kwargs)
