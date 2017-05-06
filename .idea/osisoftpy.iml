@@ -15,10 +15,14 @@
     <orderEntry type="sourceFolder" forTests="false" />
   </component>
   <component name="PackageRequirementsSettings">
-    <option name="requirementsPath" value="" />
+    <option name="requirementsPath" value="D:\projects\osisoftpy\requirements.txt" />
+  </component>
+  <component name="ReSTService">
+    <option name="workdir" value="D:\projects\osisoftpy\docs\source" />
+    <option name="DOC_DIR" value="D:\projects\osisoftpy\docs\source" />
   </component>
   <component name="TestRunnerService">
-    <option name="projectConfiguration" value="Nosetests" />
-    <option name="PROJECT_TEST_RUNNER" value="Nosetests" />
+    <option name="projectConfiguration" value="py.test" />
+    <option name="PROJECT_TEST_RUNNER" value="py.test" />
   </component>
 </module>
