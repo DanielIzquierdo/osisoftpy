@@ -20,7 +20,7 @@ This module implements the OSIsoftPy API.
 """
 import logging
 
-from internal import get
+from osisoftpy.internal import get
 from osisoftpy.factory import Factory, create
 from osisoftpy.webapi import WebAPI
 

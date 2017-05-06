@@ -20,7 +20,7 @@ Some blah blah about what this file is for...
 """
 
 from osisoftpy.base import Base
-from internal import get
+from osisoftpy.internal import get
 from osisoftpy.factory import Factory, create
 from osisoftpy.point import Point
 

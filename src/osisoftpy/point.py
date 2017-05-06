@@ -20,7 +20,7 @@ This module contains the class definition for the Point class,
 which represents a PI System Point it's described by the PI Web API."""
 
 from osisoftpy.base import Base
-from internal import get
+from osisoftpy.internal import get
 from osisoftpy.factory import Factory, create
 from osisoftpy.value import Value
 

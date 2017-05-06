@@ -21,9 +21,6 @@ classes are derived, such as the WebAPI, DataArchive, AssetFramework, Point,
 and Value classes.
 """
 
-from __future__ import print_function
-from __future__ import unicode_literals
-
 import logging
 
 log = logging.getLogger(__name__)
@@ -40,6 +37,7 @@ class Base(object):
         keys = self.keys()
         self.__dict__.update((k, False) for k in keys)
         self.__dict__.update((k, v) for k, v in kwargs.items() if k in keys)
+
     def __len__(self):
         # type: () -> int
         """
