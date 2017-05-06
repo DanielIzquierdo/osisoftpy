@@ -44,6 +44,7 @@ class WebAPI(Base):
         except Exception as e:
             raise e
 
+    # TODO: add checks to prevent erroneous returns from creating points
     def points(self, **kwargs):
         try:
             return self._get_points(**kwargs)
@@ -52,12 +53,10 @@ class WebAPI(Base):
 
     def _get_query(self, **kwargs):
         r = get(self.links.get('Search') + '/query', self.session, **kwargs)
-        self.session = r.session
         return r.response
 
     def _get_points(self, **kwargs):
         r = get(self.links.get('Search') + '/query', self.session, **kwargs)
-        self.session = r.session
-        points = list(map(lambda x: create(Factory(Point), x, r.session),
+        points = list(map(lambda x: create(Factory(Point), x, self.session, self),
                           r.response.json().get('Items', None)))
         return points

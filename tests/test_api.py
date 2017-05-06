@@ -25,17 +25,30 @@ from .conftest import credentials
 
 import osisoftpy
 
-def test_get_webapi_without_url():
-    with pytest.raises(TypeError) as e:
-        osisoftpy.response()
-    e.match('argument')
+skip = False
 
-@pytest.mark.parametrize('url', ['fizz', 'buzz', 'localhst', 'http'])
-def test_get_webapi_with_invalid_url(url):
-    with pytest.raises(requests.exceptions.MissingSchema) as e:
-        osisoftpy.response(url)
-    e.match('Invalid URL')
 
+def test_get_webapi(url, authtype, username, password):
+    r = osisoftpy.response(url, authtype=authtype, username=username,
+                           password=password)
+    assert r.status_code == requests.codes.ok
+    assert r.json().get('Links').get('Self').startswith(url)
+
+
+@pytest.mark.skipif(skip, reason="Takes an extra 3s...")
+@pytest.mark.parametrize('url', ['BLANK', 'fizz', '%^$@^%#$!&', 'http', None])
+def test_get_webapi_with_urls(url):
+    if url == 'BLANK':
+        with pytest.raises(TypeError) as e:
+            osisoftpy.response()
+        e.match('argument')
+    else:
+        with pytest.raises(requests.exceptions.MissingSchema) as e:
+            osisoftpy.response(url)
+        e.match('Invalid URL')
+
+
+@pytest.mark.skipif(skip, reason="Takes an extra 5s...")
 @pytest.mark.parametrize('authtype, username, password', credentials().unknown)
 def test_get_webapi_with_credentials(url, authtype, username, password):
     cred = authtype, username, password
@@ -47,28 +60,3 @@ def test_get_webapi_with_credentials(url, authtype, username, password):
         assert r.json().get('Links').get('Self').startswith(url)
     else:
         assert r.status_code == requests.codes.unauthorized
-
-def test_get_webapi_valid_url_basic_missing_credentials(url, authtype):
-    r = osisoftpy.response(url, authtype=authtype)
-    assert r.status_code == requests.codes.unauthorized
-
-
-def test_get_webapi_valid_url_basic_missing_password(url, authtype, username):
-    r = osisoftpy.response(url, authtype=authtype,
-                           username=username)
-    assert r.status_code == requests.codes.unauthorized
-
-
-def test_get_webapi_valid_url_basic_missing_username(url, authtype, password):
-    r = osisoftpy.response(url, authtype=authtype,
-                           password=password)
-    assert r.status_code == requests.codes.unauthorized
-
-
-def test_get_webapi_valid_url_basic_valid_credentials(url, authtype,
-                                                      username, password):
-    r = osisoftpy.response(url, authtype=authtype,
-                           username=username,
-                           password=password)
-    assert r.status_code == requests.codes.ok
-    assert r.json().get('Links').get('Self').startswith(url)

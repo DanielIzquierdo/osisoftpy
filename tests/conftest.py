@@ -20,7 +20,7 @@ Contains pytest fixtures which are globally available throughout the suite.
 """
 
 from collections import namedtuple
-import itertools
+from itertools import product
 import pytest
 import osisoftpy
 
@@ -60,12 +60,16 @@ def query():
 
 
 def credentials():
-    a = frozenset(['kerberos', 'basic', ''])
-    u = frozenset(['albertxu', 'andrew', ' ', 'apong'])
-    p = frozenset(['Welcome2pi', 'p@ssw0rd', ''])
+    a = frozenset(['kerberos', 'basic', None])
+    u = frozenset(['albertxu', 'andrew', None])
+    p = frozenset(['Welcome2pi', 'p@ssw0rd', None])
+
+    valid = list(product(['basic', None], ['albertxu'], ['Welcome2pi']))
+    unknown = list(product(a, u, p))
+
     Credentials = namedtuple('Credentials', ['valid', 'unknown'])
-    credtuple = Credentials(valid=[('basic', 'albertxu', 'Welcome2pi'),],
-                            unknown=list(itertools.product(a, u, p)))
+    credtuple = Credentials(valid=valid, unknown=unknown)
+
     return credtuple
 
 

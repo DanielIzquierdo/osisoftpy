@@ -20,7 +20,9 @@ This module contains the class definition for the Point class,
 which represents a PI System Point it's described by the PI Web API."""
 
 from osisoftpy.base import Base
-
+from internal import get
+from osisoftpy.factory import Factory, create
+from osisoftpy.value import Value
 
 class Point(Base):
     """An :class:`OSIsoftPy <osisoftpy.dataarchive.Point>` object.
@@ -37,7 +39,8 @@ class Point(Base):
     :rtype: osisoftpy.dataarchive.Point
     """
 
-    valid_attr = {'name', 'description', 'uniqueid', 'webid', 'datatype'}
+    valid_attr = {'name', 'description', 'uniqueid', 'webid', 'datatype',
+                  'links', 'session', 'webapi'}
 
     def __init__(self, **kwargs):
         super(self.__class__, self).__init__(**kwargs)
@@ -48,3 +51,19 @@ class Point(Base):
         self.plot_values = None
         self.summary_values = None
         self.end_value = None
+
+    # TODO: add checks to prevent erroneous returns from creating values
+    # TODO: some of the spf tags return invalid webid errors...
+    def current(self, **kwargs):
+        try:
+            return self._get_current(**kwargs)
+        except Exception as e:
+            raise e
+
+    def _get_current(self, **kwargs):
+        payload = {'time': kwargs.get('time', None)}
+        endpoint = '{}/streams/{}/value'.format(self.webapi.links.get('Self'),
+                                                self.webid)
+        r = get(endpoint, self.session, params=payload, **kwargs)
+        value = create(Factory(Value), r.response.json(), self.session, self.webapi)
+        return value

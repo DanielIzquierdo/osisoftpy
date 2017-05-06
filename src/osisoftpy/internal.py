@@ -20,12 +20,21 @@ Some blah blah about what this file is for...
 """
 from collections import namedtuple
 import logging
-import re
-import arrow
 import requests
 import requests_kerberos
 
 log = logging.getLogger(__name__)
+
+
+def stringify(**kwargs):
+    """
+    Return a concatenated string of the keys and values of the kwargs
+    Source: http://stackoverflow.com/a/39623935
+    :param kwargs: kwargs to be combined into a single string
+    :return: String representation of the kwargs
+    """
+    return (','.join('{0}={1!r}'.format(k, v)
+                     for k, v in kwargs.items()))
 
 
 def _get_auth(authtype, username=None, password=None):

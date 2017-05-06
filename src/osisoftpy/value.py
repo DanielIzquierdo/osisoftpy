@@ -1,18 +1,36 @@
 # -*- coding: utf-8 -*-
 
-from __future__ import print_function
-from __future__ import unicode_literals
+#    Copyright 2017 DST Controls
+#
+#    Licensed under the Apache License, Version 2.0 (the "License");
+#    you may not use this file except in compliance with the License.
+#    You may obtain a copy of the License at
+#
+#    http://www.apache.org/licenses/LICENSE-2.0
+#
+#    Unless required by applicable law or agreed to in writing, software
+#    distributed under the License is distributed on an "AS IS" BASIS,
+#    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#    See the License for the specific language governing permissions and
+#    limitations under the License.
+"""
+osisoftpy.value
+~~~~~~~~~~~~
+Some blah blah about what this file is for...
+"""
 
-from .base import Base
+from osisoftpy.base import Base
 
 
 class Value(Base):
-    """The Value class provides methods for the available PI points"""
+    """
+    The Value class provides methods for the available PI points
+    """
+    valid_attr = {'calculationtype', 'datatype', 'timestamp', 'value',
+                  'unitsabbreviation', 'good', 'questionable', 'substituted'}
 
-    def __init__(self, calculationtype=None, datatype=None, timestamp=None,
-                 value=None, unitsabbreviation=None, good=False,
-                 questionable=False, substituted=False):
-        # type: (str, str, str, str, bool, bool, bool) -> object
+    def __init__(self, **kwargs):
+        super(self.__class__, self).__init__(**kwargs)
 
         """
 
@@ -25,20 +43,3 @@ class Value(Base):
         :param substituted: 
         :rtype: None
         """
-        self.calculationtype = calculationtype
-        self.datatype = datatype
-        self.timestamp = timestamp
-        self.value = value
-        self.unitsabbreviation = unitsabbreviation
-        self.good = good
-        self.questionable = questionable
-        self.substituted = substituted
-
-    # def __repr__(self):
-    #     representation = 'Point("{}", "{}", "{}", "{}", "{}", "{}", "{}", "{}"'
-    #     return representation.format(self.calculationtype, self.datatype,
-    #                                  self.timestamp, self.value,
-    #                                  self.unitsabbreviation, self.good,
-    #                                  self.questionable, self.substituted)
-
-

@@ -34,13 +34,12 @@ class Base(object):
         This is the Base osisoftpy object which other objects inherit from.
     """
 
-    valid_attr = set()
+    valid_attr = frozenset()
 
     def __init__(self, **kwargs):
         keys = self.keys()
         self.__dict__.update((k, False) for k in keys)
         self.__dict__.update((k, v) for k, v in kwargs.items() if k in keys)
-
     def __len__(self):
         # type: () -> int
         """

@@ -20,32 +20,30 @@ Some blah blah about what this file is for...
 """
 import logging
 from six import iteritems
-from .utils import stringify
+from osisoftpy.internal import stringify
 
 log = logging.getLogger(__name__)
 
 
-def create(factory, params, session):
+def create(factory, thing, session, webapi=None):
     """
     Return an object created with factory
+    :param webapi: 
     :param factory: 
     :param params: 
     :param session: 
     :return: 
     """
-    kwargs = dict(map(lambda k_v: (k_v[0].lower().replace('self', 'url'), k_v[1]), iteritems(params)))
-    kwargs.update({'session': session})
+    kwargs = dict(map(lambda k_v: (k_v[0].lower(), k_v[1]), iteritems(thing)))
+    kwargs.update({'session': session, 'webapi': webapi})
     thing = factory.create(**kwargs)
-    log.debug('Created %s', thing)
+    log.debug('Created %s, kwargs: %s', type(thing), stringify(**kwargs))
     return thing
 
 
 class Factory(object):
-
     def __init__(self, type_):
-        log.debug('Factory initialized.')
         self.type = type_
 
     def create(self, **kwargs):
-        log.debug('Creating %s, kwargs: %s', self.type, stringify(**kwargs))
         return self.type(**kwargs)
