@@ -53,7 +53,7 @@ class Point(Base):
         self.end_value = None
 
     # TODO: add checks to prevent erroneous returns from creating values
-    # TODO: some of the spf tags return invalid webid errors...
+    # TODO: i.e.: some of the *spf* tags return invalid webid errors...
     def current(self, **kwargs):
         try:
             return self._get_current(**kwargs)

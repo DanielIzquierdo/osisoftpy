@@ -60,12 +60,12 @@ def query():
 
 
 def credentials():
-    a = frozenset(['kerberos', 'basic', None])
-    u = frozenset(['albertxu', 'andrew', None])
-    p = frozenset(['Welcome2pi', 'p@ssw0rd', None])
+    authtypes = frozenset(['kerberos', 'basic', None])
+    usernames = frozenset(['albertxu', 'andrew', None])
+    passwords = frozenset(['Welcome2pi', 'p@ssw0rd', None])
 
     valid = list(product(['basic', None], ['albertxu'], ['Welcome2pi']))
-    unknown = list(product(a, u, p))
+    unknown = list(product(authtypes, usernames, passwords))
 
     Credentials = namedtuple('Credentials', ['valid', 'unknown'])
     credtuple = Credentials(valid=valid, unknown=unknown)

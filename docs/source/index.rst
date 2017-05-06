@@ -10,11 +10,8 @@ Welcome to osisoftpy's documentation!
     :maxdepth: 2
     :caption: Contents:
 
-.. automodule:: osisoftpy.piwebapi
-
-.. autoclass:: WebAPI
+.. automodule:: osisoftpy.api
     :members:
-
 
 Indices and tables
 ==================
