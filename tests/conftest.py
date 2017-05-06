@@ -14,10 +14,16 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 """
-osisoftpy.tests.utils.py
+osisoftpy.tests.conftest.py
 ~~~~~~~~~~~~
-Some blah blah about what this file is for...
+Contains pytest fixtures which are globally available throughout the suite.
 """
+import logging
+import os
+import shutil
+
+import pytest
+
 
 params = type('Params', (object,), {})()
 params.url = 'https://sbb03.eecs.berkeley.edu/piwebapi'

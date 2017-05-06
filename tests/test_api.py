@@ -14,17 +14,16 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 """
-osisoftpy.tests.test_int_api.py
+osisoftpy.tests.test_api.py
 ~~~~~~~~~~~~
-Some blah blah about what this file is for...
+
+Tests for the `osisoftpy.api` module.
 """
 import pytest
 import requests
+from conftest import params
 
-import osisoftpy
-from . import utils
-
-params = utils.params
+from src import osisoftpy
 
 
 def test_get_webapi_without_url():

@@ -37,24 +37,6 @@ class DataArchive(Base):
     :rtype: osisoftpy.dataarchive.DataArchive
     """
     def __init__(self, **kwargs):
-        keys = set(['name', 'serverversion', 'webid', 'isconnected', 'id'])
+        keys = {'name', 'serverversion', 'webid', 'isconnected', 'id'}
         self.__dict__.update((k, False) for k in keys)
         self.__dict__.update((k, v) for k, v in kwargs.items() if k in keys)
-
-    # def __getattr__(self, key):
-    #     try:
-    #         return self.__dict__[key]
-    #     except KeyError:
-    #         msg = '"{}" object has no attribute "{}"'
-    #         raise AttributeError(msg.format(type(self).__name__, key))
-    #
-    # def __setattr__(self, key, value):
-    #     try:
-    #         self.__dict__[key] = value
-    #     except KeyError:
-    #         msg = '"{}" object has no attribute "{}"'
-    #         raise AttributeError(msg.format(type(self).__name__, key))
-    #     except ValueError:
-    #         msg = 'Invalid value "{}" for "{}" object attribute "{}"'
-    #         raise AttributeError(
-    #             msg.format(value, type(self).__name__, key))

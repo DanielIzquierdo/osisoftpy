@@ -7,8 +7,7 @@ This module contains the PI Point class
 from rx import Observable
 from rx.core import Scheduler
 
-from osisoftpy._base import _base
-from osisoftpy._point import _point
+from src.osisoftpy import _base, _point
 
 
 class _server(_base):

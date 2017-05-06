@@ -34,6 +34,8 @@ class Base(object):
         This is the Base osisoftpy object which other objects inherit from.
     """
 
+    valid_attr = set()
+
     def __len__(self):
         # type: () -> int
         """
@@ -41,3 +43,7 @@ class Base(object):
         :return: Number of items in this object. Returns 1 for objects.
         """
         return 1
+
+    @classmethod
+    def get_keys(cls):
+        return cls.valid_attr

@@ -4,8 +4,7 @@ osisoft_pi_webapi_python_client.client
 ~~~~~~~~~~~~~~~~~~~
 This module contains the client used to access OSIsoft PI infrastructure and data
 """
-from osisoftpy._base import _base
-from osisoftpy._server import _server
+from src.osisoftpy import _base, _server
 
 
 class client(_base):

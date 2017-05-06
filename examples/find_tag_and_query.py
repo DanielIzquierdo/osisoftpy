@@ -1,7 +1,7 @@
 # import requests
 # from requests.packages.urllib3.exceptions import InsecureRequestWarning
 
-from osisoftpy._client import client
+from src.osisoftpy import client
 
 
 # disable InsecureRequestWarnings

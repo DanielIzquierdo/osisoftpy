@@ -21,9 +21,9 @@ Examples of how to use the osisoftpy package.
 """
 
 import arrow
-
-from osisoftpy.webapi import WebAPI
 from osisoftpy.utils import get_attribute, get_count
+
+from webapi import WebAPI
 
 # Friendly US datetime format:
 human_datetime_format = 'YYYY-MM-DD HH:mm:ss ZZ'

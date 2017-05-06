@@ -20,7 +20,12 @@ osisoftpy.__init__
 """
 
 import logging
+
 import colorlog
+
+__author__ = 'Andrew Pong'
+__email__ = 'apong@dstcontrols.com'
+__version__ = '1.1.0'
 
 # Configure logging
 loglevel = logging.DEBUG
@@ -49,5 +54,3 @@ log.addHandler(logging.NullHandler())
 # log.debug('debug message')
 # log.info('info message')
 # log.warn('warn message')
-
-from osisoftpy.api import webapi, response

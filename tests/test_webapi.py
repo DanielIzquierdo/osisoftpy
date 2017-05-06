@@ -14,21 +14,20 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 """
-osisoftpy.tests.test_int_api.py
+osisoftpy.tests.test_api.py
 ~~~~~~~~~~~~
-Some blah blah about what this file is for...
+
+Tests for the `osisoftpy.webapi` module.
 """
 
-import pytest
-import requests
-from requests.sessions import Session
 import re
 
 import osisoftpy
-from osisoftpy.webapi import PIWebAPI
-from . import utils
+import requests
+from requests.sessions import Session
+from conftest import params
 
-params = utils.params
+from webapi import PIWebAPI
 
 
 def _get_webapi():

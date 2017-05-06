@@ -33,10 +33,11 @@ class Point(Base):
     :return: :class:`OSIsoftPy <osisoftpy.dataarchive.Point>` object
     :rtype: osisoftpy.dataarchive.Point
     """
+
     valid_attr = set(['name', 'description', 'uniqueid', 'webid', 'datatype'])
 
     def __init__(self, **kwargs):
-        keys = Point.get_valid_attr()
+        keys = Point.get_keys()
         self.__dict__.update((k, False) for k in keys)
         self.__dict__.update((k, v) for k, v in kwargs.items() if k in keys)
         self.current_value = None
@@ -45,7 +46,3 @@ class Point(Base):
         self.plot_values = None
         self.summary_values = None
         self.end_value = None
-
-    @classmethod
-    def get_valid_attr(cls):
-        return cls.valid_attr

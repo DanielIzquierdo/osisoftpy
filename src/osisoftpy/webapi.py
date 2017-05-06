@@ -25,13 +25,13 @@ class PIWebAPI(Base):
     valid_attr = set(['links', 'session'])
 
     def __init__(self, **kwargs):
-        keys = PIWebAPI.get_valid_attr()
+        keys = PIWebAPI.get_keys()
         log.debug(stringify_kwargs(**kwargs))
         self.__dict__.update((k, False) for k in keys)
         self.__dict__.update((k, v) for k, v in kwargs.items() if k in keys)
 
     @classmethod
-    def get_valid_attr(cls):
+    def get_keys(cls):
         return cls.valid_attr
 
     def search(self, **kwargs):
