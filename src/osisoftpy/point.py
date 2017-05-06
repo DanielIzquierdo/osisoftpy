@@ -37,9 +37,8 @@ class Point(Base):
     valid_attr = set(['name', 'description', 'uniqueid', 'webid', 'datatype'])
 
     def __init__(self, **kwargs):
-        keys = Point.get_keys()
-        self.__dict__.update((k, False) for k in keys)
-        self.__dict__.update((k, v) for k, v in kwargs.items() if k in keys)
+        super(self.__class__, self).__init__(**kwargs)
+
         self.current_value = None
         self.interpolated_values = None
         self.recorded_values = None

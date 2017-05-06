@@ -69,7 +69,7 @@ setup(
     install_requires=[
         'requests',
         'requests-kerberos',
-        'rx', 'colorlog', 'six', 'arrow', 'pytest'
+        'rx', 'colorlog', 'six', 'arrow', 'pytest', 'colorlog',
     ],
     extras_require={
         # eg:

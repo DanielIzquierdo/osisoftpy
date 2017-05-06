@@ -21,9 +21,8 @@ Tests for the `osisoftpy.api` module.
 """
 import pytest
 import requests
-from conftest import params
 
-from src import osisoftpy
+import osisoftpy
 
 
 def test_get_webapi_without_url():
@@ -38,31 +37,32 @@ def test_get_webapi_with_invalid_url():
     e.match('Invalid URL')
 
 
-def test_get_webapi_with_valid_url_no_credentials():
-    r = osisoftpy.response(params.url)
+def test_get_webapi_with_valid_url_no_credentials(url):
+    r = osisoftpy.response(url)
     assert r.status_code == requests.codes.unauthorized
 
 
-def test_get_webapi_valid_url_basic_missing_credentials():
-    r = osisoftpy.response(params.url, authtype=params.authtype)
+def test_get_webapi_valid_url_basic_missing_credentials(url, authtype):
+    r = osisoftpy.response(url, authtype=authtype)
     assert r.status_code == requests.codes.unauthorized
 
 
-def test_get_webapi_valid_url_basic_missing_password():
-    r = osisoftpy.response(params.url, authtype=params.authtype,
-                           username=params.username)
+def test_get_webapi_valid_url_basic_missing_password(url, authtype, username):
+    r = osisoftpy.response(url, authtype=authtype,
+                           username=username)
     assert r.status_code == requests.codes.unauthorized
 
 
-def test_get_webapi_valid_url_basic_missing_username():
-    r = osisoftpy.response(params.url, authtype=params.authtype,
-                           password=params.password)
+def test_get_webapi_valid_url_basic_missing_username(url, authtype, password):
+    r = osisoftpy.response(url, authtype=authtype,
+                           password=password)
     assert r.status_code == requests.codes.unauthorized
 
 
-def test_get_webapi_valid_url_basic_valid_credentials():
-    r = osisoftpy.response(params.url, authtype=params.authtype,
-                           username=params.username,
-                           password=params.password)
+def test_get_webapi_valid_url_basic_valid_credentials(url, authtype,
+                                                      username, password):
+    r = osisoftpy.response(url, authtype=authtype,
+                           username=username,
+                           password=password)
     assert r.status_code == requests.codes.ok
-    assert r.json().get('Links').get('Self').startswith(params.url)
+    assert r.json().get('Links').get('Self').startswith(url)

@@ -24,65 +24,50 @@ import re
 
 import osisoftpy
 import requests
-from requests.sessions import Session
-from conftest import params
-
-from webapi import PIWebAPI
 
 
-def _get_webapi():
-    return osisoftpy.webapi(params.url,
-                            authtype=params.authtype,
-                            username=params.username,
-                            password=params.password)
+def test_get_piwebapi_object(webapi):
+    assert type(webapi) == osisoftpy.PIWebAPI
 
 
-def test_get_piwebapi_object():
-    webapi = _get_webapi()
-    assert type(webapi) == PIWebAPI
-
-
-def test_piwebapi_has_session():
-    webapi = _get_webapi()
+def test_piwebapi_has_session(webapi):
     print(', '.join("%s: %s" % item for item in vars(webapi).items()))
-    assert type(webapi.session) == Session
+    assert type(webapi.session) == requests.Session
 
 
-def test_piwebapi_has_links():
-    webapi = _get_webapi()
+def test_piwebapi_has_links(webapi):
     print(', '.join("%s: %s" % item for item in vars(webapi).items()))
     assert type(webapi.links) == dict
 
 
-def test_piwebapi_has_self_url():
-    webapi = _get_webapi()
-    assert webapi.links.get('Self') == params.url + '/'
+def test_piwebapi_has_self_url(webapi, url):
+    assert webapi.links.get('Self') == url + '/'
 
 
-def test_piwebapi_has_search_url():
-    webapi = _get_webapi()
-    assert webapi.links.get('Search') == params.url + '/search'
+def test_piwebapi_has_search_url(webapi, url):
+    assert webapi.links.get('Search') == url + '/search'
 
-def test_piwebapi_search_method():
-    webapi = _get_webapi()
+
+def test_piwebapi_search_method(webapi):
     r = webapi.search()
     assert r.status_code == requests.codes.ok
     assert r.json().get('Links').get('Self').startswith(
         webapi.links.get('Search'))
 
-def test_piwebapi_query_method():
-    webapi = _get_webapi()
+
+def test_piwebapi_query_method(webapi):
     r = webapi.query()
     assert r.status_code == requests.codes.ok
-    assert 'Query parameter must be specified' in r.json().get('Errors')[0].get('Message')
+    assert 'Query parameter must be specified' in r.json().get('Errors')[
+        0].get('Message')
 
-def test_piwebapi_query_sinusoid():
-    webapi = _get_webapi()
+
+def test_piwebapi_query_sinusoid(webapi):
     tag = 'sinusoid'
     payload = {"q": "name:{}".format(tag), "count": 10}
     r = webapi.query(params=payload)
     assert r.status_code == requests.codes.ok
     assert r.json().get('TotalHits') > 0
     assert r.json().get('Items')[0].get('Name').lower() == 'sinusoid'
-    assert bool(re.match(r.json().get('Items')[0].get('Name'), tag, re.IGNORECASE))
-
+    assert bool(
+        re.match(r.json().get('Items')[0].get('Name'), tag, re.IGNORECASE))

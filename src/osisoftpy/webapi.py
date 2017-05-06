@@ -4,7 +4,6 @@ from __future__ import print_function
 from __future__ import unicode_literals
 
 import logging
-from six import iteritems
 
 import requests
 
@@ -15,7 +14,7 @@ from .factory import Factory, create_thing
 from .point import Point
 from .structures import TypedList
 from .utils import get_attribute, get_count, get_credentials, get_endpoint, \
-    get_point_values, iterfy, test_connectivity, stringify_kwargs, get_result
+    get_point_values, get_result, iterfy, test_connectivity
 from .value import Value
 
 log = logging.getLogger(__name__)
@@ -25,14 +24,7 @@ class PIWebAPI(Base):
     valid_attr = set(['links', 'session'])
 
     def __init__(self, **kwargs):
-        keys = PIWebAPI.get_keys()
-        log.debug(stringify_kwargs(**kwargs))
-        self.__dict__.update((k, False) for k in keys)
-        self.__dict__.update((k, v) for k, v in kwargs.items() if k in keys)
-
-    @classmethod
-    def get_keys(cls):
-        return cls.valid_attr
+        super(self.__class__, self).__init__(**kwargs)
 
     def search(self, **kwargs):
         r = get_result(self.links.get('Search'), self.session,  **kwargs)

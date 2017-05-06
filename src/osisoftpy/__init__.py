@@ -19,13 +19,21 @@ osisoftpy.__init__
 
 """
 
-import logging
-
-import colorlog
-
 __author__ = 'Andrew Pong'
 __email__ = 'apong@dstcontrols.com'
 __version__ = '1.2.0'
+
+from .api import webapi, response
+
+# Set default logging handler to avoid "No handler found" warnings.
+import logging
+try:  # Python 2.7+
+    from logging import NullHandler
+except ImportError:
+    class NullHandler(logging.Handler):
+        def emit(self, record):
+            pass
+import colorlog
 
 # Configure logging
 loglevel = logging.DEBUG
@@ -54,3 +62,7 @@ log.addHandler(logging.NullHandler())
 # log.debug('debug message')
 # log.info('info message')
 # log.warn('warn message')
+
+
+from .api import webapi, response
+from .webapi import PIWebAPI

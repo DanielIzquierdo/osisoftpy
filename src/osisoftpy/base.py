@@ -36,6 +36,11 @@ class Base(object):
 
     valid_attr = set()
 
+    def __init__(self, **kwargs):
+        keys = self.get_keys()
+        self.__dict__.update((k, False) for k in keys)
+        self.__dict__.update((k, v) for k, v in kwargs.items() if k in keys)
+
     def __len__(self):
         # type: () -> int
         """

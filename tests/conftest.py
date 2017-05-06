@@ -18,16 +18,39 @@ osisoftpy.tests.conftest.py
 ~~~~~~~~~~~~
 Contains pytest fixtures which are globally available throughout the suite.
 """
-import logging
-import os
-import shutil
 
 import pytest
+import osisoftpy
 
 
-params = type('Params', (object,), {})()
-params.url = 'https://sbb03.eecs.berkeley.edu/piwebapi'
-params.authtype = 'basic'
-params.username = 'albertxu'
-params.password = 'Welcome2pi'
-params.dataarchive = 'sbb03.eecs.berkeley.edu'
+@pytest.fixture(scope='module')
+def url():
+    return 'https://sbb03.eecs.berkeley.edu/piwebapi'
+
+
+@pytest.fixture(scope='module')
+def username():
+    return 'albertxu'
+
+
+@pytest.fixture(scope='module')
+def password():
+    return 'Welcome2pi'
+
+
+@pytest.fixture(scope='module')
+def authtype():
+    return 'basic'
+
+
+@pytest.fixture(scope='module')
+def dataarchive():
+    return 'sbb03.eecs.berkeley.edu'
+
+
+@pytest.fixture(scope='module')
+def webapi(url, authtype, username, password):
+    return osisoftpy.webapi(url,
+                            authtype=authtype,
+                            username=username,
+                            password=password)
