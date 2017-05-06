@@ -21,7 +21,8 @@ which represents a PI System Point it's described by the PI Web API."""
 
 from osisoftpy.base import Base
 from osisoftpy.internal import get
-from osisoftpy.factory import Factory, create
+from osisoftpy.factory import Factory
+from osisoftpy.factory import create
 from osisoftpy.value import Value
 
 class Point(Base):
@@ -54,6 +55,7 @@ class Point(Base):
 
     # TODO: add checks to prevent erroneous returns from creating values
     # TODO: i.e.: some of the *spf* tags return invalid webid errors...
+    @property
     def current(self, **kwargs):
         try:
             return self._get_current(**kwargs)

@@ -25,7 +25,7 @@ from .conftest import credentials
 
 import osisoftpy
 
-skip = False
+skip = True
 
 
 def test_get_webapi(url, authtype, username, password):
