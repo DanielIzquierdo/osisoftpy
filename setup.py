@@ -25,7 +25,7 @@ def read(*names, **kwargs):
 setup(
     name='osisoftpy',
     description='OSIsoft PI Web WebAPI client',
-    version='1.1.0',
+    version='1.2.0',
     license='Apache Software License',
     author='Andrew Pong',
     author_email='apong@dstcontrols.com',

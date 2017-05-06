@@ -25,7 +25,7 @@ import colorlog
 
 __author__ = 'Andrew Pong'
 __email__ = 'apong@dstcontrols.com'
-__version__ = '1.1.0'
+__version__ = '1.2.0'
 
 # Configure logging
 loglevel = logging.DEBUG
