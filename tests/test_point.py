@@ -32,7 +32,7 @@ skip = False
 
 @pytest.mark.parametrize('query', ['name:sinusoid'])
 @pytest.mark.parametrize('count', [10])
-@pytest.mark.parametrize('key', ['current', 'interpolated'])
+@pytest.mark.parametrize('key', ['current', 'end', 'summary'])
 def test_point_valuekeys_are_immutable(webapi, query, count, key):
     """
 
@@ -53,8 +53,8 @@ def test_point_valuekeys_are_immutable(webapi, query, count, key):
 @pytest.mark.skipif(skip, reason='Takes an extra 2s...')
 @pytest.mark.parametrize('query', [(query())])
 @pytest.mark.parametrize('count', [10])
-@pytest.mark.parametrize('key', ['current', 'interpolated'])
-def test_points_valuekeys_are_immutable(webapi, query, count, key):
+@pytest.mark.parametrize('key', ['current', 'end', 'summary'])
+def test_points_singlevaluekeys_are_immutable(webapi, query, count, key):
     """
 
     :param webapi: 
