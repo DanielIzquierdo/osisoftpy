@@ -12,6 +12,10 @@ A python library for OSIsoft's PI Web API
    :target: https://ci.appveyor.com/project/awp/osisoftpy
    :alt: AppVeyor CI code test status
 
+.. image:: https://codeclimate.com/github/dstcontrols/osisoftpy.svg
+   :target: https://codeclimate.com/github/dstcontrols/osisoftpy
+   :alt: Code Climate rating
+
 .. image:: https://codecov.io/gh/dstcontrols/osisoftpy/branch/master/graph/badge.svg
    :target: https://codecov.io/gh/dstcontrols/osisoftpy
    :alt: Codecov Coverage Report
@@ -28,7 +32,7 @@ Usage
 
 .. code-block:: python
 
-   import arrow
+   import arrow #Optional, included to make timestamps easier to understand.
    import osisoftpy
 
 
