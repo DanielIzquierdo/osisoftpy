@@ -16,13 +16,19 @@ environment:
     - PYTHON: "C:\\Python35-x64"
     - PYTHON: "C:\\Python36-x64"
 
+init:
+  - "%PYTHON%\\python.exe -V"
+  - "%PYTHON%\\python.exe -c \"import struct;print(8 * struct.calcsize(\'P\'))\""
+
 install:
   # We need wheel installed to build wheels
-  - "%PYTHON%\\python.exe -m pip install wheel"
-  - "%PYTHON%\\python.exe -m pip install --upgrade pytest"
   - "%PYTHON%\\python.exe -m pip install -q -e ."
+  - "%PYTHON%\\python.exe -m pip install --upgrade pytest"
+  - "%PYTHON%\\python.exe -m pip install --upgrade pytest-cov"
+  - "%PYTHON%\\python.exe -m pip install wheel"
 
-build: off
+# Not a C# project, build stuff at the test step instead.
+build: false
 
 test_script:
   - "%PYTHON%\\python.exe -m pytest"
@@ -30,8 +36,11 @@ test_script:
 after_test:
   - "%PYTHON%\\python.exe setup.py bdist_wheel"
 
-artifacts:
-  - path: dist\*
+on_success:
+    # Report coverage results to codecov.io
+    - "%PYTHON%\\python.exe -m pip install codecov"
+    - set OS=WINDOWS
+    - "%PYTHON%\\python.exe -m codecov"
 
 notifications:
   - provider: Slack
@@ -42,7 +51,11 @@ notifications:
     on_build_failure: true
     on_build_status_changed: true
 
+artifacts:
+  - path: dist\*
+
 #on_success:
 #  You can use this step to upload your artifacts to a public website.
 #  See Appveyor's documentation for more details. Or you can simply
 #  access your wheels from the Appveyor "artifacts" tab for your build.
+#  - TODO: upload the content of dist/*.whl to a public wheelhouse
