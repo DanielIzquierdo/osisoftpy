@@ -26,11 +26,12 @@ Usage
 
    webapi = osisoftpy.webapi('https://localhost/piwebapi', authtype='kerberos')
 
-   '<OSIsoft PI Web API [https://localhost/piwebapi]>'
+   # <OSIsoft PI Web API [https://localhost/piwebapi]>
 
-   points = webapi.points(params=dict(q="name:CDT158", count=10))
+   search_paramaters = {'q': "name:CDT158", 'count': 10}
+   points = webapi.points(params=url_paramaters)
 
-   '<OSIsoft PI Point [CDT158 - Atmospheric Tower OH Vapor]>'
+   # <OSIsoft PI Point [CDT158 - Atmospheric Tower OH Vapor]>
 
    for point in points:
        print('The current value for {} is {}, recorded {}'.format(
@@ -38,10 +39,10 @@ Usage
            point.current.value,
            arrow.get(point.current.timestamp).humanize(),))
 
-   'The current value for CDT158 is 150.1271, recorded a minute ago'
+   # The current value for CDT158 is 150.1271, recorded a minute ago
 
    for point in points:
-       values = point.interpolated(starttime='*-14d', endtime='*', interval='1m',)
+       values = point.interpolated(starttime='*-14d', endtime='*', ='1m',)
        msg = ('{} interpolated values for {} were retrieved. '
              'The data spans from {} to {}').format(
            values.__len__(),
@@ -49,8 +50,7 @@ Usage
            arrow.get(values[0].timestamp).humanize(),
            arrow.get(values[-1].timestamp).humanize(),)
 
-   '20161 interpolated values for CDT158 were retrieved; '
-   'the data spans from 14 days ago to just now'
+   # 20161 interpolated values for CDT158 were retrieved; the data spans from 14 days ago to just now
 
 Installation
 ------------

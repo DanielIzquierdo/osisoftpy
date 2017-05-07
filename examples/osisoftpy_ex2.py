@@ -32,7 +32,7 @@ print(webapi)
 
 print('Connected to {}'.format(webapi.links.get('Self')))
 
-params= dict(q="name:CDT158", count=10)
+params= {'q': "name:CDT158", 'count': 10}
 points = webapi.points(params=params)
 
 for point in points:
