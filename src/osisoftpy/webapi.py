@@ -50,7 +50,6 @@ class WebAPI(Base):
         except Exception as e:
             raise e
 
-    # TODO: add checks to prevent erroneous returns from creating points
     def points(self, **kwargs):
         try:
             return self._get_points(**kwargs)

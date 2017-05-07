@@ -75,18 +75,3 @@ def _get_auth(authtype, username=None, password=None):
             mutual_authentication=requests_kerberos.OPTIONAL)
     else:
         return requests.auth.HTTPBasicAuth(username, password)
-
-
-def gen_dict_extract(key, var):
-    log.debug('Searching for %s in %s', key, iteritems(var))
-    if hasattr(var, 'iteritems'):
-        for k, v in iteritems(var):
-            if k == key:
-                yield v
-            if isinstance(v, dict):
-                for result in gen_dict_extract(key, v):
-                    yield result
-            elif isinstance(v, list):
-                for d in v:
-                    for result in gen_dict_extract(key, d):
-                        yield result

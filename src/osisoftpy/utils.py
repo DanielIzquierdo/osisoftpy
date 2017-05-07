@@ -25,24 +25,6 @@ from osisoftpy.value import Value
 log = logging.getLogger(__name__)
 
 
-def _get_auth(authtype, username=None, password=None):
-    if authtype == 'kerberos':
-        return requests_kerberos.HTTPKerberosAuth(
-            mutual_authentication=requests_kerberos.OPTIONAL)
-    else:
-        return requests.auth.HTTPBasicAuth(username, password)
-
-
-def stringify(**kwargs):
-    """
-    Return a concatenated string of the keys and values of the kwargs
-    Source: http://stackoverflow.com/a/39623935
-    :param kwargs: kwargs to be combined into a single string
-    :return: String representation of the kwargs
-    """
-    return (','.join('{0}={1!r}'.format(k, v) for k, v in kwargs.items()))
-
-
 def get_credentials(authtype, username, password):
     # type: (str, str, str) -> requests.auth.HTTPBasicAuth
     """

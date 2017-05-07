@@ -60,8 +60,6 @@ class Point(Base):
         self.summary_values = None
         self.end_value = None
 
-    # TODO: add checks to prevent erroneous returns from creating values
-    # TODO: i.e.: some of the *spf* tags return invalid webid errors...
     @property
     def current(self, time=None):
         try:
