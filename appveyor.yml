@@ -1,5 +1,7 @@
+version: 1.0.{build}
 environment:
-
+  CODECLIMATE_REPO_TOKEN:
+    secure: h882+EhxvohqsIHhmdCFTluKjh2EgljVUiZOS47JnNthXtwKp/08v+v22UPnBK2zfZyagmudqUphAiY14qx4vFhYmnTzQj0AFMknZU5aiJ0=
   matrix:
     # For Python versions available on Appveyor, see
     # http://www.appveyor.com/docs/installed-software#python
@@ -8,6 +10,7 @@ environment:
     - PYTHON: "C:\\Python34"
     - PYTHON: "C:\\Python35"
     - PYTHON: "C:\\Python36"
+    - PYTHON: "C:\\Python27-x64"
     - PYTHON: "C:\\Python27-x64"
     - PYTHON: "C:\\Python33-x64"
       DISTUTILS_USE_SDK: "1"
@@ -25,10 +28,11 @@ install:
   - "%PYTHON%\\python.exe -m pip install -q -e ."
   - "%PYTHON%\\python.exe -m pip install --upgrade pytest"
   - "%PYTHON%\\python.exe -m pip install --upgrade pytest-cov"
+  - "%PYTHON%\\python.exe -m pip install codeclimate-test-reporter"
+  - "%PYTHON%\\python.exe -m pip install codecov"
   - "%PYTHON%\\python.exe -m pip install wheel"
 
-# Not a C# project, build stuff at the test step instead.
-build: false
+build: off
 
 test_script:
   - "%PYTHON%\\python.exe -m pytest --cov"
@@ -37,11 +41,8 @@ after_test:
   - "%PYTHON%\\python.exe setup.py bdist_wheel"
 
 on_success:
-  - "%PYTHON%\\python.exe -m pip install codeclimate-test-reporter"
-  - "%PYTHON%\\python.exe -m codeclimate-test-reporter"
-  - "%PYTHON%\\python.exe -m pip install codecov"
-  - set OS=WINDOWS
   - "%PYTHON%\\python.exe -m coverage xml --ignore-errors -o coverage.xml"
+  - "%PYTHON%\\python.exe -m codeclimate-test-reporter"
   - "%PYTHON%\\python.exe -m codecov -X gcov"
 
 notifications:
