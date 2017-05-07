@@ -42,8 +42,6 @@ after_test:
 
 on_success:
   - "%PYTHON%\\python.exe -m coverage xml --ignore-errors -o coverage.xml"
-  - "%PYTHON%\\python.exe -m codeclimate-test-reporter --debug"
-  - "%PYTHON%\\python.exe -m codeclimate-test-reporter"
   - "codeclimate-test-reporter  --debug"
   - "codeclimate-test-reporter"
   - "%PYTHON%\\python.exe -m codecov -X gcov"

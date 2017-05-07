@@ -18,6 +18,7 @@ engines:
       enabled: true
       exclude_paths:
         - "*"
+        - "!setup.py"
         - "!src/osisoftpy/**"
         - "src/osisoftpy/legacy/"
 ratings:
@@ -27,5 +28,8 @@ ratings:
   - "**.py"
 exclude_paths:
 - "*"
-- "!src/osisoftpy/**"
+- "!setup.py"
+- "docs/**/*"
+- "examples/**/*"
+- "tests/**/*"
 - "src/osisoftpy/legacy/"
