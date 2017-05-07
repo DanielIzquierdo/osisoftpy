@@ -18,7 +18,6 @@ osisoftpy.webapi
 ~~~~~~~~~~~~
 Some blah blah about what this file is for...
 """
-
 import logging
 
 from osisoftpy.base import Base
@@ -39,7 +38,8 @@ class WebAPI(Base):
         super(self.__class__, self).__init__(**kwargs)
 
     def __str__(self):
-        return '<OSIsoft PI Web API [{}]>'.format(self.links.get('Self'))
+        self_str = '<OSIsoft PI Web API [{}]>'
+        return self_str.format(self.links.get('Self'))
 
     def search(self, **kwargs):
         r = get(self.links.get('Search'), self.session, **kwargs)
@@ -51,6 +51,7 @@ class WebAPI(Base):
         except Exception as e:
             raise e
 
+    # TODO: add checks to prevent erroneous returns from creating points
     def points(self, **kwargs):
         try:
             return self._get_points(**kwargs)

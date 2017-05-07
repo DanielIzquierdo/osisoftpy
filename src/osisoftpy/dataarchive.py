@@ -13,9 +13,13 @@
 #    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
-"""This module contains the class definition for the DataArchive class, 
+"""
+osisoftpy.point
+~~~~~~~~~~~~
+This module contains the class definition for the DataArchive class, 
 which represents a PI System Data Archive server as it's described by the PI 
-Web API. """
+Web API.
+"""
 
 from .base import Base
 
@@ -43,5 +47,5 @@ class DataArchive(Base):
         super(self.__class__, self).__init__(**kwargs)
 
     def __str__(self):
-        return '<OSIsoft PI Data Archive Server [{} - {}]>'.format(self.name,
-                                                    self.serverversion)
+        self_str = '<OSIsoft PI Data Archive Server [{} - {}]>'
+        return self_str.format(self.name, self.serverversion)

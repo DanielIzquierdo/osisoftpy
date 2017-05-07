@@ -16,8 +16,9 @@
 """
 osisoftpy.point
 ~~~~~~~~~~~~
-This module contains the class definition for the Point class, 
-which represents a PI System Point it's described by the PI Web API."""
+This module contains the class definition for the Point class, which
+represents a PI System Point it's described by the PI Web API.
+"""
 
 import logging
 
@@ -28,6 +29,7 @@ from osisoftpy.internal import get
 from osisoftpy.value import Value
 
 log = logging.getLogger(__name__)
+
 
 class Point(Base):
     """An :class:`OSIsoftPy <osisoftpy.dataarchive.Point>` object.
@@ -51,7 +53,8 @@ class Point(Base):
         super(self.__class__, self).__init__(**kwargs)
 
     def __str__(self):
-        return '<OSIsoft PI Point [{} - {}]>'.format(self.name, self.description)
+        self_str = '<OSIsoft PI Point [{} - {}]>'
+        return self_str.format(self.name, self.description)
 
         self.current_value = None
         self.interpolated_values = None

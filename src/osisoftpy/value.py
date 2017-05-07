@@ -43,3 +43,7 @@ class Value(Base):
         :param substituted: 
         :rtype: None
         """
+
+    def __str__(self):
+        self_str = '<OSIsoft PI Value [{} - {}]>'
+        return self_str.format(self.timestamp, self.value)

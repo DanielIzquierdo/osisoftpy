@@ -29,9 +29,10 @@ class client(_base):
                 results.insert(-1,
                                _server(
                                    super(client, self).≈(),
-                                   super(client, self).Session(),
-                                   item['WebId']))
-            except Exception as e:
+                                                        super(client,
+                                                              self).Session(),
+                                                        item['WebId']))
+                except Exception as e:
                 print
                 print('Unable to retrieve server information for "' +
                       item['Name'] + '".')

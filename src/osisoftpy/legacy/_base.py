@@ -1,5 +1,3 @@
-
-
 """
 osisoft_pi_webapi_python_client._base
 ~~~~~~~~~~~~~~~~~~~
@@ -16,7 +14,8 @@ from requests_kerberos import HTTPKerberosAuth, OPTIONAL
 class _base(object):
     """The Base Pi Object"""
 
-    def __init__(self, piWebApiDomain, userName='', password='', authenticationType='kerberos', verifySSL=True):
+    def __init__(self, piWebApiDomain, userName='', password='',
+                 authenticationType='kerberos', verifySSL=True):
         self._piWebApiDomain = self.__domainNameCleanup(piWebApiDomain)
         self.__session = requests.Session()
         self.__session.auth = self.__auth(
@@ -34,7 +33,7 @@ class _base(object):
 
     def Host(self):
         """Returns the host name"""
-        return(self._piWebApiDomain)
+        return (self._piWebApiDomain)
 
     def __testConnection(self):
         """tests connectivity to the piwebapi"""
@@ -58,7 +57,8 @@ class _base(object):
 
     def Request(self, url):
         """makes a GET request to the pi web api"""
-        return self.__session.get(self._piWebApiDomain + '/piwebapi/' + url).json()
+        return self.__session.get(
+            self._piWebApiDomain + '/piwebapi/' + url).json()
 
     def Post(self, url, payload):
         """makes a POST request to the pi web api"""

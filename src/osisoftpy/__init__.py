@@ -25,7 +25,6 @@ __author__ = 'Andrew Pong'
 __email__ = 'apong@dstcontrols.com'
 __version__ = '1.2.0'
 
-
 # Set default logging handler to avoid "No handler found" warnings.
 try:  # Python 2.7+
     from logging import NullHandler
@@ -56,4 +55,3 @@ from osisoftpy.webapi import (WebAPI)
 from osisoftpy.point import (Point)
 from osisoftpy.value import (Value)
 from osisoftpy.api import (webapi, response)
-
