@@ -18,8 +18,8 @@ after_success:
   - codecov
 notifications:
   slack:
-      on_success: always
-      on_failure: always
+    on_success: always
+    on_failure: always
     rooms:
       - dstcontrols:SUPzxzw8n9xyevY5kUkajRAm#pge
     template:
