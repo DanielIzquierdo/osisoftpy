@@ -37,6 +37,9 @@ class WebAPI(Base):
     def __init__(self, **kwargs):
         super(self.__class__, self).__init__(**kwargs)
 
+    def __str__(self):
+        return '<OSIsoft PI Web API [{}]>'.format(self.links.get('Self'))
+
     def search(self, **kwargs):
         r = get(self.links.get('Search'), self.session, **kwargs)
         return r.response

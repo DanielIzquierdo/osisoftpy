@@ -20,10 +20,18 @@ Usage
 
 .. code-block:: python
 
-   import osisoftpy
-
-   webapi = osisoftpy.webapi('https://localhost/piwebapi', authtype='kerberos')
-   webapi.search('indexed search query')
+   >>> import arrow
+   >>> import osisoftpy
+   >>> webapi = osisoftpy.webapi('https://localhost/piwebapi', authtype='kerberos')
+   <OSIsoft PI Web API [https://localhost/piwebapi]>
+   >>> points = webapi.points(params=dict(q="name:CDT158", count=10))
+   <OSIsoft PI Point [CDT158 - Atmospheric Tower OH Vapor]>
+   >>> for point in points:
+   >>>     print('The current value for {} is {}, recorded {}'.format(
+   >>>         point.name,
+   >>>         point.current.value,
+   >>>         arrow.get(point.current.timestamp).humanize(), ))
+   The current value for CDT158 is 150.1271, recorded a minute ago
 
 Installation
 ------------

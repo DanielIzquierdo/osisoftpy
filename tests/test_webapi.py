@@ -67,7 +67,7 @@ def test_webapi_query_method(webapi):
 
 def test_webapi_query_sinusoid(webapi):
     tag = 'sinusoid'
-    payload = {"q": "name:{}".format(tag), "count": 10}
+    payload = dict(q="name:{}".format(tag), count=10)
     r = webapi.query(params=payload)
     assert r.status_code == requests.codes.ok
     assert r.json().get('TotalHits') > 0

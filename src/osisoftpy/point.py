@@ -50,6 +50,9 @@ class Point(Base):
     def __init__(self, **kwargs):
         super(self.__class__, self).__init__(**kwargs)
 
+    def __str__(self):
+        return '<OSIsoft PI Point [{} - {}]>'.format(self.name, self.description)
+
         self.current_value = None
         self.interpolated_values = None
         self.recorded_values = None
@@ -60,14 +63,12 @@ class Point(Base):
     # TODO: add checks to prevent erroneous returns from creating values
     # TODO: i.e.: some of the *spf* tags return invalid webid errors...
     @property
-    def current(self, time=None, **kwargs):
+    def current(self, time=None):
         try:
-            kwargs.update({'time': time})
-            return self._get_current(**kwargs)
+            return self._get_current(time=time)
         except Exception as e:
             raise e
 
-    @property
     def interpolated(self, **kwargs):
         try:
             return self._get_interpolated(**kwargs)
@@ -142,11 +143,11 @@ class Point(Base):
 
     def _get_interpolated(self, **kwargs):
         payload = {
-            'time': kwargs.get('starttime', None),
-            'time': kwargs.get('endtime', None),
-            'time': kwargs.get('interval', None),
-            'time': kwargs.get('filterexpression', None),
-            'time': kwargs.get('includefilteredvalues', None),
+            'starttime': kwargs.get('starttime', None),
+            'endtime': kwargs.get('endtime', None),
+            'interval': kwargs.get('interval', None),
+            'filterexpression': kwargs.get('filterexpression', None),
+            'includefilteredvalues': kwargs.get('includefilteredvalues', None),
         }
         endpoint = 'interpolated'
         return self._get_values(payload=payload, endpoint=endpoint, **kwargs)
