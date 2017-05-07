@@ -1,0 +1,21 @@
+engines:
+  pep8:
+    enabled: true
+  duplication:
+    enabled: true
+    config:
+      languages:
+        python:
+          python_version: 3
+  fixme:
+      enabled: true
+ratings:
+  paths:
+  - src/osisoftpy/**
+  - "**.py"
+exclude_paths:
+- .idea/**/*
+- docs/**/*
+- examples/**/*
+- tests/**/*
+- src/osisoftpy/legacy/
