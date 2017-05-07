@@ -12,6 +12,10 @@ A python library for OSIsoft's PI Web API
    :target: https://ci.appveyor.com/project/awp/osisoftpy
    :alt: AppVeyor CI code test status
 
+.. image:: https://codecov.io/gh/dstcontrols/osisoftpy/branch/master/graph/badge.svg
+   :target: https://codecov.io/gh/dstcontrols/osisoftpy
+   :alt: Codecov Coverage Report
+
 .. image:: https://readthedocs.org/projects/osisoftpy/badge/?version=master
    :target: http://osisoftpy.readthedocs.io/en/master/?badge=master
    :alt: Documentation status
