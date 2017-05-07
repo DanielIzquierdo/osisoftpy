@@ -18,6 +18,7 @@ osisoftpy.api
 ~~~~~~~~~~~~
 This module implements the OSIsoftPy API.
 """
+
 import logging
 
 from osisoftpy.internal import get

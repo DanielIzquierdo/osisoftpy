@@ -18,6 +18,7 @@ osisoftpy.webapi
 ~~~~~~~~~~~~
 Some blah blah about what this file is for...
 """
+
 import logging
 
 from osisoftpy.base import Base

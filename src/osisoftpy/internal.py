@@ -18,6 +18,7 @@ osisoftpy.internal
 ~~~~~~~~~~~~
 Some blah blah about what this file is for...
 """
+
 import logging
 
 import requests

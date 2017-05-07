@@ -12,6 +12,7 @@ class OSIsoftPyException(Exception):
     """There was an ambiguous exception while handling your request."""
     pass
 
+
 class PIWebAPIError(OSIsoftPyException):
     pass
 

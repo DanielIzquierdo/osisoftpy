@@ -18,8 +18,10 @@ osisoftpy.factory
 ~~~~~~~~~~~~
 Some blah blah about what this file is for...
 """
+
 import logging
 from six import iteritems
+
 from osisoftpy.internal import _stringify
 
 log = logging.getLogger(__name__)

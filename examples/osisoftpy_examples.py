@@ -21,9 +21,9 @@ Examples of how to use the osisoftpy package.
 """
 
 import arrow
-from osisoftpy.utils import get_attribute, get_count
+from legacy.utils import get_attribute, get_count
 
-from monstrosity import Monstrosity
+from legacy.monstrosity import Monstrosity
 
 # Friendly US datetime format:
 human_datetime_format = 'YYYY-MM-DD HH:mm:ss ZZ'

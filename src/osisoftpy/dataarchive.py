@@ -36,7 +36,12 @@ class DataArchive(Base):
     :return: :class:`OSIsoftPy <osisoftpy.dataarchive.DataArchive>` object
     :rtype: osisoftpy.dataarchive.DataArchive
     """
+
+    valid_attr = {'name', 'serverversion', 'webid', 'isconnected', 'id'}
+
     def __init__(self, **kwargs):
-        keys = {'name', 'serverversion', 'webid', 'isconnected', 'id'}
-        self.__dict__.update((k, False) for k in keys)
-        self.__dict__.update((k, v) for k, v in kwargs.items() if k in keys)
+        super(self.__class__, self).__init__(**kwargs)
+
+    def __str__(self):
+        return '<OSIsoft PI Data Archive Server [{} - {}]>'.format(self.name,
+                                                    self.serverversion)
