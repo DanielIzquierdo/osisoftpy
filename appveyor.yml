@@ -41,7 +41,7 @@ on_success:
     - "%PYTHON%\\python.exe -m pip install codecov"
     - set OS=WINDOWS
     - "%PYTHON%\\python.exe -m coverage xml --ignore-errors -o coverage.xml"
-    - "%PYTHON%\\python.exe -m codecov"
+    - "%PYTHON%\\python.exe -m codecov -X gcov"
 
 notifications:
   - provider: Slack

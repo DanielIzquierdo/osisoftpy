@@ -1,8 +1,8 @@
 # .coveragerc to control coverage.py
 [run]
 branch = True
-include =
-    src/osisoftpy/*
+source =
+    src/osisoftpy/
 omit =
     src/osisoftpy/logged.py
     src/osisoftpy/monstrosity.py
@@ -27,3 +27,7 @@ exclude_lines =
     if __name__ == .__main__.:
 
 ignore_errors = True
+
+[xml]
+output = coverage.xml
+package_depth = 99
