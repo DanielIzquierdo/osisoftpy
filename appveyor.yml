@@ -31,7 +31,7 @@ install:
 build: false
 
 test_script:
-  - "%PYTHON%\\python.exe -m pytest --cov=./"
+  - "%PYTHON%\\python.exe -m pytest --cov"
 
 after_test:
   - "%PYTHON%\\python.exe setup.py bdist_wheel"
