@@ -51,7 +51,9 @@ log.addHandler(logging.NullHandler())
 # log.info('info message')
 # log.warn('warn message')
 
-from osisoftpy.api import (webapi, response)
+from osisoftpy.exceptions import (PIWebAPIError)
 from osisoftpy.webapi import (WebAPI)
 from osisoftpy.point import (Point)
 from osisoftpy.value import (Value)
+from osisoftpy.api import (webapi, response)
+

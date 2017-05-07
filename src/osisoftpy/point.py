@@ -19,11 +19,15 @@ osisoftpy.point
 This module contains the class definition for the Point class, 
 which represents a PI System Point it's described by the PI Web API."""
 
+import logging
+
 from osisoftpy.base import Base
-from osisoftpy.internal import get
 from osisoftpy.factory import Factory
 from osisoftpy.factory import create
+from osisoftpy.internal import get
 from osisoftpy.value import Value
+
+log = logging.getLogger(__name__)
 
 class Point(Base):
     """An :class:`OSIsoftPy <osisoftpy.dataarchive.Point>` object.
@@ -56,16 +60,159 @@ class Point(Base):
     # TODO: add checks to prevent erroneous returns from creating values
     # TODO: i.e.: some of the *spf* tags return invalid webid errors...
     @property
-    def current(self, **kwargs):
+    def current(self, time=None, **kwargs):
         try:
+            kwargs.update({'time': time})
             return self._get_current(**kwargs)
         except Exception as e:
             raise e
 
+    @property
+    def interpolated(self, **kwargs):
+        try:
+            return self._get_interpolated(**kwargs)
+        except Exception as e:
+            raise e
+
+    @property
+    def interpolatedattimes(self, **kwargs):
+        try:
+            return self._get_interpolatedattimes(**kwargs)
+        except Exception as e:
+            raise e
+
+    @property
+    def recorded(self, **kwargs):
+        try:
+            return self._get_recorded(**kwargs)
+        except Exception as e:
+            raise e
+
+    @property
+    def recordedattime(self, **kwargs):
+        try:
+            return self._get_recordedattime(**kwargs)
+        except Exception as e:
+            raise e
+
+    @property
+    def plot(self, **kwargs):
+        try:
+            return self._get_plot(**kwargs)
+        except Exception as e:
+            raise e
+
+    @property
+    def summary(self, **kwargs):
+        try:
+            return self._get_summary(**kwargs)
+        except Exception as e:
+            raise e
+
+    @property
+    def end(self, **kwargs):
+        try:
+            return self._get_end(**kwargs)
+        except Exception as e:
+            raise e
+
+    def _get_value(self, payload, endpoint, **kwargs):
+        log.debug('payload: %s', payload)
+        url = '{}/streams/{}/{}'.format(self.webapi.links.get('Self'),
+                                        self.webid, endpoint)
+        r = get(url, self.session, params=payload, **kwargs)
+        value = create(Factory(Value), r.response.json(), self.session,
+                       self.webapi)
+        return value
+
+    def _get_values(self, payload, endpoint, **kwargs):
+        url = '{}/streams/{}/{}'.format(self.webapi.links.get('Self'),
+                                        self.webid, endpoint)
+        r = get(url, self.session, params=payload, **kwargs)
+        values = list(map(
+            lambda x: create(Factory(Value), x, self.session, self.webapi),
+            r.response.json().get('Items', None)
+        ))
+        return values
+
     def _get_current(self, **kwargs):
         payload = {'time': kwargs.get('time', None)}
-        endpoint = '{}/streams/{}/value'.format(self.webapi.links.get('Self'),
-                                                self.webid)
-        r = get(endpoint, self.session, params=payload, **kwargs)
-        value = create(Factory(Value), r.response.json(), self.session, self.webapi)
-        return value
+        endpoint = 'value'
+        return self._get_value(payload=payload, endpoint=endpoint, **kwargs)
+
+    def _get_interpolated(self, **kwargs):
+        payload = {
+            'time': kwargs.get('starttime', None),
+            'time': kwargs.get('endtime', None),
+            'time': kwargs.get('interval', None),
+            'time': kwargs.get('filterexpression', None),
+            'time': kwargs.get('includefilteredvalues', None),
+        }
+        endpoint = 'interpolated'
+        return self._get_values(payload=payload, endpoint=endpoint, **kwargs)
+
+    def _get_interpolatedattimes(self, **kwargs):
+        payload = {
+            'time': kwargs.get('starttime', None),
+            'time': kwargs.get('endtime', None),
+            'time': kwargs.get('interval', None),
+            'time': kwargs.get('filterexpression', None),
+            'time': kwargs.get('includefilteredvalues', None),
+        }
+        endpoint = 'interpolated'
+        return self._get_values(payload=payload, endpoint=endpoint, **kwargs)
+
+    def _get_recorded(self, **kwargs):
+        payload = {
+            'time': kwargs.get('starttime', None),
+            'time': kwargs.get('endtime', None),
+            'time': kwargs.get('interval', None),
+            'time': kwargs.get('filterexpression', None),
+            'time': kwargs.get('includefilteredvalues', None),
+        }
+        endpoint = 'interpolated'
+        return self._get_values(payload=payload, endpoint=endpoint, **kwargs)
+
+    def _get_recordedattime(self, **kwargs):
+        payload = {
+            'time': kwargs.get('starttime', None),
+            'time': kwargs.get('endtime', None),
+            'time': kwargs.get('interval', None),
+            'time': kwargs.get('filterexpression', None),
+            'time': kwargs.get('includefilteredvalues', None),
+        }
+        endpoint = 'interpolated'
+        return self._get_values(payload=payload, endpoint=endpoint, **kwargs)
+
+    def _get_plot(self, **kwargs):
+        payload = {
+            'time': kwargs.get('starttime', None),
+            'time': kwargs.get('endtime', None),
+            'time': kwargs.get('interval', None),
+            'time': kwargs.get('filterexpression', None),
+            'time': kwargs.get('includefilteredvalues', None),
+        }
+        endpoint = 'interpolated'
+        return self._get_values(payload=payload, endpoint=endpoint, **kwargs)
+
+    def _get_summary(self, **kwargs):
+        payload = {
+            'time': kwargs.get('starttime', None),
+            'time': kwargs.get('endtime', None),
+            'time': kwargs.get('interval', None),
+            'time': kwargs.get('filterexpression', None),
+            'time': kwargs.get('includefilteredvalues', None),
+        }
+        endpoint = 'interpolated'
+        return self._get_values(payload=payload, endpoint=endpoint, **kwargs)
+
+    def _get_end(self, **kwargs):
+        payload = {
+            'time': kwargs.get('starttime', None),
+            'time': kwargs.get('endtime', None),
+            'time': kwargs.get('interval', None),
+            'time': kwargs.get('filterexpression', None),
+            'time': kwargs.get('includefilteredvalues', None),
+        }
+        endpoint = 'interpolated'
+        return self._get_values(payload=payload, endpoint=endpoint, **kwargs)

@@ -18,12 +18,15 @@ osisoftpy.webapi
 ~~~~~~~~~~~~
 Some blah blah about what this file is for...
 """
+import logging
 
 from osisoftpy.base import Base
 from osisoftpy.internal import get
 from osisoftpy.factory import Factory, create
 from osisoftpy.point import Point
 
+
+log = logging.getLogger(__name__)
 
 class WebAPI(Base):
     """
@@ -57,6 +60,7 @@ class WebAPI(Base):
 
     def _get_points(self, **kwargs):
         r = get(self.links.get('Search') + '/query', self.session, **kwargs)
+
         points = list(map(lambda x: create(Factory(Point), x, self.session, self),
                           r.response.json().get('Items', None)))
         return points

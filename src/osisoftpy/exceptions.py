@@ -8,18 +8,12 @@ This module contains the set of OSIsoftPy's exceptions.
 """
 
 
-class OSIsoftPyException(IOError):
+class OSIsoftPyException(Exception):
     """There was an ambiguous exception while handling your request."""
+    pass
 
-    def __init__(self, *args, **kwargs):
-        """Initialize this class with `request` and `response` objects."""
-        response = kwargs.pop('response', None)
-        self.response = response
-        self.request = kwargs.pop('request', None)
-        if (response is not None and not self.request and hasattr(response,
-                                                                  'request')):
-            self.request = self.response.request
-        super(OSIsoftPyException, self).__init__(*args, **kwargs)
+class PIWebAPIError(OSIsoftPyException):
+    pass
 
 
 class HTTPError(OSIsoftPyException):

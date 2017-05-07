@@ -21,9 +21,11 @@ Tests for the `osisoftpy.webapi` module.
 """
 
 import re
-import pytest
+
 import osisoftpy
+import pytest
 import requests
+
 from .conftest import query
 
 
@@ -57,10 +59,10 @@ def test_webapi_search_method(webapi):
 
 
 def test_webapi_query_method(webapi):
-    r = webapi.query()
-    assert r.status_code == requests.codes.ok
-    assert 'Query parameter must be specified' in r.json().get('Errors')[
-        0].get('Message')
+    with pytest.raises(osisoftpy.exceptions.PIWebAPIError) as e:
+        r = webapi.query()
+        assert r.status_code == requests.codes.ok
+    assert e.match('Query parameter must be specified')
 
 
 def test_webapi_query_sinusoid(webapi):
@@ -79,6 +81,7 @@ def test_webapi_points_sinusoid(webapi):
     payload = {"q": "name:{}".format(tag), "count": 10}
     r = webapi.points(params=payload)
     assert all(isinstance(x, osisoftpy.Point) for x in r)
+    assert r.__len__() == 1
 
 
 @pytest.mark.parametrize('query', query())

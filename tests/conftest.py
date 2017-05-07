@@ -68,9 +68,14 @@ def credentials():
     unknown = list(product(authtypes, usernames, passwords))
 
     Credentials = namedtuple('Credentials', ['valid', 'unknown'])
-    credtuple = Credentials(valid=valid, unknown=unknown)
+    return Credentials(valid=valid, unknown=unknown)
 
-    return credtuple
+
+def pointvalues():
+    single = ['current', 'end', 'summary', 'recordedattime', 'interpolatedattimes']
+    multi = ['interpolated', 'recorded', 'plot']
+    PointValues = namedtuple('PointValues', ['single', 'multi'])
+    return PointValues(single=single, multi=multi)
 
 
 @pytest.fixture(scope='module')
