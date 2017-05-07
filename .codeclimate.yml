@@ -22,7 +22,6 @@ engines:
         - "src/osisoftpy/legacy/"
 ratings:
   paths:
-  - "!*"
   - "src/osisoftpy/**"
   - "!src/osisoftpy/legacy/"
   - "**.py"
