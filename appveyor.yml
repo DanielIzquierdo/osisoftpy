@@ -37,11 +37,12 @@ after_test:
   - "%PYTHON%\\python.exe setup.py bdist_wheel"
 
 on_success:
-    # Report coverage results to codecov.io
-    - "%PYTHON%\\python.exe -m pip install codecov"
-    - set OS=WINDOWS
-    - "%PYTHON%\\python.exe -m coverage xml --ignore-errors -o coverage.xml"
-    - "%PYTHON%\\python.exe -m codecov -X gcov"
+  - "%PYTHON%\\python.exe -m pip install codeclimate-test-reporter"
+  - "%PYTHON%\\python.exe -m codeclimate-test-reporter"
+  - "%PYTHON%\\python.exe -m pip install codecov"
+  - set OS=WINDOWS
+  - "%PYTHON%\\python.exe -m coverage xml --ignore-errors -o coverage.xml"
+  - "%PYTHON%\\python.exe -m codecov -X gcov"
 
 notifications:
   - provider: Slack

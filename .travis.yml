@@ -10,12 +10,14 @@ before_install:
   - pip install --upgrade pytest
   - pip install codecov
   - pip install pytest-cov
+  - pip install codeclimate-test-reporter
 install:
   - pip install -q -e .
 script:
   - python -m pytest --cov
 after_success:
   - codecov
+  - codeclimate-test-reporter
 notifications:
   slack:
     on_success: always
