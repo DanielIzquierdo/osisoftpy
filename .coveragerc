@@ -2,10 +2,11 @@
 [run]
 branch = True
 include =
-    src/*
+    src/osisoftpy/*
 omit =
     src/osisoftpy/logged.py
     src/osisoftpy/monstrosity.py
+    src/osisoftpy/utils.py
 
 [report]
 # Regexes for lines to exclude from consideration
@@ -15,7 +16,7 @@ exclude_lines =
 
     # Don't complain about missing debug-only code:
     def __repr__
-    if self\.debug
+    if .debug:
 
     # Don't complain if tests don't hit defensive assertion code:
     raise AssertionError
@@ -26,6 +27,3 @@ exclude_lines =
     if __name__ == .__main__.:
 
 ignore_errors = True
-
-[html]
-directory = coverage_html_report
