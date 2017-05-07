@@ -1,6 +1,13 @@
 engines:
   pep8:
     enabled: true
+    checks:
+      W291:
+        enabled: false
+      W293:
+        enabled: false
+      E402:
+        enabled: false
   duplication:
     enabled: true
     config:
@@ -9,13 +16,17 @@ engines:
           python_version: 3
   fixme:
       enabled: true
+      exclude_paths:
+        - "*"
+        - "!src/osisoftpy/**"
+        - "src/osisoftpy/legacy/"
 ratings:
   paths:
-  - src/osisoftpy/**
+  - "*"
+  - "!src/osisoftpy/**"
+  - "src/osisoftpy/legacy/"
   - "**.py"
 exclude_paths:
-- .idea/**/*
-- docs/**/*
-- examples/**/*
-- tests/**/*
-- src/osisoftpy/legacy/
+- "*"
+- "!src/osisoftpy/**"
+- "src/osisoftpy/legacy/"
