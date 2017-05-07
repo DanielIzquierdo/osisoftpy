@@ -25,11 +25,9 @@ init:
 
 install:
   # We need wheel installed to build wheels
-  - "%PYTHON%\\python.exe -m pip install -q -e ."
+  - "%PYTHON%\\python.exe -m pip install --editable ."
   - "%PYTHON%\\python.exe -m pip install --upgrade pytest"
   - "%PYTHON%\\python.exe -m pip install --upgrade pytest-cov"
-  - "%PYTHON%\\python.exe -m pip install codeclimate-test-reporter"
-  - "%PYTHON%\\python.exe -m pip install codecov"
   - "%PYTHON%\\python.exe -m pip install wheel"
 
 build: off
@@ -40,11 +38,13 @@ test_script:
 after_test:
   - "%PYTHON%\\python.exe setup.py bdist_wheel"
 
-on_success:
-  - "%PYTHON%\\python.exe -m coverage xml --ignore-errors -o coverage.xml"
-  - "codeclimate-test-reporter  --debug"
-  - "codeclimate-test-reporter"
-  - "%PYTHON%\\python.exe -m codecov -X gcov"
+# I give up getting coverage report submission from appveyor.
+#on_success:
+#  - "%PYTHON%\\python.exe -m pip install codeclimate-test-reporter"
+#  - "%PYTHON%\\python.exe -m pip install codecov"
+#  - "%PYTHON%\\python.exe -m coverage xml --ignore-errors -o coverage.xml"
+#  - "codeclimate-test-reporter  --debug"
+#  - "%PYTHON%\\python.exe -m codecov -X gcov"
 
 notifications:
   - provider: Slack
