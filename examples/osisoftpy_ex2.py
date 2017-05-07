@@ -64,12 +64,15 @@ for point in (p for p in points):
     #     print('... {} {}'.format(
     #         value.value,
     #         arrow.get(value.timestamp).humanize(), ))
-    msg = '{} interpolated values for {} were retrieved; the data spans from {} to {}'
-    print(msg.format(
+    msg = ('{} interpolated values for {} were retrieved. '
+           'The data spans from {} to {}').format(
         values.__len__(),
         point.name,
         arrow.get(values[0].timestamp).humanize(),
-        arrow.get(values[-1].timestamp).humanize(),))
+        arrow.get(values[-1].timestamp).humanize()
+    )
+
+    print(msg)
 
     min = numpy.amin([v.value for v in values])
     max = numpy.amax([v.value for v in values])
