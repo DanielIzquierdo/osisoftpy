@@ -29,7 +29,7 @@ Usage
    # <OSIsoft PI Web API [https://localhost/piwebapi]>
 
    search_paramaters = {'q': "name:CDT158", 'count': 10}
-   points = webapi.points(params=url_paramaters)
+   points = webapi.points(params=search_paramaters)
 
    # <OSIsoft PI Point [CDT158 - Atmospheric Tower OH Vapor]>
 
