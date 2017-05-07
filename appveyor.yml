@@ -35,9 +35,12 @@ artifacts:
 
 notifications:
   - provider: Slack
-    auth_token:
+    incoming_webhook:
       secure: cD/h53d0l9UlqM9TRgv7uxYp6v+tIIy65S+7cOKeCsPWdeW1nZXPHvuPPJgdfrTBabDjuhQdT/tQol4vKZrehxNnaqf6ST/sNCCJgrTPp14=
     channel: '#pge'
+    on_build_success: true
+    on_build_failure: true
+    on_build_status_changed: true
 
 #on_success:
 #  You can use this step to upload your artifacts to a public website.

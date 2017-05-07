@@ -6,11 +6,15 @@ A python library for OSIsoft's PI Web API
 
 .. image:: https://travis-ci.org/dstcontrols/osisoftpy.svg?branch=master
    :target: https://travis-ci.org/dstcontrols/osisoftpy
-   :alt: Code Testing Status
+   :alt: Travis CI code test status
+
+.. image:: https://ci.appveyor.com/api/projects/status/ugkm40a5ry81tjgt/branch/master?svg=true
+   :target: https://ci.appveyor.com/project/awp/osisoftpy
+   :alt: AppVeyor CI code test status
 
 .. image:: https://readthedocs.org/projects/osisoftpy/badge/?version=master
    :target: http://osisoftpy.readthedocs.io/en/master/?badge=master
-   :alt: Documentation Status
+   :alt: Documentation status
 
 
 This library provides pythonic access to OSIsoft's PI System.
