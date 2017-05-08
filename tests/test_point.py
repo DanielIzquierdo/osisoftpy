@@ -23,30 +23,23 @@ Tests for the `osisoftpy.point` module.
 import re
 
 import pytest
-import arrow
-
 import osisoftpy
 
 from .conftest import pointvalues
 from .conftest import query
+from .conftest import now
 
 skip = False
 
-now = arrow.utcnow()
 
 
-@pytest.mark.skipif(skip, reason='Takes an extra 2s...')
+# TODO: add tests for docstrings
+
+
 @pytest.mark.parametrize('query', [(query())])
 @pytest.mark.parametrize('count', [10])
 @pytest.mark.parametrize('key', pointvalues().single)
 def test_points_singlevaluekeys_are_immutable(webapi, query, count, key):
-    """
-
-    :param webapi: 
-    :param query: 
-    :param count: 
-    :param key: 
-    """
     points = webapi.points(params=dict(q=query, count=count))
     assert all(isinstance(x, osisoftpy.Point) for x in points)
     for point in points:
@@ -57,23 +50,16 @@ def test_points_singlevaluekeys_are_immutable(webapi, query, count, key):
         assert isinstance(point.current, osisoftpy.Value)
 
 
-@pytest.mark.skipif(skip, reason='Takes an extra 2s...')
 @pytest.mark.parametrize('query', ['name:sinusoid'])
 @pytest.mark.parametrize('count', [10])
 @pytest.mark.parametrize('keys', [pointvalues().single])
 def test_points_singlevaluekeys_are_validtypes(webapi, query, count, keys):
-    """
-
-    :param webapi: 
-    :param query: 
-    :param count: 
-    :param keys: 
-    """
     payload = dict(q=query, count=count)
     points = webapi.points(params=payload)
     assert all(isinstance(x, osisoftpy.Point) for x in points)
     for point in points:
         for k in keys:
+
             try:
                 valuekey = getattr(point, k)
                 if re.match('int\d{0,2}', point.datatype, re.IGNORECASE):
@@ -84,18 +70,10 @@ def test_points_singlevaluekeys_are_validtypes(webapi, query, count, keys):
                 pass
 
 
-@pytest.mark.skipif(skip, reason='Takes an extra 2s...')
 @pytest.mark.parametrize('query', ['name:sinusoid'])
 @pytest.mark.parametrize('count', [10])
 @pytest.mark.parametrize('keys', [pointvalues().multi])
 def test_points_multivaluekeys_are_validtypes(webapi, query, count, keys):
-    """
-
-    :param webapi: 
-    :param query: 
-    :param count: 
-    :param keys: 
-    """
     payload = dict(q=query, count=count)
     points = webapi.points(params=payload)
     assert all(isinstance(x, osisoftpy.Point) for x in points)
@@ -111,26 +89,6 @@ def test_points_multivaluekeys_are_validtypes(webapi, query, count, keys):
                 pass
 
 
-# TODO: add tests for docstrings
-@pytest.mark.skipif(True, reason='not implemented')
-@pytest.mark.parametrize('query', ['name:sinusoid'])
-@pytest.mark.parametrize('count', [10])
-@pytest.mark.parametrize('keys', [pointvalues().multi])
-def test_points_methods_help(webapi, query, count, keys):
-    """
-
-    :param webapi: 
-    :param query: 
-    :param count: 
-    :param keys: 
-    """
-
-    help_text = help(webapi)
-    print(help_text)
-    assert help_text is not None
-
-
-@pytest.mark.skipif(skip, reason='Takes an extra 2s...')
 @pytest.mark.parametrize('query', ['name:sinusoid'])
 @pytest.mark.parametrize('count', [10])
 @pytest.mark.parametrize('key', ['interpolated'])
@@ -139,17 +97,8 @@ def test_points_methods_help(webapi, query, count, keys):
     {'expected_count': 20161, 'starttime': '*-14d', 'interval': '1m', }
 ])
 def test_points_interpolated_return_expected_value_count(
-    webapi, query, count, key, params,
+        webapi, query, count, key, params,
 ):
-    """
-
-    :param webapi: 
-    :param query: 
-    :param count: 
-    :param keys: 
-    :param params: 
-
-    """
     payload = dict(q=query, count=count)
     points = webapi.points(params=payload)
     assert all(isinstance(x, osisoftpy.Point) for x in points)
@@ -160,36 +109,26 @@ def test_points_interpolated_return_expected_value_count(
         assert values.__len__() == expected_count
 
 
-@pytest.mark.skipif(skip, reason='Takes an extra 2s...')
 @pytest.mark.parametrize('query', ['name:sinusoid'])
 @pytest.mark.parametrize('count', [10])
 @pytest.mark.parametrize('key', ['interpolatedattimes'])
 @pytest.mark.parametrize('params', [
-    {'time': now, 'expected_count': 1},
-    {'time': [now, now.replace(weeks=-1)], 'expected_count': 2},
+    {'time': now(), 'expected_count': 1},
+    {'time': [now(), now().replace(weeks=-1)], 'expected_count': 2},
     {'time': [
-        now,
-        now.replace(weeks=-1),
-        now.replace(weeks=-2),
-        now.replace(weeks=-3),
-        now.replace(weeks=-4),
-        now.replace(weeks=-5),
-        now.replace(weeks=-6),
+        now(),
+        now().replace(weeks=-1),
+        now().replace(weeks=-2),
+        now().replace(weeks=-3),
+        now().replace(weeks=-4),
+        now().replace(weeks=-5),
+        now().replace(weeks=-6),
 
     ], 'expected_count': 7},
 ])
 def test_points_interpolatedattimes_return_expected_value_count(
         webapi, query, count, key, params,
 ):
-    """
-
-    :param webapi: 
-    :param query: 
-    :param count: 
-    :param keys: 
-    :param params: 
-
-    """
     payload = dict(q=query, count=count)
     points = webapi.points(params=payload)
     assert all(isinstance(x, osisoftpy.Point) for x in points)
@@ -198,3 +137,58 @@ def test_points_interpolatedattimes_return_expected_value_count(
         expected_count = params.pop('expected_count')
         values = valuekey(**params)
         assert values.__len__() == expected_count
+
+#TODO : figure out how to calculate the expected number of recorded values
+@pytest.mark.parametrize('query', ['name:sinusoid'])
+@pytest.mark.parametrize('count', [10])
+@pytest.mark.parametrize('key', ['recorded'])
+@pytest.mark.parametrize('params', [
+    {},
+    {'starttime': '*-14d'},
+    {'starttime': '*-14d', 'endtime': '*-7d'},
+    {'starttime': '*-14d', 'boundarytype': 'inside'},
+    {'starttime': '*-14d', 'endtime': '*-7d', 'boundarytype': 'outside'},
+
+])
+def test_points_recorded_return_values(
+        webapi, query, count, key, params,
+):
+    payload = dict(q=query, count=count)
+    points = webapi.points(params=payload)
+    assert all(isinstance(x, osisoftpy.Point) for x in points)
+    for point in points:
+        valuekey = getattr(point, key)
+        values = valuekey(**params)
+        assert values.__len__() > 0
+
+
+@pytest.mark.parametrize('query', ['name:sinusoid'])
+@pytest.mark.parametrize('count', [10])
+@pytest.mark.parametrize('key', ['recordedattime'])
+@pytest.mark.parametrize('retrievalmode',
+    ['Auto','AtOrBefore','Before','AtOrAfter','After','Exact'])
+def test_points_recorded_returns_one_value(
+        webapi, query, count, key, now, retrievalmode,
+):
+    payload = dict(q=query, count=count)
+    points = webapi.points(params=payload)
+    assert all(isinstance(x, osisoftpy.Point) for x in points)
+    for point in points:
+        valuekey = getattr(point, key)
+        payload = {'time': now, 'retrievalmode': retrievalmode}
+        values = valuekey(**payload)
+        assert all(isinstance(x, osisoftpy.Value) for x in values)
+        assert values.__len__() == 1
+        for value in values:
+            print('Point {}, recorded value {} {}: {}'.format(
+                point.name, retrievalmode, now, value.value))
+
+
+
+
+
+
+
+
+
+

@@ -189,24 +189,128 @@ class Point(Base):
         return self._get_values(payload=payload, endpoint=endpoint)
 
     @wrapt_handle_exceptions
-    def recorded(self, **kwargs):
-        return self._get_recorded(**kwargs)
-
-    @property
-    @wrapt_handle_exceptions
-    def recordedattime(self, **kwargs):
-        return self._get_recordedattime(**kwargs)
-
-    @wrapt_handle_exceptions
     def plot(self, **kwargs):
         return self._get_plot(**kwargs)
 
-    @property
+    @wrapt_handle_exceptions
+    def recorded(
+        self,
+        starttime='*-1d',
+        endtime='*',
+        boundarytype='Inside',
+        filterexpression=None,
+        maxcount=1000,
+        includefilteredvalues=False,
+        selectedfields=None,):
+        """
+        Returns a list of compressed values for the requested time range 
+        from the source provider. 
+        
+        Returned times are affected by the specified boundary type. If no 
+        values are found for the time range and conditions specified then 
+        the HTTP response will be success, with a body containing an empty 
+        array of Items. When specifying true for the includeFilteredValues 
+        parameter, consecutive filtered events are not returned. The first 
+        value that would be filtered out is returned with its time and the 
+        enumeration value "Filtered". The next value in the collection will 
+        be the next compressed value in the specified direction that passes 
+        the filter criteria - if any. When both boundaryType and a 
+        filterExpression are specified, the events returned for the boundary 
+        condition specified are passed through the filter. If the 
+        includeFilteredValues parameter is true, the boundary values will be 
+        reported at the proper timestamps with the enumeration value 
+        "Filtered" when the filter conditions are not met at the boundary 
+        time. If the includeFilteredValues parameter is false for this case, 
+        no event is returned for the boundary time. 
+        :param maxcount: 
+        :param starttime: An optional start time. The default is '*-1d' for 
+            element attributes and points. For event frame attributes, 
+            the default is the event frame's start time, or '*-1d' if that is 
+            not set. 
+        :param endtime: An optional end time. The default is '*' 
+            for element attributes and points. For event frame attributes, 
+            the default is the event frame's end time, or '*' if that is not 
+            set. Note that if endTime is earlier than startTime, the resulting 
+            values will be in time-descending order. 
+        :param boundarytype: An optional value that determines how the times 
+            and values of the returned end points are determined.
+            The default is 'Inside'.
+        :param filterexpression: An optional string containing a filter 
+            expression. Expression variables are relative to the data point. 
+            Use '.' to reference the containing attribute. 
+            The default is no filtering.
+        :param includefilteredvalues: Specify 'true' to indicate that values 
+            which  fail the filter criteria are present in the returned data 
+            at the times where they occurred with a value set to a 'Filtered' 
+            enumeration value with bad status. Repeated consecutive failures 
+            are omitted. 
+        :param selectedfields: List of fields to be returned in the 
+            response, separated by semicolons (;). If this parameter is not 
+            specified, all available fields will be returned. This parameter 
+            filters PI Web API response so that the response only includes a 
+            selected set of fields. It allows PI Web API to return none but the 
+            information that you are interested in, and therefore reduce your 
+            bandwidth usage. 
+        :return: :class:`OSIsoftPy <osisoftpy.structures.TypedList>` 
+            object containing a list of :class:`OSIsoftPy 
+            <osisoftpy.dataarchive.Point>` objects. :rtype: 
+            osisoftpy.TypedList<osisoftpy.Point> 
+        """
+        payload = {
+            'starttime': starttime,
+            'endtime': endtime,
+            'boundarytype': boundarytype,
+            'filterexpression': filterexpression,
+            'maxcount': maxcount,
+            'includefilteredvalues': includefilteredvalues,
+            'selectedfields': selectedfields,
+        }
+        return self._get_values(payload=payload, endpoint='recorded')
+
+    @wrapt_handle_exceptions
+    def recordedattime(
+            self,
+            time,
+            retrievalmode='Auto',
+            selectedfields=None,):
+        """
+        Returns a single recorded value based on the passed time and 
+        retrieval mode from the stream. 
+ 
+        :param time: A list of timestamps at which to retrieve interpolated 
+                values. 
+        :param retrievalmode: An optional value that determines the value to 
+            return when a value doesn't exist at the exact time specified.
+            The default is 'Auto'. The retrieval mode is an enumeration of the 
+            possible values for retrieving recorded values from a stream. 
+            The following values are accepted:
+            Auto: Automatically determine the best retrieval mode.
+            AtOrBefore: Return a recorded value at the passed time or if no 
+                value exists at that time, the previous recorded value.
+            Before: Return the first recorded value before the passed time.
+            AtOrAfter: Return a recorded value at the passed time or if no 
+                value exists at that time, the next recorded value.
+            After: Return the first recorded value after the passed time.
+            Exact: Return a recorded value at the passed time or return an 
+                error if none exists.
+        :param selectedfields: List of fields to be returned in the 
+            response, separated by semicolons (;). If this parameter is not 
+            specified, all available fields will be returned. 
+        :return: :class:`OSIsoftPy <osisoftpy.dataarchive.Point>` object 
+        :rtype: osisoftpy.osisoftpy.Point
+        """
+        payload = {
+            'time': time,
+            'retrievalmode': retrievalmode,
+            'selectedfields': selectedfields,
+        }
+        endpoint = 'interpolatedattimes'
+        return self._get_values(payload=payload, endpoint=endpoint)
+
     @wrapt_handle_exceptions
     def summary(self, **kwargs):
         return self._get_summary(**kwargs)
 
-    @property
     @wrapt_handle_exceptions
     def end(self, **kwargs):
         return self._get_end(**kwargs)

@@ -21,6 +21,7 @@ Contains pytest fixtures which are globally available throughout the suite.
 
 from collections import namedtuple
 from itertools import product
+import arrow
 import pytest
 import osisoftpy
 
@@ -49,6 +50,10 @@ def authtype():
 def dataarchive():
     return 'sbb03.eecs.berkeley.edu'
 
+@pytest.fixture(scope='module')
+def now():
+    return arrow.utcnow()
+
 
 def query():
     Query = namedtuple('Query', ['single', 'partial', 'wildcard', 'multi'])
@@ -72,7 +77,7 @@ def credentials():
 
 
 def pointvalues():
-    single = ['current', 'end', 'summary', 'recordedattime']
+    single = ['current']
     multi = ['interpolated', 'interpolatedattimes', 'recorded', 'plot']
     PointValues = namedtuple('PointValues', ['single', 'multi'])
     return PointValues(single=single, multi=multi)
@@ -84,3 +89,4 @@ def webapi(url, authtype, username, password):
                             authtype=authtype,
                             username=username,
                             password=password)
+
