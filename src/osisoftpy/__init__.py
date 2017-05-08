@@ -25,14 +25,6 @@ __author__ = 'Andrew Pong'
 __email__ = 'apong@dstcontrols.com'
 __version__ = '1.2.0'
 
-# Set default logging handler to avoid "No handler found" warnings.
-try:  # Python 2.7+
-    from logging import NullHandler
-except ImportError:
-    class NullHandler(logging.Handler):
-        def emit(self, record):
-            pass
-
 # Configure logging
 loglevel = logging.DEBUG
 fmt = '[%(filename)s:%(lineno)s %(funcName)5s() ] %(levelname).1s %(message)s'
