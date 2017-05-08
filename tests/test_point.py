@@ -33,7 +33,7 @@ skip = False
 @pytest.mark.skipif(skip, reason='Takes an extra 2s...')
 @pytest.mark.parametrize('query', [(query())])
 @pytest.mark.parametrize('count', [10])
-@pytest.mark.parametrize('key', ['current'])
+@pytest.mark.parametrize('key', pointvalues().single)
 def test_points_singlevaluekeys_are_immutable(webapi, query, count, key):
     """
 
@@ -104,11 +104,12 @@ def test_points_multivaluekeys_are_validtypes(webapi, query, count, keys):
             except AttributeError:
                 pass
 
-@pytest.mark.skipif(skip, reason='Takes an extra 2s...')
+# TODO: add tests for docstrings
+@pytest.mark.skipif(True, reason='not implemented')
 @pytest.mark.parametrize('query', ['name:sinusoid'])
 @pytest.mark.parametrize('count', [10])
 @pytest.mark.parametrize('keys', [pointvalues().multi])
-def test_points_interpolated_default_kwargs(webapi, query, count, keys):
+def test_points_methods_help(webapi, query, count, keys):
     """
 
     :param webapi: 
@@ -116,15 +117,42 @@ def test_points_interpolated_default_kwargs(webapi, query, count, keys):
     :param count: 
     :param keys: 
     """
+
+    help_text = help(webapi)
+    print(help_text)
+    assert help_text is not None
+
+
+@pytest.mark.skipif(skip, reason='Takes an extra 2s...')
+@pytest.mark.parametrize('query', ['name:sinusoid'])
+@pytest.mark.parametrize('count', [10])
+@pytest.mark.parametrize('keys', [pointvalues().multi])
+@pytest.mark.parametrize('params', [
+    {'query_type': 'interpolated', 'interval': '2h', 'expected_count': 13},
+    {'query_type': 'interpolated', 'starttime':'*-14d', 'interval': '1m', 'expected_count': 20161}])
+def test_points_multivaluekeys_return_expected_value_count(
+        webapi, query, count, keys, params):
+    """
+
+    :param webapi: 
+    :param query: 
+    :param count: 
+    :param keys: 
+    :param params: 
+
+    """
     payload = dict(q=query, count=count)
     points = webapi.points(params=payload)
     assert all(isinstance(x, osisoftpy.Point) for x in points)
     for point in points:
         for k in keys:
             valuekey = getattr(point, k)
-            print(valuekey)
-            values = valuekey()
-            for v in values:
-                print(v)
+            if k == 'interpolated':
+                query_type = params.pop('query_type')
+                expected_count = params.pop('expected_count')
+                values = valuekey(**params)
+                assert values.__len__() == expected_count
+            else:
+                values = valuekey()
 
 

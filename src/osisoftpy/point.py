@@ -80,7 +80,7 @@ class Point(Base):
     @wrapt_handle_exceptions
     def interpolated(
             self,
-            starttime='*-3h',
+            starttime='*-1d',
             endtime='*',
             interval='1h',
             filterexpression=None,
@@ -104,6 +104,7 @@ class Point(Base):
     def recorded(self, **kwargs):
         return self._get_recorded(**kwargs)
 
+    @property
     @wrapt_handle_exceptions
     def recordedattime(self, **kwargs):
         return self._get_recordedattime(**kwargs)
@@ -112,10 +113,12 @@ class Point(Base):
     def plot(self, **kwargs):
         return self._get_plot(**kwargs)
 
+    @property
     @wrapt_handle_exceptions
     def summary(self, **kwargs):
         return self._get_summary(**kwargs)
 
+    @property
     @wrapt_handle_exceptions
     def end(self, **kwargs):
         return self._get_end(**kwargs)
