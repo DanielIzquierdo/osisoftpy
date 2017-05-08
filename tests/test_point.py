@@ -30,30 +30,10 @@ from .conftest import pointvalues
 skip = False
 
 
-@pytest.mark.parametrize('query', ['name:sinusoid'])
-@pytest.mark.parametrize('count', [10])
-@pytest.mark.parametrize('key', ['current', 'end', 'summary'])
-def test_point_valuekeys_are_immutable(webapi, query, count, key):
-    """
-
-    :param webapi: 
-    :param query: 
-    :param count: 
-    :param key: 
-    """
-    points = webapi.points(params=dict(q=query, count=count))
-    assert all(isinstance(x, osisoftpy.Point) for x in points)
-    for point in points:
-        with pytest.raises(AttributeError) as e:
-            setattr(point, key, 'foo')
-        e.match('can\'t set attribute')
-        assert isinstance(point.current, osisoftpy.Value)
-
-
 @pytest.mark.skipif(skip, reason='Takes an extra 2s...')
 @pytest.mark.parametrize('query', [(query())])
 @pytest.mark.parametrize('count', [10])
-@pytest.mark.parametrize('key', ['current', 'end', 'summary'])
+@pytest.mark.parametrize('key', ['current'])
 def test_points_singlevaluekeys_are_immutable(webapi, query, count, key):
     """
 
@@ -66,6 +46,7 @@ def test_points_singlevaluekeys_are_immutable(webapi, query, count, key):
     assert all(isinstance(x, osisoftpy.Point) for x in points)
     for point in points:
         with pytest.raises(AttributeError) as e:
+            print(point, key, 'foo')
             setattr(point, key, 'foo')
         e.match('can\'t set attribute')
         assert isinstance(point.current, osisoftpy.Value)
@@ -97,6 +78,53 @@ def test_points_singlevaluekeys_are_validtypes(webapi, query, count, keys):
             except AttributeError:
                 pass
 
+@pytest.mark.skipif(skip, reason='Takes an extra 2s...')
+@pytest.mark.parametrize('query', ['name:sinusoid'])
+@pytest.mark.parametrize('count', [10])
+@pytest.mark.parametrize('keys', [pointvalues().multi])
+def test_points_multivaluekeys_are_validtypes(webapi, query, count, keys):
+    """
 
+    :param webapi: 
+    :param query: 
+    :param count: 
+    :param keys: 
+    """
+    payload = dict(q=query, count=count)
+    points = webapi.points(params=payload)
+    assert all(isinstance(x, osisoftpy.Point) for x in points)
+    for point in points:
+        for k in keys:
+            try:
+                valuekey = getattr(point, k)
+                if re.match('int\d{0,2}', point.datatype, re.IGNORECASE):
+                    assert type(valuekey.value) is int
+                elif re.match('float\d{0,2}', point.datatype, re.IGNORECASE):
+                    assert type(valuekey.value) is float
+            except AttributeError:
+                pass
+
+@pytest.mark.skipif(skip, reason='Takes an extra 2s...')
+@pytest.mark.parametrize('query', ['name:sinusoid'])
+@pytest.mark.parametrize('count', [10])
+@pytest.mark.parametrize('keys', [pointvalues().multi])
+def test_points_interpolated_default_kwargs(webapi, query, count, keys):
+    """
+
+    :param webapi: 
+    :param query: 
+    :param count: 
+    :param keys: 
+    """
+    payload = dict(q=query, count=count)
+    points = webapi.points(params=payload)
+    assert all(isinstance(x, osisoftpy.Point) for x in points)
+    for point in points:
+        for k in keys:
+            valuekey = getattr(point, k)
+            print(valuekey)
+            values = valuekey()
+            for v in values:
+                print(v)
 
 

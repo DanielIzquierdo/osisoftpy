@@ -60,7 +60,7 @@ def test_webapi_search_method(webapi):
 
 def test_webapi_query_method(webapi):
     with pytest.raises(osisoftpy.exceptions.PIWebAPIError) as e:
-        r = webapi.query()
+        r = webapi.response()
         assert r.status_code == requests.codes.ok
     assert e.match('Query parameter must be specified')
 
@@ -68,7 +68,7 @@ def test_webapi_query_method(webapi):
 def test_webapi_query_sinusoid(webapi):
     tag = 'sinusoid'
     payload = dict(q="name:{}".format(tag), count=10)
-    r = webapi.query(params=payload)
+    r = webapi.response(params=payload)
     assert r.status_code == requests.codes.ok
     assert r.json().get('TotalHits') > 0
     assert r.json().get('Items')[0].get('Name').lower() == 'sinusoid'

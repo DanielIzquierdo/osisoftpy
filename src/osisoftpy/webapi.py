@@ -41,24 +41,34 @@ class WebAPI(Base):
         self_str = '<OSIsoft PI Web API [{}]>'
         return self_str.format(self.links.get('Self'))
 
-    def search(self, **kwargs):
-        r = get(self.links.get('Search'), self.session, **kwargs)
-        return r.response
 
-    def query(self, **kwargs):
+
+
+
+
+    def search(self, **kwargs):
         try:
-            return self._get_query(**kwargs)
+            return self._get_search(**kwargs)
         except Exception as e:
             raise e
 
-    # TODO: add checks to prevent erroneous returns from creating points
+    def response(self, **kwargs):
+        try:
+            return self._get_response(**kwargs)
+        except Exception as e:
+            raise e
+
     def points(self, **kwargs):
         try:
             return self._get_points(**kwargs)
         except Exception as e:
             raise e
 
-    def _get_query(self, **kwargs):
+    def _get_search(self, **kwargs):
+        r = get(self.links.get('Search'), self.session, **kwargs)
+        return r.response
+
+    def _get_response(self, **kwargs):
         r = get(self.links.get('Search') + '/query', self.session, **kwargs)
         return r.response
 

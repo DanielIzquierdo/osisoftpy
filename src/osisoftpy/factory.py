@@ -39,7 +39,7 @@ def create(factory, thing, session, webapi=None):
     kwargs = dict(map(lambda k_v: (k_v[0].lower(), k_v[1]), iteritems(thing)))
     kwargs.update({'session': session, 'webapi': webapi})
     thing = factory.create(**kwargs)
-    log.debug('Created %s, kwargs: %s', type(thing), _stringify(**kwargs))
+    # log.debug('Created %s, kwargs: %s', type(thing), _stringify(**kwargs))
     return thing
 
 

@@ -34,7 +34,7 @@ except ImportError:
             pass
 
 # Configure logging
-loglevel = logging.INFO
+loglevel = logging.DEBUG
 fmt = '[%(filename)s:%(lineno)s %(funcName)5s() ] %(levelname).1s %(message)s'
 
 handler = logging.StreamHandler()

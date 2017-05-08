@@ -7,6 +7,14 @@ osisoftpy.exceptions
 This module contains the set of OSIsoftPy's exceptions.
 """
 
+# TODO: Implement custom PI Web API HTTP response codes:
+# streams/{webid}/GetInterpolated
+# 200: The values that meet the specified conditions.
+# 400: The request was malformed.
+# 409: The data reference does not support this method,
+#      or the supplied filter expression is unsupported,
+#      or the desired units of measure are incompatible.
+
 
 class OSIsoftPyException(Exception):
     """There was an ambiguous exception while handling your request."""

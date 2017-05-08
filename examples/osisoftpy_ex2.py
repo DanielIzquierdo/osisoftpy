@@ -59,6 +59,7 @@ for point in points:
 for point in (p for p in points):
 
     values = point.interpolated(starttime='*-14d', endtime='*', interval='1m')
+    values = point.interpolated()
 
     # for value in values:
     #     print('... {} {}'.format(

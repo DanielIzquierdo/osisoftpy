@@ -21,7 +21,7 @@ represents a PI System Point it's described by the PI Web API.
 """
 
 import logging
-
+import wrapt
 from osisoftpy.base import Base
 from osisoftpy.factory import Factory
 from osisoftpy.factory import create
@@ -29,6 +29,14 @@ from osisoftpy.internal import get
 from osisoftpy.value import Value
 
 log = logging.getLogger(__name__)
+
+@wrapt.decorator
+def wrapt_handle_exceptions(wrapped, instance, args, kw):
+    log.debug('Calling decorated function %s', wrapped)
+    try:
+        return wrapped(*args, **kw)
+    except Exception as e:
+        raise e
 
 
 class Point(Base):
@@ -64,59 +72,53 @@ class Point(Base):
         self.end_value = None
 
     @property
+    @wrapt_handle_exceptions
     def current(self, time=None):
-        try:
-            return self._get_current(time=time)
-        except Exception as e:
-            raise e
+        payload = {'time': time}
+        return self._get_value(payload=payload, endpoint='value')
 
-    def interpolated(self, **kwargs):
-        try:
-            return self._get_interpolated(**kwargs)
-        except Exception as e:
-            raise e
+    @wrapt_handle_exceptions
+    def interpolated(
+            self,
+            starttime='*-3h',
+            endtime='*',
+            interval='1h',
+            filterexpression=None,
+            includefilteredvalues=False,
+            selectedfields=None,):
+        payload = {
+            'starttime': starttime,
+            'endtime': endtime,
+            'interval': interval,
+            'filterexpression': filterexpression,
+            'includefilteredvalues': includefilteredvalues,
+            'selectedfields': selectedfields,
+        }
+        return self._get_values(payload=payload, endpoint='interpolated')
 
-    @property
+    @wrapt_handle_exceptions
     def interpolatedattimes(self, **kwargs):
-        try:
-            return self._get_interpolatedattimes(**kwargs)
-        except Exception as e:
-            raise e
+        return self._get_interpolatedattimes(**kwargs)
 
-    @property
+    @wrapt_handle_exceptions
     def recorded(self, **kwargs):
-        try:
-            return self._get_recorded(**kwargs)
-        except Exception as e:
-            raise e
+        return self._get_recorded(**kwargs)
 
-    @property
+    @wrapt_handle_exceptions
     def recordedattime(self, **kwargs):
-        try:
-            return self._get_recordedattime(**kwargs)
-        except Exception as e:
-            raise e
+        return self._get_recordedattime(**kwargs)
 
-    @property
+    @wrapt_handle_exceptions
     def plot(self, **kwargs):
-        try:
-            return self._get_plot(**kwargs)
-        except Exception as e:
-            raise e
+        return self._get_plot(**kwargs)
 
-    @property
+    @wrapt_handle_exceptions
     def summary(self, **kwargs):
-        try:
-            return self._get_summary(**kwargs)
-        except Exception as e:
-            raise e
+        return self._get_summary(**kwargs)
 
-    @property
+    @wrapt_handle_exceptions
     def end(self, **kwargs):
-        try:
-            return self._get_end(**kwargs)
-        except Exception as e:
-            raise e
+        return self._get_end(**kwargs)
 
     def _get_value(self, payload, endpoint, **kwargs):
         log.debug('payload: %s', payload)
@@ -136,22 +138,6 @@ class Point(Base):
             r.response.json().get('Items', None)
         ))
         return values
-
-    def _get_current(self, **kwargs):
-        payload = {'time': kwargs.get('time', None)}
-        endpoint = 'value'
-        return self._get_value(payload=payload, endpoint=endpoint, **kwargs)
-
-    def _get_interpolated(self, **kwargs):
-        payload = {
-            'starttime': kwargs.get('starttime', None),
-            'endtime': kwargs.get('endtime', None),
-            'interval': kwargs.get('interval', None),
-            'filterexpression': kwargs.get('filterexpression', None),
-            'includefilteredvalues': kwargs.get('includefilteredvalues', None),
-        }
-        endpoint = 'interpolated'
-        return self._get_values(payload=payload, endpoint=endpoint, **kwargs)
 
     def _get_interpolatedattimes(self, **kwargs):
         payload = {

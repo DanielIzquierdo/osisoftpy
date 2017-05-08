@@ -19,6 +19,7 @@ osisoftpy_examples.py
 ~~~~~~~~~~~~
 Examples of how to use the osisoftpy package.
 """
+import inspect
 
 import arrow
 from legacy.utils import get_attribute, get_count
@@ -101,8 +102,10 @@ for point in points:
             for value in values:
                 print(msg_body.format(point.name, value.calculationtype,
                                       value.timestamp, value.value))
+
 msg_summary = '{} values returned - {} current, {} interpolated, {} plot, ' \
               '{} recorded, and {} summary'
 print(msg_summary.format(totalizer.total, totalizer.current,
                          totalizer.interpolated, totalizer.plot,
                          totalizer.recorded, totalizer.summary))
+
