@@ -86,6 +86,16 @@ class Point(Base):
             filterexpression=None,
             includefilteredvalues=False,
             selectedfields=None,):
+        """
+
+        :param starttime: 
+        :param endtime: 
+        :param interval: 
+        :param filterexpression: 
+        :param includefilteredvalues: 
+        :param selectedfields: 
+        :return: 
+        """
         payload = {
             'starttime': starttime,
             'endtime': endtime,

@@ -69,7 +69,7 @@ setup(
         'requests',
         'requests-kerberos',
         'six',
-        'arrow',
+        'arrow', 'wrapt',
     ],
     extras_require={
         # eg:
