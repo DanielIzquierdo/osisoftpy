@@ -28,12 +28,30 @@ webapi = osisoftpy.webapi(
     username='albertxu',
     password='Welcome2pi', )
 
+
+# webapi = osisoftpy.webapi(authtype='kerberos')
+
 print(webapi)
 
 print('Connected to {}'.format(webapi.links.get('Self')))
 
-params= {'q': "name:CDT158", 'count': 10}
+params= {'q': "name:CDT158"}
 points = webapi.points(params=params)
+
+for point in points:
+    print(point.name)
+    print(point.current.value)
+    print(point.uniqueid)
+    print(point.webid)
+    print(point.datatype)
+    print(point.interpolated())
+    for value in point.interpolated():
+        print(value.timestamp, value.value)
+    for value in point.recorded():
+        print(value.timestamp, value.value)
+
+
+
 
 for point in points:
     print(point)
@@ -41,6 +59,9 @@ for point in points:
 print(points)
 
 print('{} PI points were retrieved.'.format(points.__len__()))
+
+
+
 
 for point in points:
     print('The current value for {} is {}, recorded {}'.format(
