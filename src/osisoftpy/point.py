@@ -26,6 +26,7 @@ from osisoftpy.base import Base
 from osisoftpy.factory import Factory
 from osisoftpy.factory import create
 from osisoftpy.internal import get
+from osisoftpy.internal import put
 from osisoftpy.value import Value
 
 log = logging.getLogger(__name__)
@@ -70,6 +71,24 @@ class Point(Base):
         self.plot_values = None
         self.summary_values = None
         self.end_value = None
+
+    @wrapt_handle_exceptions
+    def attributes(self, namefilter=None, selectedfields=None):
+        payload = {
+            'namefilter': namefilter,
+            'selectedfields': selectedfields,
+        }
+        return self._get_values(
+            payload=payload, endpoint='attributes', controller='points')
+
+    @wrapt_handle_exceptions
+    def update_attribute(self, name, value):
+
+        url = 'points/{}/attributes/{}'.format(
+            self.webapi.links.get('Self'), name)
+        payload = {value}
+        r = put(url, self.session, params=payload)
+        return r.response
 
     @property
     @wrapt_handle_exceptions
@@ -315,10 +334,10 @@ class Point(Base):
     def end(self, **kwargs):
         return self._get_end(**kwargs)
 
-    def _get_value(self, payload, endpoint, **kwargs):
+    def _get_value(self, payload, endpoint, controller='streams', **kwargs):
         log.debug('payload: %s', payload)
-        url = '{}/streams/{}/{}'.format(self.webapi.links.get('Self'),
-                                        self.webid, endpoint)
+        url = '{}/{}/{}/{}'.format(
+            self.webapi.links.get('Self'), controller, self.webid, endpoint)
         r = get(url, self.session, params=payload, **kwargs)
         value = create(Factory(Value), r.response.json(), self.session,
                        self.webapi)

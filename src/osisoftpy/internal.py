@@ -58,6 +58,33 @@ def get(url, session=None, **kwargs):
     except Exception as e:
         raise e
 
+def put(url, session=None, **kwargs):
+    try:
+        s = session or requests.session()
+        log.debug(s)
+        with s:
+            s.verify = kwargs.get('verifyssl', True)
+            log.debug(s.auth)
+            s.auth = s.auth or _get_auth(kwargs.get('authtype', None),
+                                         kwargs.get('username', None),
+                                         kwargs.get('password', None))
+            Response = namedtuple('Response', ['response', 'session'])
+            r = Response(s.put(url, params=kwargs.get('params', None)), s)
+            json = r.response.json()
+            if 'Errors' in json and json.get('Errors').__len__() > 0:
+                msg = 'PI Web API returned an error: {}'
+                raise PIWebAPIError(msg.format(json.get('Errors')))
+            else:
+                return r
+
+    except PIWebAPIError as e:
+
+        log.exception(e, exc_info=True)
+        raise e
+
+    except Exception as e:
+        raise e
+
 
 def _stringify(**kwargs):
     """
