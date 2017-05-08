@@ -50,8 +50,8 @@ class Point(Base):
     :param uniqueid: Unique GUID for the Point created by the PI System
     :param datatype: PI Point datatype
     
-    :return: :class:`OSIsoftPy <osisoftpy.dataarchive.Point>` object
-    :rtype: osisoftpy.dataarchive.Point
+    :return: :class:`OSIsoftPy <osisoftpy.Point>` object
+    :rtype: osisoftpy.Point
     """
 
     valid_attr = {'name', 'description', 'uniqueid', 'webid', 'datatype',
@@ -74,6 +74,20 @@ class Point(Base):
     @property
     @wrapt_handle_exceptions
     def current(self, time=None):
+        """
+        Returns the value of the stream at the specified time. By default, 
+        this is usually the current value. 
+
+        :param time: An optional time. The default time context is 
+            determined from the owning object - for example, the time range of 
+            the event frame or transfer which holds this attribute. Otherwise, 
+            the implementation of the Data Reference determines the meaning of 
+            no context. For Points or simply configured PI Point Data 
+            References, this means the snapshot value of the PI Point on the 
+            Data Server.
+        :return: :class:`OSIsoftPy <osisoftpy.Point>` object
+        :rtype: osisoftpy.Point
+        """
         payload = {'time': time}
         return self._get_value(payload=payload, endpoint='value')
 
@@ -87,14 +101,37 @@ class Point(Base):
             includefilteredvalues=False,
             selectedfields=None,):
         """
+        Retrieves interpolated values over the specified time range at 
+        the specified sampling interval. 
 
-        :param starttime: 
-        :param endtime: 
-        :param interval: 
-        :param filterexpression: 
-        :param includefilteredvalues: 
-        :param selectedfields: 
-        :return: 
+        :param starttime: An optional start time. The default is '*-1d' for 
+            element attributes and points. For event frame attributes, 
+            the default is the event frame's start time, or '*-1d' if that is 
+            not set. 
+        :param endtime: An optional end time. The default is '*' 
+            for element attributes and points. For event frame attributes, 
+            the default is the event frame's end time, or '*' if that is not 
+            set. Note that if endTime is earlier than startTime, the resulting 
+            values will be in time-descending order. 
+        :param interval: The sampling interval, in AFTimeSpan format. 
+        :param filterexpression: An 
+            optional string containing a filter expression. Expression 
+            variables are relative to the data point. Use '.' to reference the 
+            containing attribute. If the attribute does not support filtering, 
+            the filter will be ignored. The default is no filtering. 
+        :param 
+            includefilteredvalues: Specify 'true' to indicate that values which 
+            fail the filter criteria are present in the returned data at the 
+            times where they occurred with a value set to a 'Filtered' 
+            enumeration value with bad status. Repeated consecutive failures 
+            are omitted. 
+        :param selectedfields: List of fields to be returned in the 
+            response, separated by semicolons (;). If this parameter is not 
+            specified, all available fields will be returned. 
+        :return: :class:`OSIsoftPy <osisoftpy.structures.TypedList>` object 
+            containing a list of 
+            :class:`OSIsoftPy <osisoftpy.dataarchive.Point>` objects. 
+        :rtype: osisoftpy.TypedList<osisoftpy.Point>
         """
         payload = {
             'starttime': starttime,
@@ -107,8 +144,49 @@ class Point(Base):
         return self._get_values(payload=payload, endpoint='interpolated')
 
     @wrapt_handle_exceptions
-    def interpolatedattimes(self, **kwargs):
-        return self._get_interpolatedattimes(**kwargs)
+    def interpolatedattimes(
+            self,
+            time,
+            filterexpression=None,
+            includefilteredvalues=False,
+            sortorder='Ascending',
+            selectedfields=None,):
+        """
+        Retrieves interpolated values over the specified time range at the 
+        specified sampling interval. 
+ 
+        :param time: A list of timestamps at which to retrieve interpolated 
+                values. 
+        :param filterexpression: An 
+            optional string containing a filter expression. Expression 
+            variables are relative to the data point. Use '.' to reference the 
+            containing attribute. If the attribute does not support filtering, 
+            the filter will be ignored. The default is no filtering. 
+        :param 
+            includefilteredvalues: Specify 'true' to indicate that values which 
+            fail the filter criteria are present in the returned data at the 
+            times where they occurred with a value set to a 'Filtered' 
+            enumeration value with bad status. Repeated consecutive failures 
+            are omitted. 
+        :param selectedfields: List of fields to be returned in the 
+            response, separated by semicolons (;). If this parameter is not 
+            specified, all available fields will be returned. 
+        :param sortorder The order that the returned collection is sorted. The 
+            default is 'Ascending'. 
+        :return: :class:`OSIsoftPy <osisoftpy.structures.TypedList>` object 
+            containing a list of 
+            :class:`OSIsoftPy <osisoftpy.dataarchive.Point>` objects. 
+        :rtype: osisoftpy.TypedList<osisoftpy.Point>
+        """
+        payload = {
+            'time': time,
+            'filterexpression': filterexpression,
+            'includefilteredvalues': includefilteredvalues,
+            'sortorder': sortorder,
+            'selectedfields': selectedfields,
+        }
+        endpoint = 'interpolatedattimes'
+        return self._get_values(payload=payload, endpoint=endpoint)
 
     @wrapt_handle_exceptions
     def recorded(self, **kwargs):

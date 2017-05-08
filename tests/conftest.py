@@ -73,7 +73,7 @@ def credentials():
 
 def pointvalues():
     single = ['current', 'end', 'summary', 'recordedattime']
-    multi = ['interpolated', 'recorded', 'plot']
+    multi = ['interpolated', 'interpolatedattimes', 'recorded', 'plot']
     PointValues = namedtuple('PointValues', ['single', 'multi'])
     return PointValues(single=single, multi=multi)
 
