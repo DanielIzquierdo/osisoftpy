@@ -32,10 +32,11 @@ install:
           throw "There are newer queued builds for this pull request, failing early." }
   - ECHO "Filesystem root:"
   - ps: "ls \"C:/\""
-  - "%PYTHON%\\python.exe -m pip install setuptools --no-binary :all: --upgrade"
-  - "%PYTHON%\\python.exe -m pip install wheel --no-binary :all: --upgrade"
-  - "%PYTHON%\\python.exe -m pip install pytest --no-binary :all: --upgrade"
-  - "%PYTHON%\\python.exe -m pip install pytest-cov --no-binary :all: --upgrade"
+  - "%PYTHON%\\python.exe -m pip install six"
+  - "%PYTHON%\\python.exe -m pip install setuptools"
+  - "%PYTHON%\\python.exe -m pip install wheel"
+  - "%PYTHON%\\python.exe -m pip install pytest"
+  - "%PYTHON%\\python.exe -m pip install pytest-cov"
   - "%PYTHON%\\python.exe -m pip install --editable ."
 
 
