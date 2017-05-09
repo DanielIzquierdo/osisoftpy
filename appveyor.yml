@@ -22,6 +22,18 @@ init:
   - "%PYTHON%\\python.exe -c \"import struct;print(8 * struct.calcsize(\'P\'))\""
 
 install:
+  # If there is a newer build queued for the same PR, cancel this one.
+  # The AppVeyor 'rollout builds' option is supposed to serve the same
+  # purpose but it is problematic because it tends to cancel builds pushed
+  # directly to master instead of just PR builds (or the converse).
+  # credits: JuliaLang developers.
+  - ps: if ($env:APPVEYOR_PULL_REQUEST_NUMBER -and $env:APPVEYOR_BUILD_NUMBER -ne ((Invoke-RestMethod `
+        https://ci.appveyor.com/api/projects/$env:APPVEYOR_ACCOUNT_NAME/$env:APPVEYOR_PROJECT_SLUG/history?recordsNumber=50).builds | `
+        Where-Object pullRequestId -eq $env:APPVEYOR_PULL_REQUEST_NUMBER)[0].buildNumber) { `
+          throw "There are newer queued builds for this pull request, failing early." }
+  - ECHO "Filesystem root:"
+  - ps: "ls \"C:/\""
+
   # We need wheel installed to build wheels
   - "%PYTHON%\\python.exe -m pip install --editable ."
   - "%PYTHON%\\python.exe -m pip install --upgrade pytest"
@@ -34,7 +46,7 @@ test_script:
   - "%PYTHON%\\python.exe -m pytest --cov"
 
 after_test:
-  - "%PYTHON%\\python.exe -m pip download --only-binary=:all: dist"
+  - "%PYTHON%\\python.exe -m pip download --requirement requirements.txt --dest dist\deps"
   - "%PYTHON%\\python.exe setup.py bdist_wheel"
   - ps: "ls dist"
 
@@ -46,6 +58,7 @@ after_test:
 #  - "%PYTHON%\\python.exe -m coverage xml --ignore-errors -o coverage.xml"
 #  - "codeclimate-test-reporter  --debug"
 #  - "%PYTHON%\\python.exe -m codecov -X gcov"
+#  - TODO: upload the content of dist/*.whl to a public wheelhouse
 
 notifications:
   - provider: Slack
@@ -58,9 +71,3 @@ notifications:
 
 artifacts:
   - path: dist\*
-
-#on_success:
-#  You can use this step to upload your artifacts to a public website.
-#  See Appveyor's documentation for more details. Or you can simply
-#  access your wheels from the Appveyor "artifacts" tab for your build.
-#  - TODO: upload the content of dist/*.whl to a public wheelhouse
