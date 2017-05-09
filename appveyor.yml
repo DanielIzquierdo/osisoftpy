@@ -5,15 +5,16 @@ environment:
   matrix:
     # For Python versions available on Appveyor, see
     # http://www.appveyor.com/docs/installed-software#python
-    - PYTHON: "C:\\Python27"
-    - PYTHON: "C:\\Python33"
-    - PYTHON: "C:\\Python34"
-    - PYTHON: "C:\\Python35"
-    - PYTHON: "C:\\Python36"
-    - PYTHON: "C:\\Python27-x64"
-    - PYTHON: "C:\\Python27-x64"
-    - PYTHON: "C:\\Python35-x64"
-    - PYTHON: "C:\\Python36-x64"
+#    - PYTHON: "C:\\Python27"
+#    - PYTHON: "C:\\Python33"
+#    - PYTHON: "C:\\Python34"
+#    - PYTHON: "C:\\Python35"
+#    - PYTHON: "C:\\Python36"
+#    - PYTHON: "C:\\Python27-x64"
+    - PYTHON: "C:\\Python33-x64"
+    - PYTHON: "C:\\Python34-x64"
+#    - PYTHON: "C:\\Python35-x64"
+#    - PYTHON: "C:\\Python36-x64"
 
 init:
   - "%PYTHON%\\python.exe -V"
@@ -31,12 +32,11 @@ install:
           throw "There are newer queued builds for this pull request, failing early." }
   - ECHO "Filesystem root:"
   - ps: "ls \"C:/\""
-
-  # We need wheel installed to build wheels
   - "%PYTHON%\\python.exe -m pip install --editable ."
-  - "%PYTHON%\\python.exe -m pip install --upgrade pytest"
-  - "%PYTHON%\\python.exe -m pip install --upgrade pytest-cov"
-  - "%PYTHON%\\python.exe -m pip install wheel"
+  - "%PYTHON%\\python.exe -m pip install setuptools --no-binary :all: --upgrade --force-reinstall"
+  - "%PYTHON%\\python.exe -m pip install wheel --no-binary :all: --upgrade --force-reinstall"
+  - "%PYTHON%\\python.exe -m pip install pytest --no-binary :all: --upgrade --force-reinstall"
+  - "%PYTHON%\\python.exe -m pip install pytest-cov --no-binary :all: --upgrade --force-reinstall"
 
 build: off
 
@@ -46,14 +46,14 @@ test_script:
 after_test:
   - "%PYTHON%\\python.exe -m pip download --requirement requirements.txt --dest dist\\deps"
   - "%PYTHON%\\python.exe setup.py bdist_wheel"
+  - ps: $artifact_name = $(Get-Item '.\dist\osisoftpy*.whl').Name.Replace('any.whl', 'win32.zip')
+  - ps: Remove-Item .\dist\osisoftpy*win32.zip*
+  - ps: 7z a -tzip dist\$artifact_name '.\dist\*' -aoa '-i!*.whl' '-x!*.zip' '-x!*.tmp'
   - ps: "ls dist"
 
 
 # I give up getting coverage report submission from appveyor.
-on_success:
-  - ps: $artifact_name = $(Get-Item '.\dist\osisoftpy*.whl').Name.Replace('any.whl', 'win32.zip')
-  - ps: Remove-Item .\dist\osisoftpy*win32.zip*
-  - ps: 7z a -tzip dist\$artifact_name '.\dist\*' -aoa '-i!*.whl' '-x!*.zip' '-x!*.tmp'
+#on_success:
 #  - 7z a myapp.zip path\to\bin\*.dll
 #  - "%PYTHON%\\python.exe -m pip install codeclimate-test-reporter"
 #  - "%PYTHON%\\python.exe -m pip install codecov"
