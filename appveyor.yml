@@ -5,16 +5,16 @@ environment:
   matrix:
     # For Python versions available on Appveyor, see
     # http://www.appveyor.com/docs/installed-software#python
-#    - PYTHON: "C:\\Python27"
-#    - PYTHON: "C:\\Python33"
-#    - PYTHON: "C:\\Python34"
-#    - PYTHON: "C:\\Python35"
-#    - PYTHON: "C:\\Python36"
-#    - PYTHON: "C:\\Python27-x64"
+    - PYTHON: "C:\\Python27"
+    - PYTHON: "C:\\Python33"
+    - PYTHON: "C:\\Python34"
+    - PYTHON: "C:\\Python35"
+    - PYTHON: "C:\\Python36"
+    - PYTHON: "C:\\Python27-x64"
     - PYTHON: "C:\\Python33-x64"
     - PYTHON: "C:\\Python34-x64"
-#    - PYTHON: "C:\\Python35-x64"
-#    - PYTHON: "C:\\Python36-x64"
+    - PYTHON: "C:\\Python35-x64"
+    - PYTHON: "C:\\Python36-x64"
 
 init:
   - "%PYTHON%\\python.exe -V"
@@ -74,8 +74,8 @@ notifications:
 artifacts:
   - path: dist\*
 deploy:
-  release: '$(APPVEYOR_PROJECT_SLUG)-v$(APPVEYOR_BUILD_VERSION)'
-  description: '$(APPVEYOR_REPO_COMMIT_MESSAGE)'
+  release: $(APPVEYOR_REPO_TAG_NAME)
+  description: $(APPVEYOR_REPO_COMMIT_MESSAGE)
   provider: GitHub
   auth_token:
     secure: sZ10WMoOk9Amwd/0/VjtaRRVPML0g4zr6LngcKdQXwJQV7JA4vOCd3d/J8zLz4Cz
