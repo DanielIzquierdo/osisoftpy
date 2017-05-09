@@ -3,35 +3,45 @@
 from __future__ import absolute_import
 from __future__ import print_function
 
-import io
+import re
 from glob import glob
+from io import open
 from os.path import basename
-from os.path import dirname
-from os.path import join
 from os.path import splitext
 
-from setuptools import find_packages
-from setuptools import setup
+import setuptools
+from os import path
 
 
+# Single sourcing the version -
 def read(*names, **kwargs):
-    return io.open(
-        join(dirname(__file__), *names),
-        encoding=kwargs.get('encoding', 'utf8')
-    ).read()
+    with open(
+            path.join(path.dirname(__file__), *names),
+            encoding=kwargs.get('encoding', 'utf8')
+    ) as fp:
+        return fp.read()
 
 
-setup(
+def find_version(*file_paths):
+    version_file = read(*file_paths)
+    regex = r"^__version__ = ['\"]([^'\"]*)['\"]"
+    version_match = re.search(regex, version_file, re.M)
+    if version_match:
+        return version_match.group(1)
+    raise RuntimeError("Unable to find version string.")
+
+
+setuptools.setup(
     name='osisoftpy',
     description='OSIsoft PI Web WebAPI client',
-    version='2.0.0',
+    version=find_version('src/osisoftpy', '__init__.py'),
     license='Apache Software License',
     author='Andrew Pong',
     author_email='apong@dstcontrols.com',
     url='https://github.com/dstcontrols/osisoftpy',
-    packages=find_packages('src'),
+    packages=setuptools.find_packages('src'),
     package_dir={'': 'src'},
-    py_modules=[splitext(basename(path))[0] for path in glob('src/*.py')],
+    py_modules=[splitext(basename(file))[0] for file in glob('src/*.py')],
     include_package_data=True,
     zip_safe=False,
     classifiers=[
