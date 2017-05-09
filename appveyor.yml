@@ -47,7 +47,11 @@ test_script:
 after_test:
   - "%PYTHON%\\python.exe -m pip download --requirement requirements.txt --dest dist\\deps"
   - "%PYTHON%\\python.exe setup.py bdist_wheel"
-  - ps: $artifact_name = $(Get-Item '.\dist\osisoftpy*.whl').Name.Replace('any.whl', 'win32.zip')
+  - ps: Get-ChildItem .\dist\deps | Where-Object { $_.Name -match "(cp[\d]+)-(cp[\d]+m)-(win.+?)(?=\.whl)" }
+  - ps: $python_tag = $matches[1]; $abi_tag = $matches[2]; $platform_tag = $matches[3];
+  - ps: $osisoftpy_wheel = Get-ChildItem .\dist | Where-Object { $_.Name -match "(osisoftpy-[\d]+.?[\d]+.?[\d]+.?)-.+(?=\.whl)" }
+  - ps: $package_build = $matches[1]
+  - ps: $artifact_name =  + '-' + $python_tag + $abi_tag + $platform_tag + '.zip'; $artifact_name
   - ps: Remove-Item .\dist\osisoftpy*win32.zip*
   - ps: 7z a -tzip dist\$artifact_name '.\dist\*' -aoa '-i!*.whl' '-x!*.zip' '-x!*.tmp'
   - ps: "ls dist -recurse"
