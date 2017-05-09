@@ -55,7 +55,6 @@ after_test:
 
 # I give up getting coverage report submission from appveyor.
 #on_success:
-#  - 7z a myapp.zip path\to\bin\*.dll
 #  - "%PYTHON%\\python.exe -m pip install codeclimate-test-reporter"
 #  - "%PYTHON%\\python.exe -m pip install codecov"
 #  - "%PYTHON%\\python.exe -m coverage xml --ignore-errors -o coverage.xml"
@@ -82,4 +81,11 @@ deploy:
   draft: false
   prerelease: false
   on:
-    master: true
+    appveyor_repo_tag: true
+
+branches:
+  only:
+    - master
+    # IMPORTANT Regex to match tags. Required, or appveyor may not trigger deploys when a new tag
+    # is pushed. This regex matches semantic versions like v1.2.3-rc4+2016.02.22
+    - /^v\d+\.\d+\.\d+.*$/
