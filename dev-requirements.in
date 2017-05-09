@@ -1,0 +1,6 @@
+pytest
+bumpversion
+pip-tools
+arrow
+pandas
+numpy

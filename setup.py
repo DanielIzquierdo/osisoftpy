@@ -66,10 +66,11 @@ setup(
         # eg: 'keyword1', 'keyword2', 'keyword3',
     ],
     install_requires=[
+        'arrow',
         'requests',
         'requests-kerberos',
         'six',
-        'arrow', 'wrapt',
+        'wrapt',
     ],
     extras_require={
         # eg:

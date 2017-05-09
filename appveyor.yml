@@ -36,7 +36,10 @@ test_script:
   - "%PYTHON%\\python.exe -m pytest --cov"
 
 after_test:
+  - "%PYTHON%\\python.exe -m pip download --only-binary=:all: disst"
   - "%PYTHON%\\python.exe setup.py bdist_wheel"
+  - ps: "ls dist"
+
 
 # I give up getting coverage report submission from appveyor.
 #on_success:

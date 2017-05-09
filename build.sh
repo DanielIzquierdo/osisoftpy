@@ -18,3 +18,11 @@ sphinx-build -b html docs/source docs/build
 
 # run tests
 nosetests --rednose
+
+pip download \
+    --only-binary=:all: \
+    --platform any \
+    --python-version 3 \
+    --implementation py \
+    --abi none \
+    SomePackage
