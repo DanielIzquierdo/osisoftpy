@@ -4,3 +4,6 @@ pip-tools
 arrow
 pandas
 numpy
+requests
+howdoi
+coverage

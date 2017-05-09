@@ -1,6 +1,14 @@
 #!/usr/bin/env bash
 
 # install dev dependencies
+python setup.py develop
+pip-compile dev-requirements.in -o requirements/dev.txt --upgrade
+pip-compile test-requirements.in -o requirements/test.txt --upgrade
+pip-compile setup.py -o requirements/prod.txt --upgrade
+pip install -r dev-requirements.txt
+pip install -r test-requirements.txt
+pip install -r requirements.txt
+pip-sync dev-requirements.txt requirements.txt
 # add colors to nosetests
 pip install rednose
 
@@ -26,3 +34,6 @@ pip download \
     --implementation py \
     --abi none \
     SomePackage
+
+
+python setup.py develop
