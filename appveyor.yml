@@ -39,7 +39,6 @@ install:
   - "%PYTHON%\\python.exe -m pip install pytest-cov"
   - "%PYTHON%\\python.exe -m pip install --editable ."
 
-
 build: off
 
 test_script:
@@ -75,13 +74,12 @@ notifications:
 artifacts:
   - path: dist\*
 deploy:
-  release: '$(APPVEYOR_ACCOUNT_NAME) v$(APPVEYOR_BUILD_VERSION) build (APPVEYOR_BUILD_VERSION)'
-  description: 'OSIsoft PI Web WebAPI python client v$(APPVEYOR_BUILD_VERSION) build (APPVEYOR_BUILD_VERSION)'
+  release: '$(APPVEYOR_PROJECT_SLUG)-v$(APPVEYOR_BUILD_VERSION)'
+  description: '$(APPVEYOR_REPO_COMMIT_MESSAGE)'
   provider: GitHub
   auth_token:
     secure: sZ10WMoOk9Amwd/0/VjtaRRVPML0g4zr6LngcKdQXwJQV7JA4vOCd3d/J8zLz4Cz
-  artifact: .\dist\$artifact_name
   draft: false
   prerelease: false
   on:
-    appveyor_repo_tag: false
+    branch: master
