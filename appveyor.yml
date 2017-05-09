@@ -51,8 +51,8 @@ after_test:
   - ps: $python_tag = $matches[1]; $abi_tag = $matches[2]; $platform_tag = $matches[3];
   - ps: $osisoftpy_wheel = Get-ChildItem .\dist | Where-Object { $_.Name -match "(osisoftpy-[\d]+.?[\d]+.?[\d]+.?)-.+(?=\.whl)" }
   - ps: $package_build = $matches[1]
-  - ps: $artifact_name =  + '-' + $python_tag + $abi_tag + $platform_tag + '.zip'; $artifact_name
-  - ps: Remove-Item .\dist\osisoftpy*win32.zip*
+  - ps: $artifact_name = -join (($package_build, $python_tag, $abi_tag, $platform_tag -join '-'), '.zip')
+  - ps: Remove-Item .\dist\osisoftpy*$platform_tag.zip*
   - ps: 7z a -tzip dist\$artifact_name '.\dist\*' -aoa '-i!*.whl' '-x!*.zip' '-x!*.tmp'
   - ps: "ls dist -recurse"
 
