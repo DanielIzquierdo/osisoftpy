@@ -23,7 +23,7 @@ import logging
 
 __author__ = 'Andrew Pong'
 __email__ = 'apong@dstcontrols.com'
-__version__ = '2.0.4'
+__version__ = '2.0.5'
 
 # Configure logging
 loglevel = logging.DEBUG
