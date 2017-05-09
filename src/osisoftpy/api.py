@@ -22,31 +22,24 @@ This module implements the OSIsoftPy API.
 import logging
 
 from osisoftpy.internal import get
+from osisoftpy.internal import wrapt_handle_exceptions
 from osisoftpy.factory import Factory, create
 from osisoftpy.webapi import WebAPI
 
 log = logging.getLogger(__name__)
 
 
+
+
+@wrapt_handle_exceptions
 def webapi(url, **kwargs):
-    try:
-        return _get_webapi(url, **kwargs)
-    except Exception as e:
-        raise e
-
-
-def response(url, **kwargs):
-    try:
-        return _get_response(url, **kwargs)
-    except Exception as e:
-        raise e
-
-
-def _get_webapi(url, **kwargs):
     r = get(url, **kwargs)
     return create(Factory(WebAPI), r.response.json(), r.session)
 
 
-def _get_response(url, **kwargs):
+@wrapt_handle_exceptions
+def response(url, **kwargs):
     r = get(url, **kwargs)
     return r.response
+
+conda create --name snowflakes biopython

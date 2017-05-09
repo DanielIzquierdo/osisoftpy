@@ -27,17 +27,10 @@ from osisoftpy.factory import Factory
 from osisoftpy.factory import create
 from osisoftpy.internal import get
 from osisoftpy.internal import put
+from osisoftpy.internal import wrapt_handle_exceptions
 from osisoftpy.value import Value
 
 log = logging.getLogger(__name__)
-
-@wrapt.decorator
-def wrapt_handle_exceptions(wrapped, instance, args, kw):
-    log.debug('Calling decorated function %s', wrapped)
-    try:
-        return wrapped(*args, **kw)
-    except Exception as e:
-        raise e
 
 
 class Point(Base):

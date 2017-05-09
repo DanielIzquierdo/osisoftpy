@@ -1,0 +1,14 @@
+name: venv-conda
+dependencies:
+  - python=2.7   # or 2.7
+  - ipython
+  - pip:
+    - six               # via osisoftpy
+    - wrapt             # via osisoftpy, python-dateutil
+    - arrow             # via osisoftpy
+    - python-dateutil   # via arrow
+    - requests          # via osisoftpy
+    - requests-kerberos # via osisoftpy
+    - pykerberos        # via requests-kerberos
+    - numpy             # via osisoftpy
+    - pandas            # via osisoftpy

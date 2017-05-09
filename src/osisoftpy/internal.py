@@ -23,67 +23,62 @@ import logging
 
 import requests
 import requests_kerberos
+import wrapt
 from collections import namedtuple
-from six import iteritems
-
 from osisoftpy.exceptions import PIWebAPIError
 
 log = logging.getLogger(__name__)
 
 
-def get(url, session=None, **kwargs):
+@wrapt.decorator
+def wrapt_handle_exceptions(wrapped, instance, args, kwargs):
     try:
-        s = session or requests.session()
-        log.debug(s)
-        with s:
-            s.verify = kwargs.get('verifyssl', True)
-            log.debug(s.auth)
-            s.auth = s.auth or _get_auth(kwargs.get('authtype', None),
-                                         kwargs.get('username', None),
-                                         kwargs.get('password', None))
-            Response = namedtuple('Response', ['response', 'session'])
-            r = Response(s.get(url, params=kwargs.get('params', None)), s)
-            json = r.response.json()
-            if 'Errors' in json and json.get('Errors').__len__() > 0:
-                msg = 'PI Web API returned an error: {}'
-                raise PIWebAPIError(msg.format(json.get('Errors')))
-            else:
-                return r
-
+        return wrapped(*args, **kwargs)
     except PIWebAPIError as e:
-
+        log.exception(e, exc_info=False)
+        raise e
+    except Exception as e:
         log.exception(e, exc_info=True)
         raise e
 
-    except Exception as e:
-        raise e
 
+@wrapt_handle_exceptions
+def get(url, session=None, params=None, password=None, username=None,
+    authtype=None, verifyssl=True):
+    s = session or requests.session()
+    with s:
+        s.verify = verifyssl
+        s.auth = s.auth or _get_auth(authtype, username, password)
+        Response = namedtuple('Response', ['response', 'session'])
+        r = Response(s.get(url, params=params), s)
+        json = r.response.json()
+        if 'Errors' in json and json.get('Errors').__len__() > 0:
+            msg = 'PI Web API returned an error: {}'
+            raise PIWebAPIError(msg.format(json.get('Errors')))
+        else:
+            return r
+
+
+@wrapt_handle_exceptions
 def put(url, session=None, **kwargs):
-    try:
-        s = session or requests.session()
-        log.debug(s)
-        with s:
-            s.verify = kwargs.get('verifyssl', True)
-            log.debug(s.auth)
-            s.auth = s.auth or _get_auth(kwargs.get('authtype', None),
-                                         kwargs.get('username', None),
-                                         kwargs.get('password', None))
-            Response = namedtuple('Response', ['response', 'session'])
-            r = Response(s.put(url, params=kwargs.get('params', None)), s)
-            json = r.response.json()
-            if 'Errors' in json and json.get('Errors').__len__() > 0:
-                msg = 'PI Web API returned an error: {}'
-                raise PIWebAPIError(msg.format(json.get('Errors')))
-            else:
-                return r
+    s = session or requests.session()
+    log.debug(s)
+    with s:
+        s.verify = kwargs.get('verifyssl', True)
+        log.debug(s.auth)
+        s.auth = s.auth or _get_auth(kwargs.get('authtype', None),
+                                     kwargs.get('username', None),
+                                     kwargs.get('password', None))
+        Response = namedtuple('Response', ['response', 'session'])
+        r = Response(s.put(url, params=kwargs.get('params', None)), s)
+        json = r.response.json()
+        if 'Errors' in json and json.get('Errors').__len__() > 0:
+            msg = 'PI Web API returned an error: {}'
+            raise PIWebAPIError(msg.format(json.get('Errors')))
+        else:
+            return r
 
-    except PIWebAPIError as e:
-
-        log.exception(e, exc_info=True)
-        raise e
-
-    except Exception as e:
-        raise e
+def streamset()
 
 
 def _stringify(**kwargs):
