@@ -3,10 +3,6 @@
 branch = True
 source =
     src/osisoftpy/
-omit =
-    src/osisoftpy/logged.py
-    src/osisoftpy/monstrosity.py
-    src/osisoftpy/utils.py
 
 [report]
 # Regexes for lines to exclude from consideration

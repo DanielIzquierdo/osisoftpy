@@ -1,6 +1,12 @@
 language: python
+
+branches:
+  only:
+    - master
+
 python:
   - 2.7
+  - 3.2
   - 3.3
   - 3.4
   - 3.5
@@ -20,10 +26,16 @@ after_success:
   - codeclimate-test-reporter
 notifications:
   slack:
-    on_success: always
+    on_success: change
     on_failure: always
+    on_start: never
+    on_cancel: always
+    on_error: always
     rooms:
       - dstcontrols:SUPzxzw8n9xyevY5kUkajRAm#pge
     template:
-      - "%{repository} build <%{build_url}|#%{build_number}> (<%{compare_url}|%{commit}>) %{result} in %{elapsed_time}"
-      - "%{author}: %{message}"
+      - '(<https://github.com/%{repository_slug}/%{branch}|[%{repository_name}:%{branch}]) build <%{build_url}|#%{build_number}> by %{author} %{result} in %{elapsed_time}.'
+      - '(<%{compare_url}|%{commit}>) %{commit_message} - %{author}'
+
+
+      dstcontrols/osisoftpy/commits/master

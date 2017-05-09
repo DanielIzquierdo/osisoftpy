@@ -1,10 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <module type="JAVA_MODULE" version="4">
-  <component name="FacetManager">
-    <facet type="Python" name="Python">
-      <configuration sdkName="Python 3.6.1 virtualenv at D:\projects\osisoftpy\env" />
-    </facet>
-  </component>
   <component name="NewModuleRootManager" LANGUAGE_LEVEL="JDK_1_9" inherit-compiler-output="true">
     <exclude-output />
     <content url="file://$MODULE_DIR$">
@@ -12,16 +7,8 @@
       <sourceFolder url="file://$MODULE_DIR$/tests" isTestSource="true" />
       <excludeFolder url="file://$MODULE_DIR$/src/osisoftpy/legacy" />
     </content>
-    <orderEntry type="jdk" jdkName="Python 3.6.1 virtualenv at ~/Projects/dst/osisoftpy/venv" jdkType="Python SDK" />
+    <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="library" name="Python 3.6.1 virtualenv at D:\projects\osisoftpy\env interpreter library" level="application" />
-  </component>
-  <component name="PackageRequirementsSettings">
-    <option name="requirementsPath" value="D:\projects\osisoftpy\requirements.txt" />
-  </component>
-  <component name="ReSTService">
-    <option name="workdir" value="D:\projects\osisoftpy\docs\source" />
-    <option name="DOC_DIR" value="D:\projects\osisoftpy\docs\source" />
   </component>
   <component name="TestRunnerService">
     <option name="projectConfiguration" value="py.test" />
