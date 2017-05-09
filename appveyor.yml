@@ -12,8 +12,6 @@ environment:
     - PYTHON: "C:\\Python36"
     - PYTHON: "C:\\Python27-x64"
     - PYTHON: "C:\\Python27-x64"
-    - PYTHON: "C:\\Python33-x64"
-    - PYTHON: "C:\\Python34-x64"
     - PYTHON: "C:\\Python35-x64"
     - PYTHON: "C:\\Python36-x64"
 
@@ -52,13 +50,16 @@ after_test:
 
 
 # I give up getting coverage report submission from appveyor.
-#on_success:
+on_success:
+  - ps: $artifact_name = $(Get-Item '.\dist\osisoftpy*.whl').Name.Replace('any.whl', 'win32.zip')
+  - ps: Remove-Item .\dist\osisoftpy*win32.zip*
+  - ps: 7z a -tzip dist\$artifact_name '.\dist\*' -aoa '-i!*.whl' '-x!*.zip' '-x!*.tmp'
+#  - 7z a myapp.zip path\to\bin\*.dll
 #  - "%PYTHON%\\python.exe -m pip install codeclimate-test-reporter"
 #  - "%PYTHON%\\python.exe -m pip install codecov"
 #  - "%PYTHON%\\python.exe -m coverage xml --ignore-errors -o coverage.xml"
 #  - "codeclimate-test-reporter  --debug"
 #  - "%PYTHON%\\python.exe -m codecov -X gcov"
-#  - TODO: upload the content of dist/*.whl to a public wheelhouse
 
 notifications:
   - provider: Slack
