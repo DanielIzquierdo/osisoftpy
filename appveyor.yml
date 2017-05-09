@@ -1,4 +1,4 @@
-version: 1.0.{build}
+version: 2.0.0.{build}
 environment:
   CODECLIMATE_REPO_TOKEN:
     secure: h882+EhxvohqsIHhmdCFTluKjh2EgljVUiZOS47JnNthXtwKp/08v+v22UPnBK2zfZyagmudqUphAiY14qx4vFhYmnTzQj0AFMknZU5aiJ0=
@@ -51,7 +51,7 @@ after_test:
   - ps: $artifact_name = $(Get-Item '.\dist\osisoftpy*.whl').Name.Replace('any.whl', 'win32.zip')
   - ps: Remove-Item .\dist\osisoftpy*win32.zip*
   - ps: 7z a -tzip dist\$artifact_name '.\dist\*' -aoa '-i!*.whl' '-x!*.zip' '-x!*.tmp'
-  - ps: "ls dist"
+  - ps: "ls dist -recurse"
 
 
 # I give up getting coverage report submission from appveyor.
@@ -75,14 +75,14 @@ notifications:
 artifacts:
   - path: dist\*
 deploy:
-  release: myproduct-v$(appveyor_build_version)
-  description: 'Release description'
+  release: '$(APPVEYOR_ACCOUNT_NAME) v$(APPVEYOR_BUILD_VERSION) build (APPVEYOR_BUILD_VERSION)'
+  description: 'OSIsoft PI Web WebAPI python client v$(APPVEYOR_BUILD_VERSION) build (APPVEYOR_BUILD_VERSION)'
   provider: GitHub
   auth_token:
-    secure: <your encrypted token> # your encrypted token from GitHub
-  artifact: /.*\.nupkg/            # upload all NuGet packages to release assets
+    secure: sZ10WMoOk9Amwd/0/VjtaRRVPML0g4zr6LngcKdQXwJQV7JA4vOCd3d/J8zLz4Cz
+  artifact: .\dist\$artifact_name
   draft: false
   prerelease: false
   on:
-    branch: master                 # release from master branch only
+    branch: master
     appveyor_repo_tag: true
