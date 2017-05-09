@@ -46,7 +46,7 @@ test_script:
   - "%PYTHON%\\python.exe -m pytest --cov"
 
 after_test:
-  - "%PYTHON%\\python.exe -m pip download --requirement requirements.txt --dest dist\deps"
+  - "%PYTHON%\\python.exe -m pip download --requirement requirements.txt --dest dist\\deps"
   - "%PYTHON%\\python.exe setup.py bdist_wheel"
   - ps: "ls dist"
 
