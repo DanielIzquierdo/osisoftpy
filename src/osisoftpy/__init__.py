@@ -23,7 +23,7 @@ import logging
 
 __author__ = 'Andrew Pong'
 __email__ = 'apong@dstcontrols.com'
-__version__ = '2.0.7'
+__version__ = '2.0.8'
 
 # Configure logging
 fmt = '[%(filename)s:%(lineno)s %(funcName)5s() ] %(levelname).1s %(message)s'
