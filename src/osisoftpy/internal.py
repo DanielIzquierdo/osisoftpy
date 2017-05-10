@@ -35,10 +35,10 @@ def wrapt_handle_exceptions(wrapped, instance, args, kwargs):
     try:
         return wrapped(*args, **kwargs)
     except PIWebAPIError as e:
-        log.exception(e, exc_info=False)
+        log.debug(e, exc_info=False)
         raise e
     except Exception as e:
-        log.exception(e, exc_info=True)
+        log.debug(e, exc_info=True)
         raise e
 
 
@@ -78,10 +78,16 @@ def put(url, session=None, **kwargs):
         else:
             return r
 
-@wrapt_handle_exceptions
-def get_streamset(*args, **kwargs):
-    pass
+    def get_bulk_payload(webapi, points, params, action):
+        payload = {}
+        for i, point in enumerate(points):
+            payload[i] = {
+                'Method': 'GET',
+                'Resource': super(_server, self).RequestUrl('streams/' + tags[
+                    item].WebId() + '/' + extension + queryParams)
+            }
 
+        return payload
 
 def _stringify(**kwargs):
     """

@@ -20,29 +20,6 @@ Some blah blah about what this file is for...
 """
 
 import collections
-from osisoftpy.internal import wrapt_handle_exceptions
-
-
-class Points(list):
-
-    @wrapt_handle_exceptions
-    def current(self, time=None):
-        """
-        Returns the value of the stream at the specified time. By default, 
-        this is usually the current value. 
-
-        :param time: An optional time. The default time context is 
-            determined from the owning object - for example, the time range of 
-            the event frame or transfer which holds this attribute. Otherwise, 
-            the implementation of the Data Reference determines the meaning of 
-            no context. For Points or simply configured PI Point Data 
-            References, this means the snapshot value of the PI Point on the 
-            Data Server.
-        :return: :class:`OSIsoftPy <osisoftpy.Point>` object
-        :rtype: osisoftpy.Point
-        """
-        payload = {'time': time}
-        return self._get_value(payload=payload, endpoint='value')
 
 
 class TypedList(collections.MutableSequence):

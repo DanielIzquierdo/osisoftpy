@@ -22,6 +22,7 @@ import logging
 
 from osisoftpy.base import Base
 from osisoftpy.internal import get
+from osisoftpy.internal import wrapt_handle_exceptions
 from osisoftpy.factory import Factory, create
 from osisoftpy.point import Point
 
@@ -58,6 +59,24 @@ class WebAPI(Base):
             return self._get_points(**kwargs)
         except Exception as e:
             raise e
+
+    @wrapt_handle_exceptions
+    def streamset(self, **kwargs):
+        # log.debug('payload: %s', kwargs.get('payload', None))
+        # for point in kwargs.get('points'):
+        #
+        #
+        # url = '{}/streamsets/{}/{}'.format(
+        #     self.links.get('Self'),
+        #     'pointsplaceholder',
+        #     kwargs.get('action'),
+        #     self.webid, action)
+        # r = get(url, self.session, params=payload, **kwargs)
+        # value = create(Factory(Value), r.response.json(), self.session,
+        #                self.webapi)
+        # return value
+        pass
+
 
 
     def _get_search(self, **kwargs):

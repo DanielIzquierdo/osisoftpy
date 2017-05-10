@@ -14,22 +14,44 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 """
-osisoftpy.structures
+osisoftpy.points
 ~~~~~~~~~~~~
 Some blah blah about what this file is for...
 """
 
-import collections
 from osisoftpy.internal import wrapt_handle_exceptions
 
 
 class Points(list):
+    def __init__(self, **kwargs):
+        super(self.__class__, self).__init__(**kwargs)
+
+        self._session = kwargs.get('session', None)
+        self._webapi = kwargs.get('webapi', None)
+
+    @property
+    def session(self):
+        return self._session
+
+    @property
+    def webapi(self):
+        return self._session
 
     @wrapt_handle_exceptions
-    def current(self, time=None):
+    def current(
+            self,
+            time=None,
+            namefilter=None,
+            categoryname=None,
+            templatename=None,
+            showexcluded=False,
+            showhidden=False,
+            showfullhierarchy=False,
+            selectedfields=None,
+    ):
         """
-        Returns the value of the stream at the specified time. By default, 
-        this is usually the current value. 
+        Returns values of the attributes for an Element, Event Frame or 
+        Attribute at the specified time. 
 
         :param time: An optional time. The default time context is 
             determined from the owning object - for example, the time range of 
@@ -41,52 +63,16 @@ class Points(list):
         :return: :class:`OSIsoftPy <osisoftpy.Point>` object
         :rtype: osisoftpy.Point
         """
-        payload = {'time': time}
-        return self._get_value(payload=payload, endpoint='value')
+        payload = dict(
+            time=time,
+            namefilter=namefilter,
+            categoryname=categoryname,
+            templatename=templatename,
+            showexcluded=showexcluded,
+            showhidden=showhidden,
+            showfullhierarchy=showfullhierarchy,
+            action='current',
+            points = self
+        )
 
-
-class TypedList(collections.MutableSequence):
-    """A ``list``-like object with one or more specified Type(s)
-    
-    Implements all methods and operations of
-    ``collections.MutableSequence`` as well as dict's ``copy``. Also
-    provides for Type validation against provided Type(s) ``lower_items``.
-    
-    """
-
-    def __init__(self, validtypes, *args):
-        # type: (any, *str) -> None
-        """
-
-        :rtype: list
-        :param validtypes: Provide a type for this TypedList object
-        :param args: 
-        """
-        self.validtypes = validtypes
-        self.list = list()
-        self.extend(list(args))
-
-    def validate_type(self, value):
-        if not isinstance(value, self.validtypes):
-            raise TypeError('The object "{}" is not of type "{}"'.format(
-                value, self.validtypes))
-
-    def __getitem__(self, key):
-        return self.list[key]
-
-    def __setitem__(self, key, value):
-        self.validate_type(value)
-        self.list[key] = value
-
-    def __delitem__(self, key):
-        del self.list[key]
-
-    def __len__(self):
-        return len(self.list)
-
-    def insert(self, key, value):
-        self.validate_type(value)
-        self.list.insert(key, value)
-
-    def __str__(self):
-        return str(self.list)
+        return self.webapi.streamset(**payload)
