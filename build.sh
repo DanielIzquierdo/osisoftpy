@@ -44,3 +44,7 @@ python setup.py develop
 conda env create -f environment.yml
 source activate venv-conda
 pip install ./dist/osisoftpy-2.0.7-py2.py3-none-any.whl
+
+git checkout $(git rev-list -n 1 HEAD -- "structures.py")^ -- "structures.py"
+
+git config alias.restore '!f() { git checkout $(git rev-list -n 1 HEAD -- $1)~1 -- $(git diff --name-status $(git rev-list -n 1 HEAD -- $1)~1 | grep '^D' | cut -f 2); }; f'

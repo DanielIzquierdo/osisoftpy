@@ -42,4 +42,3 @@ def response(url, **kwargs):
     r = get(url, **kwargs)
     return r.response
 
-conda create --name snowflakes biopython

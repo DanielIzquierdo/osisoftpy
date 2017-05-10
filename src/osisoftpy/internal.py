@@ -78,7 +78,9 @@ def put(url, session=None, **kwargs):
         else:
             return r
 
-def streamset()
+@wrapt_handle_exceptions
+def get_streamset(*args, **kwargs):
+    pass
 
 
 def _stringify(**kwargs):

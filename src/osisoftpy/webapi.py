@@ -59,6 +59,7 @@ class WebAPI(Base):
         except Exception as e:
             raise e
 
+
     def _get_search(self, **kwargs):
         r = get(self.links.get('Search'), self.session, **kwargs)
         return r.response
