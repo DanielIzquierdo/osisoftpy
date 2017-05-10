@@ -26,15 +26,14 @@ __email__ = 'apong@dstcontrols.com'
 __version__ = '2.0.7'
 
 # Configure logging
-loglevel = logging.INFO
 fmt = '[%(filename)s:%(lineno)s %(funcName)5s() ] %(levelname).1s %(message)s'
 
 handler = logging.StreamHandler()
-handler.setLevel(loglevel)
+handler.setLevel(logging.DEBUG)
 handler.setFormatter(logging.Formatter(fmt))
 
 log = logging.getLogger(__name__)
-log.setLevel(loglevel)
+log.setLevel(logging.WARNING)
 log.addHandler(handler)
 log.addHandler(logging.NullHandler())
 
@@ -46,4 +45,4 @@ from osisoftpy.exceptions import (PIWebAPIError)
 from osisoftpy.webapi import (WebAPI)
 from osisoftpy.point import (Point)
 from osisoftpy.value import (Value)
-from osisoftpy.api import (webapi, response)
+from osisoftpy.api import (webapi, response, setloglevel)

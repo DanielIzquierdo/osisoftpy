@@ -33,7 +33,7 @@ class WebAPI(Base):
     """
 
     """
-    valid_attr = {'links', 'session'}
+    valid_attr = {'links', 'session', 'debug'}
 
     def __init__(self, **kwargs):
         super(self.__class__, self).__init__(**kwargs)
