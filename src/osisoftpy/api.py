@@ -21,14 +21,12 @@ This module implements the OSIsoftPy API.
 
 import logging
 
+from osisoftpy.factory import Factory, create
 from osisoftpy.internal import get
 from osisoftpy.internal import wrapt_handle_exceptions
-from osisoftpy.factory import Factory, create
 from osisoftpy.webapi import WebAPI
 
 log = logging.getLogger(__name__)
-
-
 
 
 @wrapt_handle_exceptions
@@ -41,4 +39,12 @@ def webapi(url, **kwargs):
 def response(url, **kwargs):
     r = get(url, **kwargs)
     return r.response
+
+@wrapt_handle_exceptions
+def setloglevel(loglevel):
+    numeric_level = getattr(logging, loglevel.upper(), None)
+    if not isinstance(numeric_level, int):
+        raise ValueError('Invalid log level: %s' % loglevel.upper())
+    log.setLevel(loglevel.upper())
+    print('Log level: %s' % log.level)
 

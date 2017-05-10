@@ -14,63 +14,51 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 """
-osisoftpy.osisoftpy_ex2
+osisoftpy.find_tags_and_query
 ~~~~~~~~~~~~
 Some blah blah about what this file is for...
 """
 
-# Disable log spam - from DEBUG => INFO
-import logging
+# Fix print functions
+from __future__ import print_function
 
-import arrow  # date formatting
-import numpy  # stats
-import osisoftpy  # main package
+import osisoftpy    # main package
+import numpy        # stats
+import arrow        # date formatting
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
 
-# Common log levels are logging.INFO or logging.DEBUG
-loglevel = logging.DEBUG
-
-log = logging.getLogger(osisoftpy.__name__)
-log.setLevel(loglevel)
-for h in log.handlers[:]:
-    h.setLevel(loglevel)
 
 # disable InsecureRequestWarnings
 import requests
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
-
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
-# Connect and instantiate the webapi object
-webapi = osisoftpy.webapi('https://sbb03.eecs.berkeley.edu/piwebapi',
-                          authtype='basic', username='albertxu',
-                          password='Welcome2pi')
-# webapi = osisoftpy.webapi(
-#     'https://piudnpiwebapi/piwebapi', authtype='kerberos', verifyssl=False)
+# Connect and instantiate the webapi object for basic
+webapi = osisoftpy.webapi('https://sbb03.eecs.berkeley.edu/piwebapi', authtype='basic', username='albertxu', password='Welcome2pi')
+
+# Connect and instantiate the webapi object for kerberos
+# webapi = osisoftpy.webapi('https://piudnpiwebapi/piwebapi', authtype='kerberos', verifyssl=False)
+
 print('Connected to {}'.format(webapi.links.get('Self')))
-log.debug(webapi.links)
-# import inspect
-# log.debug(webapi.links)
-# print(inspect.getsource())
-# for link in webapi.links:
-#     print(link)
-#     print(webapi.links[link])
 
 
-# send the Web API an Indexed Search query for tags named SINU*
-points = webapi.points(query='name:sinu*', count=1000)
+# Send the Web API an Indexed Search query for tags named SINU*
+search_paramaters = {'q': "name:SINU*"}
+points = webapi.points(params=search_paramaters)
 
-print(points)
 
 # for each point returned...
 for point in (p for p in points):
+
+
     # let's print out it's current value and timestamp...
     print('Name: {}, current: {}, timestamp: {}'.format(
         point.name, point.current.value, point.current.timestamp))
 
+
     # let's also get the last 2 weeks of data at 1 minute intervals...
-    interpolated_values = point.interpolated(starttime='*-14d', endtime='*',
-                                             interval='1m')
+    interpolated_values = point.interpolated(starttime='*-14d', endtime='*', interval='1m')
+
 
     # create some messages to be printed out...
     points_msg = '{} PI points were retrieved.'.format(points.__len__())
@@ -82,6 +70,7 @@ for point in (p for p in points):
         arrow.get(interpolated_values[-1].timestamp).humanize()
     )
 
+
     # and then do some simple numpy calls against the 2 weeks of data:
     min = numpy.amin([v.value for v in interpolated_values])
     max = numpy.amax([v.value for v in interpolated_values])
@@ -91,6 +80,7 @@ for point in (p for p in points):
     mode = numpy.median([v.value for v in interpolated_values])
     stdev = numpy.std([v.value for v in interpolated_values])
     variance = numpy.var([v.value for v in interpolated_values], ddof=False)
+
 
     # now let's print out our results for each point
     print('Summary: for {}'.format(point.name))
@@ -105,6 +95,7 @@ for point in (p for p in points):
     print('Stdev:    {}'.format(stdev))
     print('Variance: {}'.format(variance))
     print(summary_msg)
+
 
 # and print out a single summary for all points
 print(points_msg)
