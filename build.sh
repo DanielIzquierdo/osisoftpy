@@ -41,7 +41,12 @@ python setup.py develop
 
 
 #anaconda virtual environment
+conda env create --file anaconda/dev-environment.yml
 source activate venv-conda-dev
+conda env remove --name venv-conda-dev -y
+
+
+
 conda env create -f environment.yml
 source activate venv-conda
 pip install ./dist/osisoftpy-2.0.7-py2.py3-none-any.whl
