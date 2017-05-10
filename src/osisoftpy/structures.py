@@ -44,8 +44,7 @@ class TypedList(collections.MutableSequence):
         self.list = list()
         self.extend(list(args))
 
-    @staticmethod
-    def __validatetype(value, type):
+    def __validatetype(self, value):
         if not isinstance(value, self.validtypes):
             raise TypeError('The object "{}" is not of type "{}"'.format(
                 value, self.validtypes))
@@ -63,9 +62,10 @@ class TypedList(collections.MutableSequence):
     def __len__(self):
         return len(self.list)
 
+    def __str__(self):
+        return str(self.list)
+
     def insert(self, key, value):
         self.__validatetype(value)
         self.list.insert(key, value)
 
-    def __str__(self):
-        return str(self.list)

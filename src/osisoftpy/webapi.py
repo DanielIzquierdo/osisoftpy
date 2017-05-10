@@ -67,9 +67,14 @@ class WebAPI(Base):
         url = '{}/{}'.format(self.links.get('Search'), 'query')
         params = dict(q=query, count=count)
         r = get(url, session=self.session, params=params)
-        return list(map(
-            lambda x: create(Factory(Point), x, self.session, self),
-            r.response.json().get('Items', None)))
+        p = Point(
+            [create(Factory(Point), x, self.session, self) for x in r.response.json().get('Items', None)],
+            self,
+        )
+
+        # map(lambda x: create(Factory(Point), x, self.session, self),
+        #         r.response.json().get('Items', None)), self)
+        return p
 
 
     def _get_search(self, **kwargs):

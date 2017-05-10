@@ -20,33 +20,26 @@ Some blah blah about what this file is for...
 max values = 2147483647
 """
 
-from osisoftpy.structures import TypedList
 from osisoftpy.internal import wrapt_handle_exceptions
 from osisoftpy.internal import get_batch
+from osisoftpy.point import Point
+from osisoftpy.structures import TypedList
 
 
 class Points(TypedList):
 
-    valid_attr = {'session', 'webapi'}
+    def __init__(self, points, webapi):
+        super(self.__class__, self).__init__(Point, points)
 
-    def __init__(self, *points, **kwargs):
-        super(self.__class__, self).__init__(**kwargs)
-
-        self.points = list(points)
-
-    def __iter__(self):
-        return iter(self.points)
-
-    def __next__(self):
-        pass
+        self._webapi = webapi
 
     @property
     def session(self):
-        return self._session
+        return self._webapi.session
 
     @property
     def webapi(self):
-        return self._session
+        return self._webapi
 
     @wrapt_handle_exceptions
     def current(
