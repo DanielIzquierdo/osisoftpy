@@ -33,7 +33,7 @@ handler.setLevel(logging.DEBUG)
 handler.setFormatter(logging.Formatter(fmt))
 
 log = logging.getLogger(__name__)
-log.setLevel(logging.WARNING)
+log.setLevel(logging.DEBUG)
 log.addHandler(handler)
 log.addHandler(logging.NullHandler())
 

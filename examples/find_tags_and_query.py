@@ -28,8 +28,6 @@ import arrow        # date formatting
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
 
 
-osisoftpy.api.setloglevel('DEBUG')
-
 # disable InsecureRequestWarnings
 import requests
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
