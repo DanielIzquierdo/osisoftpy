@@ -14,10 +14,12 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 """
-osisoftpy.osisoftpy_ex2
+osisoftpy.find_tags_and_query
 ~~~~~~~~~~~~
 Some blah blah about what this file is for...
 """
+
+from __future__ import print_function
 
 import osisoftpy    # main package
 import numpy        # stats
@@ -28,7 +30,7 @@ from requests.packages.urllib3.exceptions import InsecureRequestWarning
 # Disable log spam - from DEBUG => INFO
 import logging
 # Common log levels are logging.INFO or logging.DEBUG
-loglevel = logging.INFO
+loglevel = logging.DEBUG
 log = logging.getLogger(osisoftpy.__name__)
 log.setLevel(loglevel)
 for h in log.handlers[:]:
@@ -45,9 +47,8 @@ webapi = osisoftpy.webapi('https://sbb03.eecs.berkeley.edu/piwebapi', authtype='
 print('Connected to {}'.format(webapi.links.get('Self')))
 
 # send the Web API an Indexed Search query for tags named SINU*
-points = webapi.points(query='name:sinu*', count=1000)
-
-current(points, 'values', webapi=webapi)
+params = {'q':'name:sinu*', 'count': 1000}
+points = webapi.points(params=params)
 
 # for each point returned...
 for point in points:

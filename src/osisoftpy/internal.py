@@ -33,6 +33,7 @@ log = logging.getLogger(__name__)
 @wrapt.decorator
 def wrapt_handle_exceptions(wrapped, instance, args, kwargs):
     try:
+        log.debug('Calling %s%s', wrapped, instance or '.')
         return wrapped(*args, **kwargs)
     except PIWebAPIError as e:
         log.debug(e, exc_info=False)

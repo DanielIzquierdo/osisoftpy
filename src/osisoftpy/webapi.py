@@ -22,11 +22,9 @@ import logging
 
 from osisoftpy.base import Base
 from osisoftpy.internal import get
-from osisoftpy.internal import get_batch
 from osisoftpy.internal import wrapt_handle_exceptions
 from osisoftpy.factory import Factory, create
 from osisoftpy.point import Point
-from osisoftpy.points import Points
 
 log = logging.getLogger(__name__)
 
@@ -61,9 +59,16 @@ class WebAPI(Base):
         except Exception as e:
             raise e
 
+    @wrapt_handle_exceptions
+    def points(self, **kwargs):
+        try:
+            return self._get_points(**kwargs)
+        except Exception as e:
+            raise e
+
 
     @wrapt_handle_exceptions
-    def points(self, query, count=10):
+    def __foo(self, query, count=10):
         url = '{}/{}'.format(self.links.get('Search'), 'query')
         params = dict(q=query, count=count)
         r = get(url, session=self.session, params=params)
@@ -80,5 +85,15 @@ class WebAPI(Base):
         r = get(self.links.get('Search') + '/query', self.session, **kwargs)
         return r.response
 
+    def _get_points(self, **kwargs):
+        payload = {
+
+        }
+        r = get(self.links.get('Search') + '/query', self.session, **kwargs)
+
+        points = list(
+            map(lambda x: create(Factory(Point), x, self.session, self),
+                r.response.json().get('Items', None)))
+        return points
 
 
