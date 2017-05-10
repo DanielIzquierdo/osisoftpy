@@ -1,0 +1,16 @@
+machine:
+  python:
+    version: 2.7
+
+dependencies:
+  override:
+    - pip install -q -e .
+  post:
+    - pip install -r test-requirements.txt
+
+test:
+  override:
+    - python -m pytest --cov
+  post:
+    - codecov
+    - codeclimate-test-reporter
