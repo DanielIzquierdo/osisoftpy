@@ -6,6 +6,8 @@ dependencies:
   post:
     - pip install -r test-requirements.txt
 
+# optimize tests to allow for parallelism @ circleci:
+# https://circleci.com/docs/1.0/parallel-manual-setup/
 test:
   override:
     - python -m pytest

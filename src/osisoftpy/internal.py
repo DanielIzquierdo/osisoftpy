@@ -60,17 +60,14 @@ def get(url, session=None, params=None, password=None, username=None,
 
 
 @wrapt_handle_exceptions
-def put(url, session=None, **kwargs):
+def put(url, session=None, params=None, password=None, username=None,
+        authtype=None, verifyssl=True, **kwargs):
     s = session or requests.session()
-    log.debug(s)
     with s:
-        s.verify = kwargs.get('verifyssl', True)
-        log.debug(s.auth)
-        s.auth = s.auth or _get_auth(kwargs.get('authtype', None),
-                                     kwargs.get('username', None),
-                                     kwargs.get('password', None))
+        s.verify = verifyssl
+        s.auth = s.auth or _get_auth(authtype, username, password)
         Response = namedtuple('Response', ['response', 'session'])
-        r = Response(s.put(url, params=kwargs.get('params', None)), s)
+        r = Response(s.put(url, params=params), s)
         json = r.response.json()
         if 'Errors' in json and json.get('Errors').__len__() > 0:
             msg = 'PI Web API returned an error: {}'
@@ -78,16 +75,32 @@ def put(url, session=None, **kwargs):
         else:
             return r
 
-    def get_bulk_payload(webapi, points, params, action):
-        payload = {}
-        for i, point in enumerate(points):
-            payload[i] = {
-                'Method': 'GET',
-                'Resource': super(_server, self).RequestUrl('streams/' + tags[
-                    item].WebId() + '/' + extension + queryParams)
-            }
 
-        return payload
+@wrapt_handle_exceptions
+def get_bulk(points, action, params=None, webapi=None,
+         password=None, username=None, authtype=None, verifyssl=True, **kwargs):
+    s = webapi.session or requests.session()
+    with s:
+        s.verify = verifyssl
+        s.auth = s.auth or _get_auth(authtype, username, password)
+        payload = {}
+        url = '{}/streams/{}'.format(webapi.links.get('Self'), action)
+        for p in points:
+            request = s.prepare_request(requests.Request(
+                'GET', '{}/{}/value'.format(url, p.webid), params=params))
+
+            payload[p.name] = {
+                'Method': request.method,
+                'Resource': request.url,
+            }
+        Response = namedtuple('Response', ['response', 'session'])
+        r = Response(s.post(url, json=payload), s)
+        json = r.response.json()
+        if 'Errors' in json and json.get('Errors').__len__() > 0:
+            msg = 'PI Web API returned an error: {}'
+            raise PIWebAPIError(msg.format(json.get('Errors')))
+        else:
+            return r
 
 def _stringify(**kwargs):
     """

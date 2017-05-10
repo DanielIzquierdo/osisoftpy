@@ -17,6 +17,7 @@
 osisoftpy.points
 ~~~~~~~~~~~~
 Some blah blah about what this file is for...
+max values = 2147483647
 """
 
 from osisoftpy.internal import wrapt_handle_exceptions
@@ -72,7 +73,7 @@ class Points(list):
             showhidden=showhidden,
             showfullhierarchy=showfullhierarchy,
             action='current',
-            points = self
+            points=self
         )
 
         return self.webapi.streamset(**payload)
