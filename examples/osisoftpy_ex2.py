@@ -23,7 +23,7 @@ import logging      # To disable logging spam
 import osisoftpy    # main package
 import numpy        # stats
 import arrow        # date formatting
-from osisoftpy.internal import get_bulk
+from osisoftpy.Points import current
 
 # Disable log spam - from DEBUG => INFO\
 loglevel = logging.DEBUG
@@ -37,9 +37,9 @@ webapi = osisoftpy.webapi('https://sbb03.eecs.berkeley.edu/piwebapi', authtype='
 print('Connected to {}'.format(webapi.links.get('Self')))
 
 # send the Web API an Indexed Search query for tags named SINU*
-points = webapi.points(params=dict(q='name:sinu*', count=1000))
+points = webapi.points(query='name:sinu*', count=1000)
 
-get_bulk(points, 'values', webapi=webapi)
+current(points, 'values', webapi=webapi)
 
 # for each point returned...
 for point in points:

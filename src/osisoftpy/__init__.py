@@ -26,7 +26,7 @@ __email__ = 'apong@dstcontrols.com'
 __version__ = '2.0.7'
 
 # Configure logging
-loglevel = logging.INFO
+loglevel = logging.DEBUG
 fmt = '[%(filename)s:%(lineno)s %(funcName)5s() ] %(levelname).1s %(message)s'
 
 handler = logging.StreamHandler()

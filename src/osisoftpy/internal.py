@@ -24,7 +24,7 @@ import logging
 import requests
 import requests_kerberos
 import wrapt
-from collections import namedtuple
+from osisoftpy.structures import APIResponse
 from osisoftpy.exceptions import PIWebAPIError
 
 log = logging.getLogger(__name__)
@@ -44,13 +44,12 @@ def wrapt_handle_exceptions(wrapped, instance, args, kwargs):
 
 @wrapt_handle_exceptions
 def get(url, session=None, params=None, password=None, username=None,
-    authtype=None, verifyssl=True):
+        authtype=None, verifyssl=True):
     s = session or requests.session()
     with s:
         s.verify = verifyssl
         s.auth = s.auth or _get_auth(authtype, username, password)
-        Response = namedtuple('Response', ['response', 'session'])
-        r = Response(s.get(url, params=params), s)
+        r = APIResponse(s.get(url, params=params), s)
         json = r.response.json()
         if 'Errors' in json and json.get('Errors').__len__() > 0:
             msg = 'PI Web API returned an error: {}'
@@ -66,8 +65,7 @@ def put(url, session=None, params=None, password=None, username=None,
     with s:
         s.verify = verifyssl
         s.auth = s.auth or _get_auth(authtype, username, password)
-        Response = namedtuple('Response', ['response', 'session'])
-        r = Response(s.put(url, params=params), s)
+        r = APIResponse(s.put(url, params=params), s)
         json = r.response.json()
         if 'Errors' in json and json.get('Errors').__len__() > 0:
             msg = 'PI Web API returned an error: {}'
@@ -77,30 +75,27 @@ def put(url, session=None, params=None, password=None, username=None,
 
 
 @wrapt_handle_exceptions
-def get_bulk(points, action, params=None, webapi=None,
-         password=None, username=None, authtype=None, verifyssl=True, **kwargs):
-    s = webapi.session or requests.session()
-    with s:
-        s.verify = verifyssl
-        s.auth = s.auth or _get_auth(authtype, username, password)
-        payload = {}
-        url = '{}/streams/{}'.format(webapi.links.get('Self'), action)
-        for p in points:
-            request = s.prepare_request(requests.Request(
-                'GET', '{}/{}/value'.format(url, p.webid), params=params))
+def get_batch(method, webapi, points, action, params=None):
 
-            payload[p.name] = {
-                'Method': request.method,
-                'Resource': request.url,
-            }
-        Response = namedtuple('Response', ['response', 'session'])
-        r = Response(s.post(url, json=payload), s)
+    s = webapi.session
+
+    with s:
+        url = webapi.url
+        payload = {}
+
+        for p in points:
+            url = '{}streams/{}/{}'.format(url, p.webid, action)
+            r = s.prepare_request(requests.Request(method, url, params=params))
+            payload[p.name] = dict(Method=r.method, Resource=r.url)
+
+        r = APIResponse(s.post('{}batch/'.format(webapi.url), json=payload), s)
         json = r.response.json()
         if 'Errors' in json and json.get('Errors').__len__() > 0:
             msg = 'PI Web API returned an error: {}'
             raise PIWebAPIError(msg.format(json.get('Errors')))
         else:
             return r
+
 
 def _stringify(**kwargs):
     """

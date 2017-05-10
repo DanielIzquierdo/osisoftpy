@@ -20,15 +20,20 @@ Some blah blah about what this file is for...
 max values = 2147483647
 """
 
+from osisoftpy.base import Base
 from osisoftpy.internal import wrapt_handle_exceptions
+from osisoftpy.internal import get_batch
 
 
-class Points(list):
+class Points(Base):
+
+    valid_attr = {'points', 'session', 'webapi'}
+
     def __init__(self, **kwargs):
         super(self.__class__, self).__init__(**kwargs)
 
-        self._session = kwargs.get('session', None)
-        self._webapi = kwargs.get('webapi', None)
+    def __iter__(self):
+        return iter(self.points)
 
     @property
     def session(self):
@@ -76,4 +81,4 @@ class Points(list):
             points=self
         )
 
-        return self.webapi.streamset(**payload)
+        return get_batch('GET', self.webapi, **payload)

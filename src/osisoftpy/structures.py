@@ -21,6 +21,7 @@ Some blah blah about what this file is for...
 
 import collections
 
+APIResponse = collections.namedtuple('APIResponse', ['response', 'session'])
 
 class TypedList(collections.MutableSequence):
     """A ``list``-like object with one or more specified Type(s)
