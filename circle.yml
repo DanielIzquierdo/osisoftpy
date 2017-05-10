@@ -1,6 +1,4 @@
-machine:
-  python:
-    version: 2.7
+# https://circleci.com/docs/1.0/config-sample/
 
 dependencies:
   override:
@@ -10,7 +8,4 @@ dependencies:
 
 test:
   override:
-    - python -m pytest --cov
-  post:
-    - codecov
-    - codeclimate-test-reporter
+    - python -m pytest
