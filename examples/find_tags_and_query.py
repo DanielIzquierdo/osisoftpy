@@ -33,10 +33,12 @@ import requests
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
-# Connect and instantiate the webapi object
+# Connect and instantiate the webapi object for basic
 webapi = osisoftpy.webapi('https://sbb03.eecs.berkeley.edu/piwebapi', authtype='basic', username='albertxu', password='Welcome2pi')
-# Connect and instantiate the webapi object
+
+# Connect and instantiate the webapi object for kerberos
 # webapi = osisoftpy.webapi('https://piudnpiwebapi/piwebapi', authtype='kerberos', verifyssl=False)
+
 print('Connected to {}'.format(webapi.links.get('Self')))
 
 
