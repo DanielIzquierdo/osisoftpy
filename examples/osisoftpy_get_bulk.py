@@ -42,11 +42,11 @@ points = webapi.points(query='name:sinu*', count=1000)
 for p in points:
     print(p.name)
 
-bulk = points.current()
+# bulk = points.current()
 
-bulk = current('GET', webapi.url, points, 'value', webapi=webapi)
-bulk_points = bulk.response.json()
+# bulk = current('GET', webapi.url, points, 'value', webapi=webapi)
+# bulk_points = bulk.response.json()
 # print(points)
 # print(_stringify(**points))
-for point in bulk_points:
-    print(point, bulk_points[point])
+# for point in bulk_points:
+#     print(point, bulk_points[point])
