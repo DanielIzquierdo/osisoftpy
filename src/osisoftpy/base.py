@@ -22,6 +22,7 @@ and Value classes.
 """
 
 import logging
+from osisoftpy.internal import on_ready, on_complete
 
 log = logging.getLogger(__name__)
 
@@ -32,6 +33,8 @@ class Base(object):
     """
 
     valid_attr = frozenset()
+    on_ready = on_ready
+    on_complete = on_complete
 
     def __init__(self, **kwargs):
         keys = self.keys()

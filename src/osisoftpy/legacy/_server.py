@@ -210,11 +210,12 @@ class _server(_base):
     def Observable(self, tags):
         sanitizedTags = self._sanitizeTags(tags)
         """returns an observable object"""
-        return Observable.timer(1000, 1000, Scheduler.timeout).map(
-            lambda second: sanitizedTags) \
+        return Observable\
+            .timer(1000, 1000, Scheduler.timeout) \
+            .map(lambda second: sanitizedTags) \
             .map(lambda tagList: self.CurrentValues(list(tagList))) \
-            .map(lambda qResult: self._checkAgainstPrevious(qResult)).filter(
-            lambda y: y is not None).publish()
+            .map(lambda qResult: self._checkAgainstPrevious(qResult)) \
+            .filter(lambda y: y is not None).publish()
 
     def _checkAgainstPrevious(self, dictionary):
         result = {}

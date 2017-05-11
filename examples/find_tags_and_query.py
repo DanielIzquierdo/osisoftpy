@@ -22,43 +22,113 @@ Some blah blah about what this file is for...
 # Fix print functions
 from __future__ import print_function
 
-import osisoftpy    # main package
-import numpy        # stats
-import arrow        # date formatting
-from requests.packages.urllib3.exceptions import InsecureRequestWarning
-
-
+import arrow  # date formatting
+import blinker
+import numpy  # stats
+import osisoftpy  # main package
 # disable InsecureRequestWarnings
 import requests
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
+from requests.packages.urllib3.exceptions import InsecureRequestWarning
+
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
 # Connect and instantiate the webapi object for basic
-webapi = osisoftpy.webapi('https://sbb03.eecs.berkeley.edu/piwebapi', authtype='basic', username='albertxu', password='Welcome2pi')
+webapi = osisoftpy.webapi('https://sbb03.eecs.berkeley.edu/piwebapi',
+                          authtype='basic', username='albertxu',
+                          password='Welcome2pi')
 
 # Connect and instantiate the webapi object for kerberos
 # webapi = osisoftpy.webapi('https://piudnpiwebapi/piwebapi', authtype='kerberos', verifyssl=False)
 
 print('Connected to {}'.format(webapi.links.get('Self')))
 
+points = webapi.foopoints(query='name:*spf*', count=100)
+
+
+# obs = osisoftpy.observable(points)
+obs2 = points.current_observable()
+
+# obs.subscribe(on_next=lambda value: print("obs Received {0}".format(value)),
+#               on_completed=lambda: print("obs Done!"),
+#               on_error=lambda error: print("obs Error Occurred: {0}".format(error))
+#               )
+
+
+obs2.subscribe(on_next=lambda value: print("obs2 Received {0}".format(value)),
+              on_completed=lambda: print("obs2 Done!"),
+              on_error=lambda error: print("obs2 Error Occurred: {0}".format(error))
+              )
+
+print('foo')
+
+
+
+# for point in observable:
+#     print(point)
+#     # print('getting data for %s...' % point.name)
+#     # let's also get the last 2 weeks of data at 1 minute intervals...
+#     # interpolated_values = point.interpolated(starttime='*-1d', endtime='*',
+#     #                                          interval='1m')
+#     # point.current()
+
+
+
+
+
+
+
+
+
 
 # Send the Web API an Indexed Search query for tags named SINU*
-search_paramaters = {'q': "name:SINU*"}
-points = webapi.points(params=search_paramaters)
+# search_paramaters = {'q': "name:SINU*"}
+# points = webapi.points(params=search_paramaters)
 
+
+
+# points = webapi.foopoints(query='name:*SPF*', count=100)
+
+
+
+
+quit()
+
+# .map(lambda point: getInterpolatedValues(point)) \
+#  \
+#  \
+for point in points:
+    print('getting data for %s...' % point.name)
+    # let's also get the last 2 weeks of data at 1 minute intervals...
+    interpolated_values = point.interpolated(starttime='*-14d', endtime='*',
+                                             interval='1m')
+    values[point.name] = interpolated_values
+
+
+
+
+
+points.current()
+
+for point in points:
+    print(point.name)
+    print('1: current value: %s' % point.current_value)
+    print('2: Return from current(): %s' % point.current())
+    print('3: current value: %s' % point.current_value)
+    print('4: Overwrite=False, current(): %s' % point.current(overwrite=False))
+
+    # for value in point:
+    #     print(value.timestamp)
 
 # for each point returned...
 for point in (p for p in points):
-
-
     # let's print out it's current value and timestamp...
     print('Name: {}, current: {}, timestamp: {}'.format(
         point.name, point.current.value, point.current.timestamp))
 
-
     # let's also get the last 2 weeks of data at 1 minute intervals...
-    interpolated_values = point.interpolated(starttime='*-14d', endtime='*', interval='1m')
-
+    interpolated_values = point.interpolated(starttime='*-14d', endtime='*',
+                                             interval='1m')
 
     # create some messages to be printed out...
     points_msg = '{} PI points were retrieved.'.format(points.__len__())
@@ -70,7 +140,6 @@ for point in (p for p in points):
         arrow.get(interpolated_values[-1].timestamp).humanize()
     )
 
-
     # and then do some simple numpy calls against the 2 weeks of data:
     min = numpy.amin([v.value for v in interpolated_values])
     max = numpy.amax([v.value for v in interpolated_values])
@@ -80,7 +149,6 @@ for point in (p for p in points):
     mode = numpy.median([v.value for v in interpolated_values])
     stdev = numpy.std([v.value for v in interpolated_values])
     variance = numpy.var([v.value for v in interpolated_values], ddof=False)
-
 
     # now let's print out our results for each point
     print('Summary: for {}'.format(point.name))
@@ -95,7 +163,6 @@ for point in (p for p in points):
     print('Stdev:    {}'.format(stdev))
     print('Variance: {}'.format(variance))
     print(summary_msg)
-
 
 # and print out a single summary for all points
 print(points_msg)

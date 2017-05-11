@@ -45,4 +45,5 @@ from osisoftpy.exceptions import (PIWebAPIError)
 from osisoftpy.webapi import (WebAPI)
 from osisoftpy.point import (Point)
 from osisoftpy.value import (Value)
-from osisoftpy.api import (webapi, response, setloglevel)
+from osisoftpy.api import *
+from osisoftpy.base import on_ready, on_complete

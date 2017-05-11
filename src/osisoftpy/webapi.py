@@ -25,6 +25,8 @@ from osisoftpy.internal import get
 from osisoftpy.internal import wrapt_handle_exceptions
 from osisoftpy.factory import Factory, create
 from osisoftpy.point import Point
+from osisoftpy.points import Points
+from rx import Observable
 
 log = logging.getLogger(__name__)
 
@@ -38,6 +40,9 @@ class WebAPI(Base):
     def __init__(self, **kwargs):
         super(self.__class__, self).__init__(**kwargs)
 
+        p = Points(list(), self)
+        self._points = p
+
     def __str__(self):
         self_str = '<OSIsoft PI Web API [{}]>'
         return self_str.format(self.links.get('Self'))
@@ -45,7 +50,6 @@ class WebAPI(Base):
     @property
     def url(self):
         return self.links.get('Self')
-
 
     def search(self, **kwargs):
         try:
@@ -62,24 +66,32 @@ class WebAPI(Base):
     @wrapt_handle_exceptions
     def points(self, **kwargs):
         try:
-            return self._get_points(**kwargs)
+            p = self._get_points(**kwargs)
+            self._points.extend(p)
+            return self._points
         except Exception as e:
             raise e
 
 
     @wrapt_handle_exceptions
-    def __foo(self, query, count=10):
+    def foopoints(self, query, count=10):
         url = '{}/{}'.format(self.links.get('Search'), 'query')
         params = dict(q=query, count=count)
         r = get(url, session=self.session, params=params)
-        p = Point(
-            [create(Factory(Point), x, self.session, self) for x in r.response.json().get('Items', None)],
-            self,
-        )
+
+        p = Points(list([create(Factory(Point), x, self.session, self) for x in r.response.json().get('Items', None)]), self)
+        self._points.extend(p)
+        return self._points
 
         # map(lambda x: create(Factory(Point), x, self.session, self),
         #         r.response.json().get('Items', None)), self)
-        return p
+
+    @staticmethod
+    def firstn(n):
+        num = 0
+        while num < n:
+            yield num
+            num += 1
 
 
     def _get_search(self, **kwargs):
@@ -91,9 +103,6 @@ class WebAPI(Base):
         return r.response
 
     def _get_points(self, **kwargs):
-        payload = {
-
-        }
         r = get(self.links.get('Search') + '/query', self.session, **kwargs)
 
         points = list(

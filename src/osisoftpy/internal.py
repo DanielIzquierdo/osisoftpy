@@ -19,8 +19,16 @@ osisoftpy.internal
 Some blah blah about what this file is for...
 """
 
-import logging
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import print_function
+from __future__ import unicode_literals
+from builtins import *
+from future.standard_library import install_aliases
+install_aliases()
 
+import logging
+import blinker
 import requests
 import requests_kerberos
 import wrapt
@@ -30,17 +38,18 @@ from osisoftpy.exceptions import PIWebAPIError
 log = logging.getLogger(__name__)
 
 
+on_ready = blinker.Signal()
+on_complete = blinker.Signal()
+
 @wrapt.decorator
 def wrapt_handle_exceptions(wrapped, instance, args, kwargs):
     try:
-        log.debug('Calling %s%s', wrapped, instance or '.')
+        # log.debug('Calling %s%s', wrapped, instance or '.')
         return wrapped(*args, **kwargs)
     except PIWebAPIError as e:
         log.debug(e, exc_info=False)
-        raise e
     except Exception as e:
         log.debug(e, exc_info=True)
-        raise e
 
 
 @wrapt_handle_exceptions
@@ -81,11 +90,10 @@ def get_batch(method, webapi, points, action, params=None):
     s = webapi.session
 
     with s:
-        url = webapi.url
         payload = {}
 
         for p in points:
-            url = '{}streams/{}/{}'.format(url, p.webid, action)
+            url = '{}streams/{}/{}'.format(webapi.url, p.webid, action)
             r = s.prepare_request(requests.Request(method, url, params=params))
             payload[p.name] = dict(Method=r.method, Resource=r.url)
 

@@ -46,6 +46,10 @@ source activate venv-conda-dev
 conda env remove --name venv-conda-dev -y
 
 
+conda env remove --name venv-conda-prod -y
+conda env create --file anaconda/prod-environment.yml
+source activate venv-conda-prod
+
 
 conda env create -f environment.yml
 source activate venv-conda

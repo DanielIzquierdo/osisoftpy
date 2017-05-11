@@ -20,39 +20,81 @@ Some blah blah about what this file is for...
 max values = 2147483647
 """
 
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import print_function
+from __future__ import unicode_literals
+from builtins import *
+import logging
+import collections
+import json
+from rx import Observable
+
 from osisoftpy.internal import wrapt_handle_exceptions
 from osisoftpy.internal import get_batch
+from osisoftpy.factory import Factory
+from osisoftpy.factory import create
+from osisoftpy.value import Value
+
 from osisoftpy.point import Point
+from osisoftpy.base import Base
 from osisoftpy.structures import TypedList
 
+log = logging.getLogger(__name__)
 
-class Points(TypedList):
 
-    def __init__(self, points, webapi):
-        super(self.__class__, self).__init__(Point, points)
 
-        self._webapi = webapi
+
+
+class Points(collections.abc.MutableSequence):
+
+    def __init__(self, iterable, webapi):
+        self.list = list()
+        self.webapi = webapi
+        self.extend(list(iterable))
+
+    def __getitem__(self, key):
+        return self.list[key]
+
+    def __setitem__(self, key, value):
+        self.list[key] = value
+
+    def __delitem__(self, key):
+        del self.list[key]
+
+    def __len__(self):
+        return len(self.list)
+
+    def insert(self, key, value):
+        self.list.insert(key, value)
+
+    def __str__(self):
+        return str(self.list)
 
     @property
     def session(self):
-        return self._webapi.session
+        return self.webapi.session
 
-    @property
-    def webapi(self):
-        return self._webapi
+    @wrapt_handle_exceptions
+    def observable(self):
+        return Observable.from_(self.list).timer(100).publish().auto_connect()
+
+    def current_observable(self, *args, **kwargs):
+        return Observable.from_(
+            self.current(*args, **kwargs)).publish().auto_connect()
 
     @wrapt_handle_exceptions
     def current(
             self,
-            time=None,
-            namefilter=None,
-            categoryname=None,
-            templatename=None,
-            showexcluded=False,
-            showhidden=False,
-            showfullhierarchy=False,
-            selectedfields=None,
-    ):
+            time: object = None,
+            namefilter: object = None,
+            categoryname: object = None,
+            templatename: object = None,
+            showexcluded: object = False,
+            showhidden: object = False,
+            showfullhierarchy: object = False,
+            selectedfields: object = None,
+    ) -> object:
         """
         Returns values of the attributes for an Element, Event Frame or 
         Attribute at the specified time. 
@@ -74,9 +116,20 @@ class Points(TypedList):
             templatename=templatename,
             showexcluded=showexcluded,
             showhidden=showhidden,
-            showfullhierarchy=showfullhierarchy,
-            action='current',
-            points=self
+            showfullhierarchy=showfullhierarchy
         )
 
-        return get_batch('GET', self.webapi, **payload)
+        r = get_batch('GET', self.webapi, self, 'value', params=payload)
+        json = r.response.json()
+
+        # The Web API returns a tuple for each request given to it via batch.
+        # in this case, the key is the name of the tag.
+        # maybe use webid instead?
+        # point[0] is the index given (name in this case)
+        # point[1] is the content (the current value in this case)
+        for p in json.items():
+            point = next((x for x in self if x.name == p[0]), None)
+            v = create(Factory(Value), p[1].get('Content'), self.session, self.webapi)
+            point.current_value = v
+        return self
+

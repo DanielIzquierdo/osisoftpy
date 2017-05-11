@@ -25,6 +25,8 @@ from osisoftpy.factory import Factory, create
 from osisoftpy.internal import get
 from osisoftpy.internal import wrapt_handle_exceptions
 from osisoftpy.webapi import WebAPI
+from osisoftpy.points import Points
+import rx
 
 log = logging.getLogger(__name__)
 
@@ -48,3 +50,8 @@ def setloglevel(loglevel):
     log.setLevel(loglevel.upper())
     print('Log level: %s' % log.level)
 
+def observable(points):
+    if not isinstance(points, Points):
+        raise TypeError('The object "{}" is not of type "{}"'.format(
+            points, Points))
+    return rx.Observable.from_(points).publish().auto_connect()

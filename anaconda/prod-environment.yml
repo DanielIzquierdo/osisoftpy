@@ -12,3 +12,4 @@ dependencies:
     - pykerberos        # via requests-kerberos
     - numpy             # via osisoftpy
     - pandas            # via osisoftpy
+    - pytest            # via osisoftpy

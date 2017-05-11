@@ -19,9 +19,15 @@ osisoftpy.point
 This module contains the class definition for the Point class, which
 represents a PI System Point it's described by the PI Web API.
 """
-
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import print_function
+from __future__ import unicode_literals
+from builtins import *
+import warnings
 import logging
 import wrapt
+import rx
 from osisoftpy.base import Base
 from osisoftpy.factory import Factory
 from osisoftpy.factory import create
@@ -54,16 +60,18 @@ class Point(Base):
     def __init__(self, **kwargs):
         super(self.__class__, self).__init__(**kwargs)
 
-    def __str__(self):
-        self_str = '<OSIsoft PI Point [{} - {}]>'
-        return self_str.format(self.name, self.description)
-
         self.current_value = None
         self.interpolated_values = None
         self.recorded_values = None
         self.plot_values = None
         self.summary_values = None
         self.end_value = None
+
+    def __str__(self):
+        self_str = '<OSIsoft PI Point [{} - {}]>'
+        return self_str.format(self.name, self.description)
+
+
 
     @wrapt_handle_exceptions
     def attributes(self, namefilter=None, selectedfields=None):
@@ -83,9 +91,8 @@ class Point(Base):
         r = put(url, self.session, params=payload)
         return r.response
 
-    @property
     @wrapt_handle_exceptions
-    def current(self, time=None):
+    def current(self, time: object = None, overwrite: object = True) -> object:
         """
         Returns the value of the stream at the specified time. By default, 
         this is usually the current value. 
@@ -97,11 +104,21 @@ class Point(Base):
             no context. For Points or simply configured PI Point Data 
             References, this means the snapshot value of the PI Point on the 
             Data Server.
+        :param overwrite: An optional boolean. 
         :return: :class:`OSIsoftPy <osisoftpy.Point>` object
         :rtype: osisoftpy.Point
         """
+        self.on_ready.send(self)
         payload = {'time': time}
-        return self._get_value(payload=payload, endpoint='value')
+        value = self._get_value(payload=payload, endpoint='value')
+        if not overwrite:
+            warnings.warn('You have set the overwrite boolean to False - '
+                          'the current value has been retrieved, but not '
+                          'stored for this point.', UserWarning)
+            return value
+        self.current_value = value
+        self.on_complete.send(self, data=self.current_value)
+        return self.current_value
 
     @wrapt_handle_exceptions
     def interpolated(
