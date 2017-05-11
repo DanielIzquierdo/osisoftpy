@@ -65,9 +65,9 @@ def query():
 
 
 def credentials():
-    authtypes = frozenset(['kerberos', 'basic', None])
-    usernames = frozenset(['albertxu', 'andrew', None])
-    passwords = frozenset(['Welcome2pi', 'p@ssw0rd', None])
+    authtypes = frozenset()
+    usernames = frozenset()
+    passwords = frozenset()
 
     valid = list(product(['basic', None], ['albertxu'], ['Welcome2pi']))
     unknown = list(product(authtypes, usernames, passwords))

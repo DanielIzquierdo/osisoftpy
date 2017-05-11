@@ -23,36 +23,31 @@ import logging
 
 from osisoftpy.factory import Factory, create
 from osisoftpy.internal import get
-from osisoftpy.internal import wrapt_handle_exceptions
 from osisoftpy.webapi import WebAPI
-from osisoftpy.points import Points
-import rx
 
 log = logging.getLogger(__name__)
 
 
-@wrapt_handle_exceptions
-def webapi(url, **kwargs):
-    r = get(url, **kwargs)
+def webapi(
+        url,
+        authtype='kerberos',
+        username=None,
+        password=None,
+        verifyssl=False):
+
+    r = get(url, authtype=authtype, username=username, password=password, verifyssl=verifyssl)
     return create(Factory(WebAPI), r.response.json(), r.session)
 
 
-@wrapt_handle_exceptions
-def response(url, **kwargs):
+def request(url, **kwargs):
     r = get(url, **kwargs)
     return r.response
 
-@wrapt_handle_exceptions
+
 def setloglevel(loglevel):
     numeric_level = getattr(logging, loglevel.upper(), None)
     if not isinstance(numeric_level, int):
         raise ValueError('Invalid log level: %s' % loglevel.upper())
     log.setLevel(loglevel.upper())
     print('Log level: %s' % log.level)
-
-def observable(points):
-    if not isinstance(points, Points):
-        raise TypeError('The object "{}" is not of type "{}"'.format(
-            points, Points))
-    return rx.Observable.from_(points).publish().auto_connect()
 

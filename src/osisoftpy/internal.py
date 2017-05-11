@@ -26,14 +26,16 @@ from __future__ import unicode_literals
 from builtins import *
 from future.standard_library import install_aliases
 install_aliases()
-
+from future.utils import raise_with_traceback
 import logging
 import blinker
 import requests
 import requests_kerberos
+from requests.packages.urllib3 import disable_warnings
+from requests.packages.urllib3.exceptions import InsecureRequestWarning
 import wrapt
 from osisoftpy.structures import APIResponse
-from osisoftpy.exceptions import PIWebAPIError
+from osisoftpy.exceptions import PIWebAPIError, Unauthorized, HTTPError
 
 log = logging.getLogger(__name__)
 
@@ -46,31 +48,47 @@ def wrapt_handle_exceptions(wrapped, instance, args, kwargs):
     try:
         # log.debug('Calling %s%s', wrapped, instance or '.')
         return wrapped(*args, **kwargs)
-    except PIWebAPIError as e:
-        log.debug(e, exc_info=False)
-    except Exception as e:
-        log.debug(e, exc_info=True)
+    except:
+        raise
 
 
-@wrapt_handle_exceptions
-def get(url, session=None, params=None, password=None, username=None,
-        authtype=None, verifyssl=True):
+def get(
+        url,
+        session=None,
+        params=None,
+        password=None,
+        username=None,
+        authtype=None,
+        verifyssl=False):
+
     s = session or requests.session()
+
     with s:
-        s.verify = verifyssl
-        s.auth = s.auth or _get_auth(authtype, username, password)
-        r = APIResponse(s.get(url, params=params), s)
-        json = r.response.json()
-        if 'Errors' in json and json.get('Errors').__len__() > 0:
-            msg = 'PI Web API returned an error: {}'
-            raise PIWebAPIError(msg.format(json.get('Errors')))
-        else:
+        try:
+            s.verify = s.verify or verifyssl
+            if not s.verify:
+                disable_warnings(InsecureRequestWarning)
+            s.auth = s.auth or _get_auth(authtype, username, password)
+            r = APIResponse(s.get(url, params=params), s)
+            if r.response.status_code == 401:
+                raise Unauthorized(
+                    'Server rejected request: wrong username or password')
+            if r.response.status_code != 200:
+                raise HTTPError(
+                    'Wrong server response: %s %s' %
+                    (r.response.status, r.response.reason))
+            json = r.response.json()
+            if 'Errors' in json and json.get('Errors').__len__() > 0:
+                msg = 'PI Web API returned an error: {}'
+                raise PIWebAPIError(msg.format(json.get('Errors')))
             return r
+        except:
+            raise
 
 
 @wrapt_handle_exceptions
 def put(url, session=None, params=None, password=None, username=None,
-        authtype=None, verifyssl=True, **kwargs):
+        authtype=None, verifyssl=False, **kwargs):
     s = session or requests.session()
     with s:
         s.verify = verifyssl
@@ -118,8 +136,11 @@ def _stringify(**kwargs):
 
 
 def _get_auth(authtype, username=None, password=None):
-    if authtype == 'kerberos':
-        return requests_kerberos.HTTPKerberosAuth(
-            mutual_authentication=requests_kerberos.OPTIONAL)
-    else:
-        return requests.auth.HTTPBasicAuth(username, password)
+    try:
+        if authtype == 'kerberos':
+            return requests_kerberos.HTTPKerberosAuth(
+                mutual_authentication=requests_kerberos.OPTIONAL)
+        else:
+            return requests.auth.HTTPBasicAuth(username, password)
+    except:
+        raise

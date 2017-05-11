@@ -27,36 +27,40 @@ import osisoftpy
 
 skip = False
 
-
-def test_get_webapi(url, authtype, username, password):
-    r = osisoftpy.response(url, authtype=authtype, username=username,
-                           password=password)
+@pytest.mark.skipif(skip, reason="Takes an extra 3s...")
+def test_api_get_request(url, authtype, username, password):
+    r = osisoftpy.request(url, authtype=authtype, username=username,
+                      password=password)
     assert r.status_code == requests.codes.ok
     assert r.json().get('Links').get('Self').startswith(url)
 
 
 @pytest.mark.skipif(skip, reason="Takes an extra 3s...")
 @pytest.mark.parametrize('url', ['BLANK', 'fizz', '%^$@^%#$!&', 'http', None])
-def test_get_webapi_with_urls(url):
+def test_api_get_webapi_with_urls(url):
     if url == 'BLANK':
         with pytest.raises(TypeError) as e:
-            osisoftpy.response()
+            osisoftpy.request()
         e.match('argument')
     else:
         with pytest.raises(requests.exceptions.MissingSchema) as e:
-            osisoftpy.response(url)
-        e.match('Invalid URL')
+            osisoftpy.webapi(url)
+        e.match('Invalid')
 
 
 @pytest.mark.skipif(skip, reason="Takes an extra 5s...")
-@pytest.mark.parametrize('authtype, username, password', credentials().unknown)
-def test_get_webapi_with_credentials(url, authtype, username, password):
-    cred = authtype, username, password
-    r = osisoftpy.response(url, authtype=cred[0],
-                           username=cred[1],
-                           password=cred[2])
-    if cred in credentials().valid:
-        assert r.status_code == requests.codes.ok
-        assert r.json().get('Links').get('Self').startswith(url)
+@pytest.mark.parametrize('a', ['kerberos', 'basic', None])
+@pytest.mark.parametrize('u', ['albertxu', 'andrew', None])
+@pytest.mark.parametrize('s', ['Welcome2pi', 'p@ssw0rd', None])
+def test_api_get_webapi_with_credentials(url, a, u, s):
+
+    if (a, u, s) in credentials().valid:
+        webapi = osisoftpy.webapi(url, authtype=a, username=u, password=s)
+        assert isinstance(webapi, osisoftpy.WebAPI)
+        assert webapi.links.get('Self').startswith(url)
     else:
-        assert r.status_code == requests.codes.unauthorized
+        with pytest.raises(osisoftpy.exceptions.Unauthorized) as e:
+            osisoftpy.webapi(url, authtype=a, username=u, password=s)
+        assert 'Server rejected request' in str(e.value)
+
+

@@ -28,6 +28,8 @@ class PIWebAPIError(OSIsoftPyException):
 class HTTPError(OSIsoftPyException):
     """An HTTP error occurred."""
 
+class Unauthorized(HTTPError):
+    """401 unauthorized"""
 
 class ConnectionError(OSIsoftPyException):
     """A Connection error occurred."""
