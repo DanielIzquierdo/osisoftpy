@@ -24,31 +24,20 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 from __future__ import unicode_literals
-from builtins import *
-import logging
-import collections
-import json
-from rx import Observable
-import blinker
 
-from osisoftpy.internal import wrapt_handle_exceptions
-from osisoftpy.internal import get_batch
+import collections
+import logging
+from builtins import *
+
 from osisoftpy.factory import Factory
 from osisoftpy.factory import create
+from osisoftpy.internal import get_batch
 from osisoftpy.value import Value
-
-from osisoftpy.point import Point
-from osisoftpy.base import Base
-from osisoftpy.structures import TypedList
 
 log = logging.getLogger(__name__)
 
 
-
-
-
 class Points(collections.abc.MutableSequence):
-
     def __init__(self, iterable, webapi):
         self.list = list()
         self.webapi = webapi
@@ -76,15 +65,6 @@ class Points(collections.abc.MutableSequence):
     def session(self):
         return self.webapi.session
 
-    # @wrapt_handle_exceptions
-    # def observable(self):
-    #     return Observable.from_(self.list).timer(100).publish().auto_connect()
-
-    # def current_observable(self, *args, **kwargs):
-    #     return Observable.from_(
-    #         self.current(*args, **kwargs)).publish().auto_connect()
-
-    @wrapt_handle_exceptions
     def current(
             self,
             time: object = None,
@@ -117,7 +97,8 @@ class Points(collections.abc.MutableSequence):
             templatename=templatename,
             showexcluded=showexcluded,
             showhidden=showhidden,
-            showfullhierarchy=showfullhierarchy
+            showfullhierarchy=showfullhierarchy,
+            selectedfields=selectedfields
         )
 
         r = get_batch('GET', self.webapi, self, 'value', params=payload)
@@ -130,7 +111,7 @@ class Points(collections.abc.MutableSequence):
         # point[1] is the content (the current value in this case)
         for p in json.items():
             point = next((x for x in self if x.name == p[0]), None)
-            v = create(Factory(Value), p[1].get('Content'), self.session, self.webapi)
+            v = create(Factory(Value), p[1].get('Content'), self.session,
+                       self.webapi)
             point.current_value = v
         return self
-

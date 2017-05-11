@@ -23,17 +23,16 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 from __future__ import unicode_literals
-from builtins import *
-import warnings
+
 import logging
-import wrapt
-import blinker
+import warnings
+from builtins import *
+
 from osisoftpy.base import Base
 from osisoftpy.factory import Factory
 from osisoftpy.factory import create
 from osisoftpy.internal import get
 from osisoftpy.internal import put
-from osisoftpy.internal import wrapt_handle_exceptions
 from osisoftpy.value import Value
 
 log = logging.getLogger(__name__)
@@ -71,7 +70,6 @@ class Point(Base):
         self_str = '<OSIsoft PI Point [{} - {}]>'
         return self_str.format(self.name, self.description)
 
-    @wrapt_handle_exceptions
     def attributes(self, namefilter=None, selectedfields=None):
         payload = {
             'namefilter': namefilter,
@@ -80,7 +78,6 @@ class Point(Base):
         return self._get_values(
             payload=payload, endpoint='attributes', controller='points')
 
-    @wrapt_handle_exceptions
     def update_attribute(self, name, value):
 
         url = 'points/{}/attributes/{}'.format(
@@ -89,7 +86,6 @@ class Point(Base):
         r = put(url, self.session, params=payload)
         return r.response
 
-    @wrapt_handle_exceptions
     def current(self, time: object = None, overwrite: object = True) -> object:
         """
         Returns the value of the stream at the specified time. By default, 
@@ -115,14 +111,15 @@ class Point(Base):
             return value
         if self.current_value and self.current_value.value != value.value:
             self.current_value = value
-            self.webapi.signals['{}/current'.format(self.webid.__str__())].send(self)
+            self.webapi.signals[
+                '{}/current'.format(self.webid.__str__())].send(self)
         elif not self.current_value:
             self.current_value = value
-            self.webapi.signals['{}/current'.format(self.webid.__str__())].send(self)
+            self.webapi.signals[
+                '{}/current'.format(self.webid.__str__())].send(self)
 
         return self.current_value
 
-    @wrapt_handle_exceptions
     def interpolated(
             self,
             starttime='*-1d',
@@ -174,7 +171,6 @@ class Point(Base):
         }
         return self._get_values(payload=payload, endpoint='interpolated')
 
-    @wrapt_handle_exceptions
     def interpolatedattimes(
             self,
             time,
@@ -219,11 +215,9 @@ class Point(Base):
         endpoint = 'interpolatedattimes'
         return self._get_values(payload=payload, endpoint=endpoint)
 
-    @wrapt_handle_exceptions
     def plot(self, **kwargs):
         return self._get_plot(**kwargs)
 
-    @wrapt_handle_exceptions
     def recorded(
             self,
             starttime='*-1d',
@@ -298,7 +292,6 @@ class Point(Base):
         }
         return self._get_values(payload=payload, endpoint='recorded')
 
-    @wrapt_handle_exceptions
     def recordedattime(
             self,
             time,
@@ -338,11 +331,9 @@ class Point(Base):
         endpoint = 'interpolatedattimes'
         return self._get_values(payload=payload, endpoint=endpoint)
 
-    @wrapt_handle_exceptions
     def summary(self, **kwargs):
         return self._get_summary(**kwargs)
 
-    @wrapt_handle_exceptions
     def end(self, **kwargs):
         return self._get_end(**kwargs)
 

@@ -19,35 +19,25 @@ osisoftpy.api
 This module implements the OSIsoftPy API.
 """
 
-import logging
-
 from osisoftpy.factory import Factory, create
 from osisoftpy.internal import get
 from osisoftpy.webapi import WebAPI
 
-log = logging.getLogger(__name__)
+def webapi(url, authtype='kerberos', username=None, password=None, verifyssl=False):
+    """Sends a request to the provided url and authentication configuration. 
+    If successfully, a WebAPI object will be constructed from the response 
+    and returned. 
 
-
-def webapi(
-        url,
-        authtype='kerberos',
-        username=None,
-        password=None,
-        verifyssl=False):
-
+    :param url: The URL of the PI Web API server.
+    :param authtype: Optional - Options are Basic and Kerberos.
+        Default authtype is kerberos.
+    :param username: Optional username - Only used for basic auth.
+    :param password: Optional password - Only used for basic auth.
+    :param verifyssl: Optional SSL verification. If set to False, then
+        InsecureRequestWarning will be disabled.
+    :return: :class:`WebAPI <WebAPI>` object
+    :rtype: osisoftpy.WebAPI
+    """
     r = get(url, authtype=authtype, username=username, password=password, verifyssl=verifyssl)
     return create(Factory(WebAPI), r.response.json(), r.session)
-
-
-def request(url, **kwargs):
-    r = get(url, **kwargs)
-    return r.response
-
-
-def setloglevel(loglevel):
-    numeric_level = getattr(logging, loglevel.upper(), None)
-    if not isinstance(numeric_level, int):
-        raise ValueError('Invalid log level: %s' % loglevel.upper())
-    log.setLevel(loglevel.upper())
-    print('Log level: %s' % log.level)
 

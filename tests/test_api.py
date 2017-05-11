@@ -28,19 +28,11 @@ import osisoftpy
 skip = False
 
 @pytest.mark.skipif(skip, reason="Takes an extra 3s...")
-def test_api_get_request(url, authtype, username, password):
-    r = osisoftpy.request(url, authtype=authtype, username=username,
-                      password=password)
-    assert r.status_code == requests.codes.ok
-    assert r.json().get('Links').get('Self').startswith(url)
-
-
-@pytest.mark.skipif(skip, reason="Takes an extra 3s...")
 @pytest.mark.parametrize('url', ['BLANK', 'fizz', '%^$@^%#$!&', 'http', None])
 def test_api_get_webapi_with_urls(url):
     if url == 'BLANK':
         with pytest.raises(TypeError) as e:
-            osisoftpy.request()
+            osisoftpy.webapi()
         e.match('argument')
     else:
         with pytest.raises(requests.exceptions.MissingSchema) as e:

@@ -16,51 +16,48 @@
 """
 osisoftpy.internal
 ~~~~~~~~~~~~
-Some blah blah about what this file is for...
+This module provides utility functions that are consumed internally by 
+OSIsoftPy.
 """
 
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
-from __future__ import unicode_literals
+from __future__ import (absolute_import, division, unicode_literals)
 from builtins import *
-from future.standard_library import install_aliases
-install_aliases()
-from future.utils import raise_with_traceback
 import logging
-import blinker
 import requests
 import requests_kerberos
 from requests.packages.urllib3 import disable_warnings
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
-import wrapt
 from osisoftpy.structures import APIResponse
-from osisoftpy.exceptions import PIWebAPIError, Unauthorized, HTTPError
+from osisoftpy.exceptions import (PIWebAPIError, Unauthorized, HTTPError)
 
 log = logging.getLogger(__name__)
 
 
-on_ready = blinker.Signal()
-on_complete = blinker.Signal()
-
-@wrapt.decorator
-def wrapt_handle_exceptions(wrapped, instance, args, kwargs):
-    try:
-        # log.debug('Calling %s%s', wrapped, instance or '.')
-        return wrapped(*args, **kwargs)
-    except:
-        raise
-
-
-def get(
-        url,
+def get(url,
         session=None,
         params=None,
         password=None,
         username=None,
         authtype=None,
         verifyssl=False):
-
+    """Constructs a HTTP request to the provided url.
+    
+    Returns an APIResponse namedtuple with two named fields: response and 
+    session. Both objects are standard Requests objects: Requests.Response, 
+    and Requests.Session 
+    
+    :param url: URL to send the HTTP request to.
+    :param session: A Requests Session object.
+    :param params: Paramaters to be passed to the GET request.
+    :param password: Optional password - passed to _get_auth as needed.
+    :param username: Optional password - passed to _get_auth as needed.
+    :param authtype: Optional password - passed to _get_auth as needed.
+    :param verifyssl: Optional SSL verification. If set to False, then
+        InsecureRequestWarning will be disabled.
+    
+    :return: :class:`APIResponse <APIResponse>` object
+    :rtype: osisoftpy.APIResponse
+    """
     s = session or requests.session()
 
     with s:
@@ -86,25 +83,35 @@ def get(
             raise
 
 
-@wrapt_handle_exceptions
 def put(url, session=None, params=None, password=None, username=None,
-        authtype=None, verifyssl=False, **kwargs):
+        authtype=None, verifyssl=False):
+
     s = session or requests.session()
+
     with s:
-        s.verify = verifyssl
-        s.auth = s.auth or _get_auth(authtype, username, password)
-        r = APIResponse(s.put(url, params=params), s)
-        json = r.response.json()
-        if 'Errors' in json and json.get('Errors').__len__() > 0:
-            msg = 'PI Web API returned an error: {}'
-            raise PIWebAPIError(msg.format(json.get('Errors')))
-        else:
+        try:
+            s.verify = s.verify or verifyssl
+            if not s.verify:
+                disable_warnings(InsecureRequestWarning)
+            s.auth = s.auth or _get_auth(authtype, username, password)
+            r = APIResponse(s.put(url, params=params), s)
+            if r.response.status_code == 401:
+                raise Unauthorized(
+                    'Server rejected request: wrong username or password')
+            if r.response.status_code != 200:
+                raise HTTPError(
+                    'Wrong server response: %s %s' %
+                    (r.response.status, r.response.reason))
+            json = r.response.json()
+            if 'Errors' in json and json.get('Errors').__len__() > 0:
+                msg = 'PI Web API returned an error: {}'
+                raise PIWebAPIError(msg.format(json.get('Errors')))
             return r
+        except:
+            raise
 
 
-@wrapt_handle_exceptions
 def get_batch(method, webapi, points, action, params=None):
-
     s = webapi.session
 
     with s:

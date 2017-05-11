@@ -22,7 +22,6 @@ import logging
 
 from osisoftpy.base import Base
 from osisoftpy.internal import get
-from osisoftpy.internal import wrapt_handle_exceptions
 from osisoftpy.factory import Factory, create
 from osisoftpy.point import Point
 from osisoftpy.points import Points
@@ -64,7 +63,6 @@ class WebAPI(Base):
         except Exception as e:
             raise e
 
-    @wrapt_handle_exceptions
     def points(self, **kwargs):
         try:
             p = self._get_points(**kwargs)
@@ -84,7 +82,6 @@ class WebAPI(Base):
         return self.signals
 
 
-    @wrapt_handle_exceptions
     def foopoints(self, query, count=10):
         url = '{}/{}'.format(self.links.get('Search'), 'query')
         params = dict(q=query, count=count)
