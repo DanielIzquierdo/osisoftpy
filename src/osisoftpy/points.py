@@ -29,6 +29,7 @@ import logging
 import collections
 import json
 from rx import Observable
+import blinker
 
 from osisoftpy.internal import wrapt_handle_exceptions
 from osisoftpy.internal import get_batch
@@ -75,13 +76,13 @@ class Points(collections.abc.MutableSequence):
     def session(self):
         return self.webapi.session
 
-    @wrapt_handle_exceptions
-    def observable(self):
-        return Observable.from_(self.list).timer(100).publish().auto_connect()
+    # @wrapt_handle_exceptions
+    # def observable(self):
+    #     return Observable.from_(self.list).timer(100).publish().auto_connect()
 
-    def current_observable(self, *args, **kwargs):
-        return Observable.from_(
-            self.current(*args, **kwargs)).publish().auto_connect()
+    # def current_observable(self, *args, **kwargs):
+    #     return Observable.from_(
+    #         self.current(*args, **kwargs)).publish().auto_connect()
 
     @wrapt_handle_exceptions
     def current(

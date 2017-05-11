@@ -20,15 +20,13 @@ Some blah blah about what this file is for...
 """
 
 # Fix print functions
-from __future__ import print_function
+from __future__ import (absolute_import, division,
+                        print_function, unicode_literals)
+from future.utils import iteritems
 
-import arrow  # date formatting
-import blinker
-import numpy  # stats
+import time
 import osisoftpy  # main package
-# disable InsecureRequestWarnings
 import requests
-from requests.packages.urllib3.exceptions import InsecureRequestWarning
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
 
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
@@ -43,41 +41,86 @@ webapi = osisoftpy.webapi('https://sbb03.eecs.berkeley.edu/piwebapi',
 
 print('Connected to {}'.format(webapi.links.get('Self')))
 
-points = webapi.foopoints(query='name:*spf*', count=100)
+# Get a list of Points from the Web API:
+points = webapi.foopoints(query='name:sinu*', count=100)
+
+# Get a list of point signals for the points we'd like to monitor for changes.
+# We're passing in a list of points, and the Point's method we're monitoring.
+signals = webapi.observe(points, 'current')
+
+# a list to store modified points in:
+updated_points = []
+
+# When the monitored point's value changes, it emits a signal.
+# This will call a function, known as as the receiver. Here, We're creating
+# receiver named notify which will simply print out the changed Point's
+# attributes, and saving the updated point to a list for us to use later.
+def notify(sender):
+    msg = 'Current value for {} has changed to {}'
+    updated_points.append(sender) # TODO: change ex to remove old point
+    print(msg.format(sender.name, sender.current_value))
+
+# Here is where we're connecting to the signals that will be emitted. We're
+# going through the signals we retrieved earlier, and connecting to each
+# one, passing in the reciver function we just defined
+for (k, signal) in iteritems(signals):
+    signal.connect(notify)
+
+# Here, we're creating a simple 500ms timer which will grab the latest value
+#  for each PI point. The point.current() method will emit the change signal
+#  when the value changes.
+# we'll just run this until we receive 10 point changes:
+starttime = time.time()
+
+while updated_points.__len__() < 10:
+    for point in points:
+        point.current()
+        # run every 500 milliseconds
+        sleep = 1/2
+        time.sleep(sleep - ((time.time() - starttime) % sleep))
+
+# print out the modified points
+for point in updated_points:
+    print(point)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 # obs = osisoftpy.observable(points)
-obs2 = points.current_observable()
-
-# obs.subscribe(on_next=lambda value: print("obs Received {0}".format(value)),
-#               on_completed=lambda: print("obs Done!"),
-#               on_error=lambda error: print("obs Error Occurred: {0}".format(error))
+# obs2 = points.current_observable()
+#
+# # obs.subscribe(on_next=lambda value: print("obs Received {0}".format(value)),
+# #               on_completed=lambda: print("obs Done!"),
+# #               on_error=lambda error: print("obs Error Occurred: {0}".format(error))
+# #               )
+#
+#
+# obs2.subscribe(on_next=lambda value: print("obs2 Received {0}".format(value)),
+#               on_completed=lambda: print("obs2 Done!"),
+#               on_error=lambda error: print("obs2 Error Occurred: {0}".format(error))
 #               )
-
-
-obs2.subscribe(on_next=lambda value: print("obs2 Received {0}".format(value)),
-              on_completed=lambda: print("obs2 Done!"),
-              on_error=lambda error: print("obs2 Error Occurred: {0}".format(error))
-              )
-
-print('foo')
-
-
-
-# for point in observable:
-#     print(point)
-#     # print('getting data for %s...' % point.name)
-#     # let's also get the last 2 weeks of data at 1 minute intervals...
-#     # interpolated_values = point.interpolated(starttime='*-1d', endtime='*',
-#     #                                          interval='1m')
-#     # point.current()
-
-
-
-
-
-
-
+#
+# print('foo')
 
 
 
@@ -103,10 +146,6 @@ for point in points:
     interpolated_values = point.interpolated(starttime='*-14d', endtime='*',
                                              interval='1m')
     values[point.name] = interpolated_values
-
-
-
-
 
 points.current()
 

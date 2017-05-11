@@ -27,7 +27,7 @@ from builtins import *
 import warnings
 import logging
 import wrapt
-import rx
+import blinker
 from osisoftpy.base import Base
 from osisoftpy.factory import Factory
 from osisoftpy.factory import create
@@ -71,8 +71,6 @@ class Point(Base):
         self_str = '<OSIsoft PI Point [{} - {}]>'
         return self_str.format(self.name, self.description)
 
-
-
     @wrapt_handle_exceptions
     def attributes(self, namefilter=None, selectedfields=None):
         payload = {
@@ -108,7 +106,6 @@ class Point(Base):
         :return: :class:`OSIsoftPy <osisoftpy.Point>` object
         :rtype: osisoftpy.Point
         """
-        self.on_ready.send(self)
         payload = {'time': time}
         value = self._get_value(payload=payload, endpoint='value')
         if not overwrite:
@@ -116,8 +113,13 @@ class Point(Base):
                           'the current value has been retrieved, but not '
                           'stored for this point.', UserWarning)
             return value
-        self.current_value = value
-        self.on_complete.send(self, data=self.current_value)
+        if self.current_value and self.current_value.value != value.value:
+            self.current_value = value
+            self.webapi.signals['{}/current'.format(self.webid.__str__())].send(self)
+        elif not self.current_value:
+            self.current_value = value
+            self.webapi.signals['{}/current'.format(self.webid.__str__())].send(self)
+
         return self.current_value
 
     @wrapt_handle_exceptions
@@ -128,7 +130,7 @@ class Point(Base):
             interval='1h',
             filterexpression=None,
             includefilteredvalues=False,
-            selectedfields=None,):
+            selectedfields=None, ):
         """
         Retrieves interpolated values over the specified time range at 
         the specified sampling interval. 
@@ -179,7 +181,7 @@ class Point(Base):
             filterexpression=None,
             includefilteredvalues=False,
             sortorder='Ascending',
-            selectedfields=None,):
+            selectedfields=None, ):
         """
         Retrieves interpolated values over the specified time range at the 
         specified sampling interval. 
@@ -223,14 +225,14 @@ class Point(Base):
 
     @wrapt_handle_exceptions
     def recorded(
-        self,
-        starttime='*-1d',
-        endtime='*',
-        boundarytype='Inside',
-        filterexpression=None,
-        maxcount=1000,
-        includefilteredvalues=False,
-        selectedfields=None,):
+            self,
+            starttime='*-1d',
+            endtime='*',
+            boundarytype='Inside',
+            filterexpression=None,
+            maxcount=1000,
+            includefilteredvalues=False,
+            selectedfields=None, ):
         """
         Returns a list of compressed values for the requested time range 
         from the source provider. 
@@ -301,7 +303,7 @@ class Point(Base):
             self,
             time,
             retrievalmode='Auto',
-            selectedfields=None,):
+            selectedfields=None, ):
         """
         Returns a single recorded value based on the passed time and 
         retrieval mode from the stream. 
@@ -345,7 +347,7 @@ class Point(Base):
         return self._get_end(**kwargs)
 
     def _get_value(self, payload, endpoint, controller='streams', **kwargs):
-        log.debug('payload: %s', payload)
+        # log.debug('payload: %s', payload)
         url = '{}/{}/{}/{}'.format(
             self.webapi.links.get('Self'), controller, self.webid, endpoint)
         r = get(url, self.session, params=payload, **kwargs)

@@ -26,7 +26,7 @@ from osisoftpy.internal import wrapt_handle_exceptions
 from osisoftpy.factory import Factory, create
 from osisoftpy.point import Point
 from osisoftpy.points import Points
-from rx import Observable
+import blinker
 
 log = logging.getLogger(__name__)
 
@@ -42,6 +42,7 @@ class WebAPI(Base):
 
         p = Points(list(), self)
         self._points = p
+        self.signals = {}
 
     def __str__(self):
         self_str = '<OSIsoft PI Web API [{}]>'
@@ -72,6 +73,16 @@ class WebAPI(Base):
         except Exception as e:
             raise e
 
+    def observe(self, points, stream):
+        if not isinstance(points, Points):
+            raise TypeError('The object "{}" is not of type "{}"'.format(
+                points, Points))
+        for p in points:
+            name = '{}/{}'.format(p.webid.__str__(), stream)
+            s = blinker.signal(name)
+            self.signals[name] = s
+        return self.signals
+
 
     @wrapt_handle_exceptions
     def foopoints(self, query, count=10):
@@ -85,13 +96,6 @@ class WebAPI(Base):
 
         # map(lambda x: create(Factory(Point), x, self.session, self),
         #         r.response.json().get('Items', None)), self)
-
-    @staticmethod
-    def firstn(n):
-        num = 0
-        while num < n:
-            yield num
-            num += 1
 
 
     def _get_search(self, **kwargs):

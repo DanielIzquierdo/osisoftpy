@@ -55,3 +55,4 @@ def observable(points):
         raise TypeError('The object "{}" is not of type "{}"'.format(
             points, Points))
     return rx.Observable.from_(points).publish().auto_connect()
+
