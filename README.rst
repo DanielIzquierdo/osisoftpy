@@ -4,6 +4,10 @@ osisoftpy
 A python library for OSIsoft's PI Web API
 -----------------------------------------
 
+.. image:: https://circleci.com/gh/dstcontrols/osisoftpy/tree/master.svg?style=shield&circle-token=07ae288c282e68695dce08f01f4ffeea36ee9405
+   :target: https://circleci.com/gh/dstcontrols/osisoftpy/tree/master
+   :alt: Circle CI code test status
+
 .. image:: https://travis-ci.org/dstcontrols/osisoftpy.svg?branch=master
    :target: https://travis-ci.org/dstcontrols/osisoftpy
    :alt: Travis CI code test status
@@ -32,7 +36,7 @@ Usage
 
 .. code-block:: python
 
-   import arrow #Optional, included to make timestamps easier to understand.
+   import arrow       # Arrow is optional - it's included here make timestamps easier to understand.
    import osisoftpy
 
 
@@ -40,29 +44,42 @@ Usage
 
    # <OSIsoft PI Web API [https://localhost/piwebapi]>
 
-   search_paramaters = {'q': "name:CDT158", 'count': 10}
-   points = webapi.points(params=search_paramaters)
+   points = webapi.points(query='name:CD* or name:SINU*', count=100)
 
-   # <OSIsoft PI Point [CDT158 - Atmospheric Tower OH Vapor]>
+   # <osisoftpy.points.Points at 0x108a26850>
+
+   points.current()
 
    for point in points:
+
        print('The current value for {} is {}, recorded {}'.format(
            point.name,
-           point.current.value,
-           arrow.get(point.current.timestamp).humanize(),))
+           point.current_value.value,
+           arrow.get(point.current_value.timestamp).humanize()))
 
-   # The current value for CDT158 is 150.1271, recorded a minute ago
+   # The current value for CDEP158 is 267, recorded 2017-05-12T01:46:23Z
+   # The current value for CDM158 is {u'IsSystem': False, u'Name': u'Cascade', u'Value': 2}, recorded 2017-05-12T01:51:53Z
+   # The current value for CDT158 is 65.66323, recorded 2017-05-12T01:50:53Z
+   # The current value for SINUSOID is 28.9156246, recorded 2017-05-12T01:49:53Z
+   # The current value for SINUSOIDU is 91.05328, recorded 2017-05-12T01:50:23Z
 
    for point in points:
-       values = point.interpolated(starttime='*-14d', endtime='*', ='1m',)
-       msg = ('{} interpolated values for {} were retrieved. '
-             'The data spans from {} to {}').format(
+
+       values = point.interpolated(starttime='*-14d', endtime='*', interval='1m')
+
+       print('{} interpolated values for {} were retrieved; '
+           'the data ranges from {} to {}.'.format(
            values.__len__(),
            point.name,
            arrow.get(values[0].timestamp).humanize(),
-           arrow.get(values[-1].timestamp).humanize(),)
+           arrow.get(values[-1].timestamp).humanize()))
 
-   # 20161 interpolated values for CDT158 were retrieved; the data spans from 14 days ago to just now
+
+   # 20161 interpolated values for CDEP158 were retrieved. The data spans from 2017-04-28T02:00:30.8133676Z to 2017-05-12T02:00:30.8133676Z
+   # 20161 interpolated values for CDM158 were retrieved. The data spans from 2017-04-28T02:00:31.6571736Z to 2017-05-12T02:00:31.6571736Z
+   # 20161 interpolated values for CDT158 were retrieved. The data spans from 2017-04-28T02:00:32.8447522Z to 2017-05-12T02:00:32.8447522Z
+   # 20161 interpolated values for SINUSOID were retrieved. The data spans from 2017-04-28T02:00:33.7666888Z to 2017-05-12T02:00:33.7666888Z
+   # 20161 interpolated values for SINUSOIDU were retrieved. The data spans from 2017-04-28T02:00:34.6417451Z to 2017-05-12T02:00:34.6417451Z
 
 Installation
 ------------

@@ -23,7 +23,7 @@ Some blah blah about what this file is for...
 from __future__ import (absolute_import, division,
                         print_function, unicode_literals)
 from future.utils import iteritems
-
+import arrow
 import time
 import osisoftpy  # main package
 import requests
@@ -42,7 +42,7 @@ webapi = osisoftpy.webapi('https://sbb03.eecs.berkeley.edu/piwebapi',
 print('Connected to {}'.format(webapi.links.get('Self')))
 
 # Get a list of Points from the Web API:
-points = webapi.foopoints(query='name:sinu*', count=100)
+points = webapi.points(query='name:CD* or name:SINU*', count=100)
 
 # Get a list of point signals for the points we'd like to monitor for changes.
 # We're passing in a list of points, and the Point's method we're monitoring.
@@ -71,6 +71,24 @@ for (k, signal) in iteritems(signals):
 #  when the value changes.
 # we'll just run this until we receive 10 point changes:
 starttime = time.time()
+
+points.current()
+
+for point in points:
+    print('The current value for {} is {}, recorded {}'.format(
+        point.name,
+        point.current_value.value,
+        arrow.get(point.current_value.timestamp).humanize()))
+
+for point in points:
+    values = point.interpolated(starttime='*-14d', endtime='*', interval='1m')
+
+    print('{} interpolated values for {} were retrieved; '
+          'the data ranges from {} to {}.'.format(
+        values.__len__(),
+        point.name,
+        arrow.get(values[0].timestamp).humanize(),
+        arrow.get(values[-1].timestamp).humanize()))
 
 while updated_points.__len__() < 10:
     for point in points:

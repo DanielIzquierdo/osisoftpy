@@ -182,7 +182,8 @@ class WebAPI(Base):
             raise TypeError('The object "{}" is not of type "{}"'.format(
                 points, Points))
         for p in points:
-            name = '{}/{}'.format(p.webid.__str__(), stream)
-            s = blinker.signal(name)
-            self.signals[name] = s
+            signalkey = '{}/{}'.format(p.webid.__str__(), stream)
+            if signalkey not in self.signals:
+                s = blinker.signal(signalkey)
+                self.signals[signalkey] = s
         return self.signals

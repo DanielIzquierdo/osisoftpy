@@ -106,14 +106,13 @@ class Point(Base):
                           'the current value has been retrieved, but not '
                           'stored for this point.', UserWarning)
             return value
+        signalkey = '{}/current'.format(self.webid.__str__())
         if self.current_value and self.current_value.value != value.value:
             self.current_value = value
-            self.webapi.signals[
-                '{}/current'.format(self.webid.__str__())].send(self)
+            self.webapi.signals[signalkey].send(self)
         elif not self.current_value:
             self.current_value = value
-            self.webapi.signals[
-                '{}/current'.format(self.webid.__str__())].send(self)
+            self.webapi.signals[signalkey].send(self)
 
         return self.current_value
 
