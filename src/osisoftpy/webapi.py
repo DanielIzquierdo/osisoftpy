@@ -20,12 +20,12 @@ Some blah blah about what this file is for...
 """
 import logging
 
+import blinker
 from osisoftpy.base import Base
-from osisoftpy.internal import get
 from osisoftpy.factory import Factory, create
+from osisoftpy.internal import get
 from osisoftpy.point import Point
 from osisoftpy.points import Points
-import blinker
 
 log = logging.getLogger(__name__)
 
@@ -49,29 +49,134 @@ class WebAPI(Base):
 
     @property
     def url(self):
+        """Returns the URL of the PI Web API instance.
+        :return: str (https://localhost/piwebapi/)
+        """
         return self.links.get('Self')
 
-    def search(self, **kwargs):
-        try:
-            return self._get_search(**kwargs)
-        except Exception as e:
-            raise e
+    def points(
+            self,
+            query,
+            scope=None,
+            fields=None,
+            count=10,
+            start=0,):
+        """Sends a request to the PI Web API instance using the provided 
+        search query and returned item count. If successful, a list of 
+        Points will be returned. 
 
-    def response(self, **kwargs):
-        try:
-            return self._get_response(**kwargs)
-        except Exception as e:
-            raise e
+        :param query: One or many terms, in the form of field:value, 
+        like "name:pump". If no field is specfied, like "pump", then the 
+        following fields will all be used: name, description, afcategories, 
+        afelementtemplate, attributename, attributedescription. 
 
-    def points(self, **kwargs):
+        The star and question mark wildcards are supported, for example: 
+        boil* or boi?er. To perform a fuzzy search, append a tilde to the 
+        end of a keyword, like "boilr~" will match "boiler". 
+
+        If multiple terms are entered, they are assumed to be ORed together. 
+        If that's not appropriate, you can specify AND, OR, and NOT 
+        operators, along with parenthesis to create a complex query. For 
+        example "(vibration* AND datatype:float32) OR afelementtemplate:pump" 
+
+        Special characters are used through the keyword syntax, so those 
+        characters must be escaped if they are in a literal search term. The 
+        following characters must be escaped with a backslash: + - && || ! ( 
+        ) { } [ ] ^ " ~ * ? : \ For example, to find a PI point named 
+        SI:NUSO.ID specify "q=name:SI\:USO.ID"
+        :param scope: List of sources 
+        to execute the query against. Specify the sources in string format (
+        e.g. pi:mypidataarchive) or in webId format. Multiple scopes (and 
+        with different formats) can be specified, separated by semicolons (
+        ;).
+        :param fields: List of fields to include in each Search Result. 
+        If no fields are specified, then the following fields are returned: 
+        afcategory; attributes; datatype; description; endtime; haschildren; 
+        itemtype; links; matchedfields; name; plottable; starttime; 
+        template; uniqueid; uom; webid The following fields are not returned 
+        by default: paths; parents; explain (must be paired with the links 
+        field)
+        :param count: Max number of results to return. The default is 
+        10 per page.
+        :param start: Index of search result to begin with. The 
+        default is to start at index 0.
+        :return: :class:`Points <Points>` object containing :class:`Point <Point>` object
+        :rtype: osisoftpy.Points
+        """
+        r = self.request(
+            query=query, scope=scope, fields=fields, count=count, start=start)
+        p = Points(list([
+            create(Factory(Point), x, self.session, self)
+            for x in r.json().get('Items', None)
+        ]), self)
+        self._points.extend(p)
+        return self._points
+
+    def request(
+            self,
+            query,
+            scope=None,
+            fields=None,
+            count=10,
+            start=0,):
+        """Sends a request to the PI Web API instance using the provided 
+        search query and returned item count. If successful, an APIResponse 
+        object will be returned. 
+
+        :param query: One or many terms, in the form of field:value, 
+        like "name:pump". If no field is specfied, like "pump", then the 
+        following fields will all be used: name, description, afcategories, 
+        afelementtemplate, attributename, attributedescription. 
+
+        The star and question mark wildcards are supported, for example: 
+        boil* or boi?er. To perform a fuzzy search, append a tilde to the 
+        end of a keyword, like "boilr~" will match "boiler". 
+
+        If multiple terms are entered, they are assumed to be ORed together. 
+        If that's not appropriate, you can specify AND, OR, and NOT 
+        operators, along with parenthesis to create a complex query. For 
+        example "(vibration* AND datatype:float32) OR afelementtemplate:pump" 
+
+        Special characters are used through the keyword syntax, so those 
+        characters must be escaped if they are in a literal search term. The 
+        following characters must be escaped with a backslash: + - && || ! ( 
+        ) { } [ ] ^ " ~ * ? : \ For example, to find a PI point named 
+        SI:NUSO.ID specify "q=name:SI\:USO.ID"
+        :param scope: List of sources 
+        to execute the query against. Specify the sources in string format (
+        e.g. pi:mypidataarchive) or in webId format. Multiple scopes (and 
+        with different formats) can be specified, separated by semicolons (
+        ;).
+        :param fields: List of fields to include in each Search Result. 
+        If no fields are specified, then the following fields are returned: 
+        afcategory; attributes; datatype; description; endtime; haschildren; 
+        itemtype; links; matchedfields; name; plottable; starttime; 
+        template; uniqueid; uom; webid The following fields are not returned 
+        by default: paths; parents; explain (must be paired with the links 
+        field)
+        :param count: Max number of results to return. The default is 
+        10 per page.
+        :param start: Index of search result to begin with. The 
+        default is to start at index 0.
+        :return: :class:`APIResponse <APIResponse>` object
+        :rtype: osisoftpy.APIResponse
+        """
+        url = '{}/{}'.format(self.links.get('Search'), 'query')
+        params = dict(q=query, count=count)
         try:
-            p = self._get_points(**kwargs)
-            self._points.extend(p)
-            return self._points
+            r = get(url, session=self.session, params=params)
+            self.session = r.session
+            return r.response
         except Exception as e:
             raise e
 
     def observe(self, points, stream):
+        """
+
+        :param points: 
+        :param stream: 
+        :return: 
+        """
         if not isinstance(points, Points):
             raise TypeError('The object "{}" is not of type "{}"'.format(
                 points, Points))
@@ -80,35 +185,3 @@ class WebAPI(Base):
             s = blinker.signal(name)
             self.signals[name] = s
         return self.signals
-
-
-    def foopoints(self, query, count=10):
-        url = '{}/{}'.format(self.links.get('Search'), 'query')
-        params = dict(q=query, count=count)
-        r = get(url, session=self.session, params=params)
-
-        p = Points(list([create(Factory(Point), x, self.session, self) for x in r.response.json().get('Items', None)]), self)
-        self._points.extend(p)
-        return self._points
-
-        # map(lambda x: create(Factory(Point), x, self.session, self),
-        #         r.response.json().get('Items', None)), self)
-
-
-    def _get_search(self, **kwargs):
-        r = get(self.links.get('Search'), self.session, **kwargs)
-        return r.response
-
-    def _get_response(self, **kwargs):
-        r = get(self.links.get('Search') + '/query', self.session, **kwargs)
-        return r.response
-
-    def _get_points(self, **kwargs):
-        r = get(self.links.get('Search') + '/query', self.session, **kwargs)
-
-        points = list(
-            map(lambda x: create(Factory(Point), x, self.session, self),
-                r.response.json().get('Items', None)))
-        return points
-
-

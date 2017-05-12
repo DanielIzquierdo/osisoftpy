@@ -50,25 +50,10 @@ def test_webapi_has_self_url(webapi, url):
 def test_webapi_has_search_url(webapi, url):
     assert webapi.links.get('Search') == url + '/search'
 
-
-def test_webapi_search_method(webapi):
-    r = webapi.search()
-    assert r.status_code == requests.codes.ok
-    assert r.json().get('Links').get('Self').startswith(
-        webapi.links.get('Search'))
-
-
-def test_webapi_query_method(webapi):
-    with pytest.raises(osisoftpy.exceptions.PIWebAPIError) as e:
-        r = webapi.response()
-        assert r.status_code == requests.codes.ok
-    assert e.match('Query parameter must be specified')
-
-
 def test_webapi_query_sinusoid(webapi):
     tag = 'sinusoid'
-    payload = dict(q="name:{}".format(tag), count=10)
-    r = webapi.response(params=payload)
+    payload = dict(query="name:{}".format(tag), count=10)
+    r = webapi.request(**payload)
     assert r.status_code == requests.codes.ok
     assert r.json().get('TotalHits') > 0
     assert r.json().get('Items')[0].get('Name').lower() == 'sinusoid'
@@ -78,16 +63,16 @@ def test_webapi_query_sinusoid(webapi):
 
 def test_webapi_points_sinusoid(webapi):
     tag = 'sinusoid'
-    payload = {"q": "name:{}".format(tag), "count": 10}
-    r = webapi.points(params=payload)
+    payload = dict(query="name:{}".format(tag), count=10)
+    r = webapi.points(**payload)
     assert all(isinstance(x, osisoftpy.Point) for x in r)
     assert r.__len__() == 1
 
 
 @pytest.mark.parametrize('query', query())
 def test_webapi_points_query(webapi, query):
-    payload = {"q": query, "count": 1000}
-    points = webapi.points(params=payload)
+    payload = dict(query=query, count=1000)
+    points = webapi.points(**payload)
     assert all(isinstance(x, osisoftpy.Point) for x in points)
     msg = '{} points were retrieved with the query "{}"'
     print(msg.format(points.__len__(), query))
