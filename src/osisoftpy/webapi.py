@@ -162,10 +162,10 @@ class WebAPI(Base):
         :rtype: osisoftpy.APIResponse
         """
         url = '{}/{}'.format(self.links.get('Search'), 'query')
-        params = dict(q=query, count=count)
+        params = dict(
+            q=query, scope=scope, fields=fields, count=count, start=start)
         try:
             r = get(url, session=self.session, params=params)
-            self.session = r.session
             return r.response
         except Exception as e:
             raise e

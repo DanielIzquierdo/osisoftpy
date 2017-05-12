@@ -22,44 +22,41 @@ Tests for the `osisoftpy.point` module.
 
 import re
 
-import pytest
 import osisoftpy
+import pytest
 
-from .conftest import pointvalues
-from .conftest import query
 from .conftest import now
+from .conftest import pointvalues
 
-skip = False
-
+skip = True
 
 
 # TODO: add tests for docstrings
-
-
-@pytest.mark.parametrize('query', [(query())])
-@pytest.mark.parametrize('count', [10])
-@pytest.mark.parametrize('key', pointvalues().single)
-def test_points_singlevaluekeys_are_immutable(webapi, query, count, key):
-    points = webapi.points(params=dict(q=query, count=count))
-    assert all(isinstance(x, osisoftpy.Point) for x in points)
-    for point in points:
-        with pytest.raises(AttributeError) as e:
-            print(point, key, 'foo')
-            setattr(point, key, 'foo')
-        e.match('can\'t set attribute')
-        assert isinstance(point.current, osisoftpy.Value)
+# TODO: consider if still worth testing
+# @pytest.mark.parametrize('query', [(query())])
+# @pytest.mark.parametrize('count', [10])
+# @pytest.mark.parametrize('key', pointvalues().single)
+# def test_points_singlevaluekeys_are_immutable(webapi, query, count, key):
+#     payload = dict(query=query, count=count)
+#     points = webapi.points(**payload)
+#     assert all(isinstance(x, osisoftpy.Point) for x in points)
+#     for point in points:
+#         with pytest.raises(AttributeError) as e:
+#             print(point, key, 'foo')
+#             setattr(point, key, 'foo')
+#         e.match('can\'t set attribute')
+#         assert isinstance(point.current, osisoftpy.Value)
 
 
 @pytest.mark.parametrize('query', ['name:sinusoid'])
 @pytest.mark.parametrize('count', [10])
 @pytest.mark.parametrize('keys', [pointvalues().single])
 def test_points_singlevaluekeys_are_validtypes(webapi, query, count, keys):
-    payload = dict(q=query, count=count)
-    points = webapi.points(params=payload)
+    payload = dict(query=query, count=count)
+    points = webapi.points(**payload)
     assert all(isinstance(x, osisoftpy.Point) for x in points)
     for point in points:
         for k in keys:
-
             try:
                 valuekey = getattr(point, k)
                 if re.match('int\d{0,2}', point.datatype, re.IGNORECASE):
@@ -74,8 +71,8 @@ def test_points_singlevaluekeys_are_validtypes(webapi, query, count, keys):
 @pytest.mark.parametrize('count', [10])
 @pytest.mark.parametrize('keys', [pointvalues().multi])
 def test_points_multivaluekeys_are_validtypes(webapi, query, count, keys):
-    payload = dict(q=query, count=count)
-    points = webapi.points(params=payload)
+    payload = dict(query=query, count=count)
+    points = webapi.points(**payload)
     assert all(isinstance(x, osisoftpy.Point) for x in points)
     for point in points:
         for k in keys:
@@ -97,14 +94,14 @@ def test_points_multivaluekeys_are_validtypes(webapi, query, count, keys):
     {'expected_count': 20161, 'starttime': '*-14d', 'interval': '1m', }
 ])
 def test_points_interpolated_return_expected_value_count(
-        webapi, query, count, key, params,
+    webapi, query, count, key, params,
 ):
-    payload = dict(q=query, count=count)
-    points = webapi.points(params=payload)
+    payload = dict(query=query, count=count)
+    points = webapi.points(**payload)
     assert all(isinstance(x, osisoftpy.Point) for x in points)
+    expected_count = params.pop('expected_count')
     for point in points:
         valuekey = getattr(point, key)
-        expected_count = params.pop('expected_count')
         values = valuekey(**params)
         assert values.__len__() == expected_count
 
@@ -129,16 +126,17 @@ def test_points_interpolated_return_expected_value_count(
 def test_points_interpolatedattimes_return_expected_value_count(
         webapi, query, count, key, params,
 ):
-    payload = dict(q=query, count=count)
-    points = webapi.points(params=payload)
+    payload = dict(query=query, count=count)
+    points = webapi.points(**payload)
     assert all(isinstance(x, osisoftpy.Point) for x in points)
+    expected_count = params.pop('expected_count')
     for point in points:
         valuekey = getattr(point, key)
-        expected_count = params.pop('expected_count')
         values = valuekey(**params)
         assert values.__len__() == expected_count
 
-#TODO : figure out how to calculate the expected number of recorded values
+
+# TODO : figure out how to calculate the expected number of recorded values
 @pytest.mark.parametrize('query', ['name:sinusoid'])
 @pytest.mark.parametrize('count', [10])
 @pytest.mark.parametrize('key', ['recorded'])
@@ -153,8 +151,8 @@ def test_points_interpolatedattimes_return_expected_value_count(
 def test_points_recorded_return_values(
         webapi, query, count, key, params,
 ):
-    payload = dict(q=query, count=count)
-    points = webapi.points(params=payload)
+    payload = dict(query=query, count=count)
+    points = webapi.points(**payload)
     assert all(isinstance(x, osisoftpy.Point) for x in points)
     for point in points:
         valuekey = getattr(point, key)
@@ -165,13 +163,12 @@ def test_points_recorded_return_values(
 @pytest.mark.parametrize('query', ['name:sinusoid'])
 @pytest.mark.parametrize('count', [10])
 @pytest.mark.parametrize('key', ['recordedattime'])
-@pytest.mark.parametrize('retrievalmode',
-    ['Auto','AtOrBefore','Before','AtOrAfter','After','Exact'])
+@pytest.mark.parametrize('retrievalmode',['Auto', 'AtOrBefore', 'Before', 'AtOrAfter', 'After','Exact'])
 def test_points_recorded_returns_one_value(
-        webapi, query, count, key, now, retrievalmode,
+    webapi, now, query, count, key, retrievalmode,
 ):
-    payload = dict(q=query, count=count)
-    points = webapi.points(params=payload)
+    payload = dict(query=query, count=count)
+    points = webapi.points(**payload)
     assert all(isinstance(x, osisoftpy.Point) for x in points)
     for point in points:
         valuekey = getattr(point, key)
@@ -182,13 +179,3 @@ def test_points_recorded_returns_one_value(
         for value in values:
             print('Point {}, recorded value {} {}: {}'.format(
                 point.name, retrievalmode, now, value.value))
-
-
-
-
-
-
-
-
-
-
