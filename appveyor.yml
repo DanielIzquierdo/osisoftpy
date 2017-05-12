@@ -17,6 +17,9 @@ environment:
     - PYTHON: "C:\\Python36-x64"
 
 init:
+  - ps: GWMI win32_logicaldisk | FT DeviceId, `
+        @{n="Size";e={[math]::Round($_.Size/1GB,2)}},`
+        @{n="Free";e={[math]::Round($_.FreeSpace/1GB,2)}}
   - "%PYTHON%\\python.exe -V"
   - "%PYTHON%\\python.exe -c \"import struct;print(8 * struct.calcsize(\'P\'))\""
 
@@ -55,6 +58,9 @@ after_test:
   - ps: Remove-Item .\dist\osisoftpy*$platform_tag.zip*
   - ps: 7z a -tzip dist\$artifact_name '.\dist\*' -aoa '-i!*.whl' '-x!*.zip' '-x!*.tmp'
   - ps: "ls dist -recurse"
+  - ps: GWMI win32_logicaldisk | FT DeviceId, `
+        @{n="Size";e={[math]::Round($_.Size/1GB,2)}},`
+        @{n="Free";e={[math]::Round($_.FreeSpace/1GB,2)}}
 
 
 # I give up getting coverage report submission from appveyor.

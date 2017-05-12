@@ -36,7 +36,7 @@ Usage
 
 .. code-block:: python
 
-   import arrow       # Arrow is optional - it's included here make timestamps easier to understand.
+   import arrow       # Arrow is optional - it's included to simplify the timestamps.
    import osisoftpy
 
 
