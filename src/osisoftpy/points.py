@@ -19,15 +19,11 @@ osisoftpy.points
 Some blah blah about what this file is for...
 max values = 2147483647
 """
-
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
-from __future__ import unicode_literals
+from __future__ import (absolute_import, division, unicode_literals)
+from future.builtins import *
 
 import collections
 import logging
-from builtins import *
 
 from osisoftpy.factory import Factory
 from osisoftpy.factory import create
@@ -37,7 +33,7 @@ from osisoftpy.value import Value
 log = logging.getLogger(__name__)
 
 
-class Points(collections.abc.MutableSequence):
+class Points(collections.MutableSequence):
     def __init__(self, iterable, webapi):
         self.list = list()
         self.webapi = webapi
@@ -67,15 +63,15 @@ class Points(collections.abc.MutableSequence):
 
     def current(
             self,
-            time: object = None,
-            namefilter: object = None,
-            categoryname: object = None,
-            templatename: object = None,
-            showexcluded: object = False,
-            showhidden: object = False,
-            showfullhierarchy: object = False,
-            selectedfields: object = None,
-    ) -> object:
+            time = None,
+            namefilter = None,
+            categoryname = None,
+            templatename = None,
+            showexcluded = False,
+            showhidden = False,
+            showfullhierarchy = False,
+            selectedfields = None,
+    ):
         """
         Returns values of the attributes for an Element, Event Frame or 
         Attribute at the specified time. 

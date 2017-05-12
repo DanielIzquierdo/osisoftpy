@@ -16,15 +16,10 @@
 """
 osisoftpy.factory
 ~~~~~~~~~~~~
-Some blah blah about what this file is for...
 """
-
-import logging
-from six import iteritems
-
-from osisoftpy.internal import _stringify
-
-log = logging.getLogger(__name__)
+from __future__ import (absolute_import, division, unicode_literals)
+from future.builtins import *
+from future.utils import iteritems
 
 
 def create(factory, thing, session, webapi=None):
@@ -39,7 +34,6 @@ def create(factory, thing, session, webapi=None):
     kwargs = dict(map(lambda k_v: (k_v[0].lower(), k_v[1]), iteritems(thing)))
     kwargs.update({'session': session, 'webapi': webapi})
     thing = factory.create(**kwargs)
-    # log.debug('Created %s, kwargs: %s', type(thing), _stringify(**kwargs))
     return thing
 
 

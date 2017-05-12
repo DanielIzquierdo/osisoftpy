@@ -19,14 +19,11 @@ osisoftpy.point
 This module contains the class definition for the Point class, which
 represents a PI System Point it's described by the PI Web API.
 """
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
-from __future__ import unicode_literals
+from __future__ import (absolute_import, division, unicode_literals)
+from future.builtins import *
 
 import logging
 import warnings
-from builtins import *
 
 from osisoftpy.base import Base
 from osisoftpy.factory import Factory
@@ -86,7 +83,7 @@ class Point(Base):
         r = put(url, self.session, params=payload)
         return r.response
 
-    def current(self, time: object = None, overwrite: object = True) -> object:
+    def current(self, time=None, overwrite=True):
         """
         Returns the value of the stream at the specified time. By default, 
         this is usually the current value. 

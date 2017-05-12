@@ -76,12 +76,11 @@ setuptools.setup(
         # eg: 'keyword1', 'keyword2', 'keyword3',
     ],
     install_requires=[
+        'blinker',
         'future',
         'arrow',
         'requests',
         'requests-kerberos',
-        'six',
-        'wrapt',
     ],
     extras_require={
         # eg:

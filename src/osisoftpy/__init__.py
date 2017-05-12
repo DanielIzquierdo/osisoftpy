@@ -18,7 +18,8 @@ osisoftpy.__init__
 ~~~~~~~~~~~~
 
 """
-
+from __future__ import (absolute_import, division, unicode_literals)
+from future.builtins import *
 import logging
 
 __author__ = 'Andrew Pong'
@@ -37,12 +38,8 @@ log.setLevel(logging.DEBUG)
 log.addHandler(handler)
 log.addHandler(logging.NullHandler())
 
-# log.debug('debug message')
-# log.info('info message')
-# log.warn('warn message')
-
 from osisoftpy.exceptions import (PIWebAPIError)
 from osisoftpy.webapi import (WebAPI)
 from osisoftpy.point import (Point)
 from osisoftpy.value import (Value)
-from osisoftpy.api import *
+from osisoftpy.api import webapi

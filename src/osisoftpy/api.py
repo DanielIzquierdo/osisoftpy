@@ -18,12 +18,18 @@ osisoftpy.api
 ~~~~~~~~~~~~
 This module implements the OSIsoftPy API.
 """
-
+from __future__ import (absolute_import, division, unicode_literals)
 from osisoftpy.factory import Factory, create
 from osisoftpy.internal import get
 from osisoftpy.webapi import WebAPI
 
-def webapi(url, authtype='kerberos', username=None, password=None, verifyssl=False):
+
+def webapi(
+        url,
+        authtype='kerberos',
+        username=None,
+        password=None,
+        verifyssl=False):
     """Sends a request to the provided url and authentication configuration. 
     If successfully, a WebAPI object will be constructed from the response 
     and returned. 
@@ -38,6 +44,6 @@ def webapi(url, authtype='kerberos', username=None, password=None, verifyssl=Fal
     :return: :class:`WebAPI <WebAPI>` object
     :rtype: osisoftpy.WebAPI
     """
-    r = get(url, authtype=authtype, username=username, password=password, verifyssl=verifyssl)
+    r = get(url, authtype=authtype, username=username, password=password,
+            verifyssl=verifyssl)
     return create(Factory(WebAPI), r.response.json(), r.session)
-

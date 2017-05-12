@@ -94,13 +94,13 @@ class _server(_base):
                                                            self._buildBulkPayload(
                                                                sanitizedTags, [
                                                                    (
-                                                                   'startTime',
-                                                                   start),
+                                                                       'startTime',
+                                                                       start),
                                                                    ('endTime',
                                                                     end),
                                                                    (
-                                                                   'boundaryType',
-                                                                   boundary),
+                                                                       'boundaryType',
+                                                                       boundary),
                                                                    ('maxCount',
                                                                     maxCount)
                                                                ], 'recorded')))
@@ -115,8 +115,8 @@ class _server(_base):
                                                            self._buildBulkPayload(
                                                                sanitizedTags, [
                                                                    (
-                                                                   'startTime',
-                                                                   start),
+                                                                       'startTime',
+                                                                       start),
                                                                    ('endTime',
                                                                     end),
                                                                    ('interval',
@@ -210,7 +210,7 @@ class _server(_base):
     def Observable(self, tags):
         sanitizedTags = self._sanitizeTags(tags)
         """returns an observable object"""
-        return Observable\
+        return Observable \
             .timer(1000, 1000, Scheduler.timeout) \
             .map(lambda second: sanitizedTags) \
             .map(lambda tagList: self.CurrentValues(list(tagList))) \

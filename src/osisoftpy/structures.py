@@ -16,21 +16,15 @@
 """
 osisoftpy.structures
 ~~~~~~~~~~~~
-Some blah blah about what this file is for...
 """
-
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
-from __future__ import unicode_literals
-
+from __future__ import (absolute_import, division, unicode_literals)
+from future.builtins import *
 import collections
-from builtins import *
 
 APIResponse = collections.namedtuple('APIResponse', ['response', 'session'])
 
 
-class TypedList(collections.abc.MutableSequence):
+class TypedList(collections.MutableSequence):
     """A ``list``-like object with one or more specified Type(s)
     
     Implements all methods and operations of
@@ -39,8 +33,7 @@ class TypedList(collections.abc.MutableSequence):
     
     """
 
-    def __init__(self, *args, validtypes=None):
-        # type: (any, *str) -> None
+    def __init__(self, validtypes=None, *args):
         """
 
         :rtype: list
@@ -54,7 +47,7 @@ class TypedList(collections.abc.MutableSequence):
     def __validatetype(self, value):
         if self.validtypes is None:
             pass
-        if not isinstance(value, self.validtypes):
+        if self.validtypes and not isinstance(value, self.validtypes):
             raise TypeError('The object "{}" is not of type "{}"'.format(
                 value, self.validtypes))
 
@@ -77,5 +70,3 @@ class TypedList(collections.abc.MutableSequence):
 
     def __str__(self):
         return str(self.list)
-
-

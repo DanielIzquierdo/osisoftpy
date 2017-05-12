@@ -16,9 +16,9 @@
 """
 osisoftpy.value
 ~~~~~~~~~~~~
-Some blah blah about what this file is for...
 """
-
+from __future__ import (absolute_import, division, unicode_literals)
+from future.builtins import *
 from osisoftpy.base import Base
 
 

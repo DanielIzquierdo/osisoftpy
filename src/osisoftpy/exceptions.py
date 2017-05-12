@@ -7,6 +7,7 @@ osisoftpy.exceptions
 This module contains the set of OSIsoftPy's exceptions.
 """
 
+
 # TODO: Implement custom PI Web API HTTP response codes:
 # streams/{webid}/GetInterpolated
 # 200: The values that meet the specified conditions.
@@ -28,8 +29,10 @@ class PIWebAPIError(OSIsoftPyException):
 class HTTPError(OSIsoftPyException):
     """An HTTP error occurred."""
 
+
 class Unauthorized(HTTPError):
     """401 unauthorized"""
+
 
 class ConnectionError(OSIsoftPyException):
     """A Connection error occurred."""

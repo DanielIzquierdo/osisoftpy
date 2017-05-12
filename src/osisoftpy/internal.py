@@ -19,9 +19,8 @@ osisoftpy.internal
 This module provides utility functions that are consumed internally by 
 OSIsoftPy.
 """
-
 from __future__ import (absolute_import, division, unicode_literals)
-from builtins import *
+from future.builtins import *
 import logging
 import requests
 import requests_kerberos
@@ -85,7 +84,6 @@ def get(url,
 
 def put(url, session=None, params=None, password=None, username=None,
         authtype=None, verifyssl=False):
-
     s = session or requests.session()
 
     with s:

@@ -18,8 +18,9 @@ osisoftpy.webapi
 ~~~~~~~~~~~~
 Some blah blah about what this file is for...
 """
+from __future__ import (absolute_import, division, unicode_literals)
+from future.builtins import *
 import logging
-
 import blinker
 from osisoftpy.base import Base
 from osisoftpy.factory import Factory, create
@@ -60,7 +61,7 @@ class WebAPI(Base):
             scope=None,
             fields=None,
             count=10,
-            start=0,):
+            start=0, ):
         """Sends a request to the PI Web API instance using the provided 
         search query and returned item count. If successful, a list of 
         Points will be returned. 
@@ -118,7 +119,7 @@ class WebAPI(Base):
             scope=None,
             fields=None,
             count=10,
-            start=0,):
+            start=0, ):
         """Sends a request to the PI Web API instance using the provided 
         search query and returned item count. If successful, an APIResponse 
         object will be returned. 
