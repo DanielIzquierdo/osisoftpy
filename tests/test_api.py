@@ -27,6 +27,7 @@ import osisoftpy
 
 skip = False
 
+
 @pytest.mark.skipif(skip, reason="Takes an extra 3s...")
 @pytest.mark.parametrize('url', ['BLANK', 'fizz', '%^$@^%#$!&', 'http', None])
 def test_api_get_webapi_with_urls(url):
@@ -40,19 +41,22 @@ def test_api_get_webapi_with_urls(url):
         e.match('Invalid')
 
 
+@pytest.mark.xfail
 @pytest.mark.skipif(skip, reason="Takes an extra 5s...")
 @pytest.mark.parametrize('a', ['kerberos', 'basic', None])
 @pytest.mark.parametrize('u', ['albertxu', 'andrew', None])
-@pytest.mark.parametrize('s', ['Welcome2pi', 'p@ssw0rd', None])
-def test_api_get_webapi_with_credentials(url, a, u, s):
+@pytest.mark.parametrize('p', ['Welcome2pi', 'p@ssw0rd', None])
+def test_api_get_webapi_with_valid_credentials(url, a, u, p):
+    if (a, u, p) not in credentials().valid:
+        webapi = osisoftpy.webapi(url, authtype=a, username=u, password=p)
 
-    if (a, u, s) in credentials().valid:
-        webapi = osisoftpy.webapi(url, authtype=a, username=u, password=s)
+
+@pytest.mark.skipif(skip, reason="Takes an extra 5s...")
+@pytest.mark.parametrize('a', ['kerberos', 'basic', None])
+@pytest.mark.parametrize('u', ['albertxu', 'andrew', None])
+@pytest.mark.parametrize('p', ['Welcome2pi', 'p@ssw0rd', None])
+def test_api_get_webapi_with_invalid_credentials(url, a, u, p):
+    if (a, u, p) in credentials().valid:
+        webapi = osisoftpy.webapi(url, authtype=a, username=u, password=p)
         assert isinstance(webapi, osisoftpy.WebAPI)
         assert webapi.links.get('Self').startswith(url)
-    else:
-        with pytest.raises(osisoftpy.exceptions.Unauthorized) as e:
-            osisoftpy.webapi(url, authtype=a, username=u, password=s)
-        assert 'Server rejected request' in str(e.value)
-
-
