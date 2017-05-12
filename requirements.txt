@@ -1,5 +1,2 @@
 # Mirrors prod
-# -r requirements/prod.txt
---index-url https://pypi.python.org/simple/
-
--e .
+-r requirements/prod.txt

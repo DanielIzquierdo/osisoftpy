@@ -42,15 +42,22 @@ python setup.py develop
 
 #anaconda virtual environment
 source deactivate
+conda env remove --name venv-conda-dev -y
 conda env create --file anaconda/dev-environment.yml
 source activate venv-conda-dev
-conda env remove --name venv-conda-dev -y
 
 
 source deactivate
 conda env remove --name venv-conda-prod -y
 conda env create --file anaconda/prod-environment.yml
 source activate venv-conda-prod
+
+
+pip install -r requirements.txt
+pip install -r test-requirements.txt
+
+
+
 
 
 conda env create -f environment.yml

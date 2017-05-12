@@ -7,6 +7,7 @@
 arrow==0.10.0
 bumpversion==0.5.3
 click==6.7                # via pip-tools
+coverage==4.4
 cssselect==1.0.1          # via pyquery
 first==2.0.1              # via pip-tools
 howdoi==1.1.9
