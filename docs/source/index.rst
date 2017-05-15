@@ -19,3 +19,5 @@ Indices and tables
 * :ref:`genindex`
 * :ref:`modindex`
 * :ref:`search`
+
+{I, l, 1}, {Q, O, 0}, {S, 5}, {Z, 2}

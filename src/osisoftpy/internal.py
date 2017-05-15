@@ -61,14 +61,15 @@ def get(url,
 
     with s:
         try:
-            s.verify = s.verify or verifyssl
+            if verifyssl is not None:
+                s.verify = verifyssl
             if not s.verify:
                 disable_warnings(InsecureRequestWarning)
             s.auth = s.auth or _get_auth(authtype, username, password)
             r = APIResponse(s.get(url, params=params), s)
             if r.response.status_code == 401:
                 raise Unauthorized(
-                    'Server rejected request: wrong username or password')
+                    'Authorization denied - incorrect username or password.')
             if r.response.status_code != 200:
                 raise HTTPError(
                     'Wrong server response: %s %s' %
