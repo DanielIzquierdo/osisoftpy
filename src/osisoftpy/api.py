@@ -19,8 +19,13 @@ osisoftpy.api
 This module implements the OSIsoftPy API.
 """
 from __future__ import (absolute_import, division, unicode_literals)
+import requests
+from requests.packages.urllib3 import disable_warnings
+from requests.packages.urllib3.exceptions import InsecureRequestWarning
+from osisoftpy.structures import APIResponse
+from osisoftpy.exceptions import (PIWebAPIError, Unauthorized, HTTPError)
 from osisoftpy.factory import Factory, create
-from osisoftpy.internal import get
+from osisoftpy.internal import get, _get_auth
 from osisoftpy.webapi import WebAPI
 
 
@@ -44,6 +49,25 @@ def webapi(
     :return: :class:`WebAPI <WebAPI>` object
     :rtype: osisoftpy.WebAPI
     """
-    r = get(url, authtype=authtype, username=username, password=password,
-            verifyssl=verifyssl)
-    return create(Factory(WebAPI), r.response.json(), r.session)
+    try:
+        s = requests.session()
+        if verifyssl is not None:
+            s.verify = verifyssl
+        if not s.verify:
+            disable_warnings(InsecureRequestWarning)
+        s.auth = _get_auth(authtype, username, password)
+        r = APIResponse(s.get(url), s)
+        if r.response.status_code == 401:
+            raise Unauthorized(
+                'Authorization denied - incorrect username or password.')
+        if r.response.status_code != 200:
+            raise HTTPError(
+                'Wrong server response: %s %s' %
+                (r.response.status, r.response.reason))
+        json = r.response.json()
+        if 'Errors' in json and json.get('Errors').__len__() > 0:
+            msg = 'PI Web API returned an error: {}'
+            raise PIWebAPIError(msg.format(json.get('Errors')))
+        return create(Factory(WebAPI), json, r.session)
+    except:
+        raise

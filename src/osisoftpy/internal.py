@@ -65,7 +65,9 @@ def get(url,
                 s.verify = verifyssl
             if not s.verify:
                 disable_warnings(InsecureRequestWarning)
-            s.auth = s.auth or _get_auth(authtype, username, password)
+            if authtype is not None:
+                s.auth = _get_auth(authtype, username, password)
+            print(s.auth)
             r = APIResponse(s.get(url, params=params), s)
             if r.response.status_code == 401:
                 raise Unauthorized(
