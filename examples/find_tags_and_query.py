@@ -32,18 +32,18 @@ from requests.packages.urllib3.exceptions import InsecureRequestWarning
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
 # Connect and instantiate the webapi object for basic
-webapi = osisoftpy.webapi('https://sbb03.eecs.berkeley.edu/piwebapi',
-                          authtype='basic', username='albertxu',
-                          password='Welcome2pi')
+# webapi = osisoftpy.webapi('https://sbb03.eecs.berkeley.edu/piwebapi',
+#                           authtype='basic', username='albertxu',
+#                           password='Welcome2pi')
 
 # Connect and instantiate the webapi object for kerberos
-# webapi = osisoftpy.webapi('https://piudnpiwebapi/piwebapi', authtype='kerberos', verifyssl=False)
+webapi = osisoftpy.webapi('https://megatron.dstcontrols.local/piwebapi', authtype='kerberos', verifyssl=False)
 
 print('Connected to {}'.format(webapi.links.get('Self')))
 
 # Get a list of Points from the Web API:
 points = webapi.points(query='name:CD* or name:SINU*', count=100)
-
+print(points.__len__())
 # Get a list of point signals for the points we'd like to monitor for changes.
 # We're passing in a list of points, and the Point's method we're monitoring.
 signals = webapi.observe(points, 'current')
@@ -80,28 +80,28 @@ for point in points:
         point.current_value.value,
         arrow.get(point.current_value.timestamp).humanize()))
 
-for point in points:
-    values = point.interpolated(starttime='*-14d', endtime='*', interval='1m')
-
-    print('{} interpolated values for {} were retrieved; '
-          'the data ranges from {} to {}.'.format(
-        values.__len__(),
-        point.name,
-        arrow.get(values[0].timestamp).humanize(),
-        arrow.get(values[-1].timestamp).humanize()))
-
-while updated_points.__len__() < 10:
-    for point in points:
-        point.current()
-        # run every 500 milliseconds
-        sleep = 1/2
-        time.sleep(sleep - ((time.time() - starttime) % sleep))
-
-# print out the modified points
-for point in updated_points:
-    print(point)
-
-
+# for point in points:
+#     values = point.interpolated(starttime='*-14d', endtime='*', interval='1m')
+#
+#     print('{} interpolated values for {} were retrieved; '
+#           'the data ranges from {} to {}.'.format(
+#         values.__len__(),
+#         point.name,
+#         arrow.get(values[0].timestamp).humanize(),
+#         arrow.get(values[-1].timestamp).humanize()))
+#
+# while updated_points.__len__() < 10:
+#     for point in points:
+#         point.current()
+#         # run every 500 milliseconds
+#         sleep = 1/2
+#         time.sleep(sleep - ((time.time() - starttime) % sleep))
+#
+# # print out the modified points
+# for point in updated_points:
+#     print(point)
+#
+#
 
 
 

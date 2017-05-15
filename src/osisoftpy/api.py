@@ -19,14 +19,18 @@ osisoftpy.api
 This module implements the OSIsoftPy API.
 """
 from __future__ import (absolute_import, division, unicode_literals)
+
 import requests
+import requests_kerberos
+import logging
 from requests.packages.urllib3 import disable_warnings
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
 from osisoftpy.structures import APIResponse
 from osisoftpy.exceptions import (PIWebAPIError, Unauthorized, HTTPError)
 from osisoftpy.factory import Factory, create
-from osisoftpy.internal import get, _get_auth
 from osisoftpy.webapi import WebAPI
+
+log = logging.getLogger(__name__)
 
 
 def webapi(
@@ -51,11 +55,14 @@ def webapi(
     """
     try:
         s = requests.session()
-        if verifyssl is not None:
-            s.verify = verifyssl
+        s.verify = verifyssl
         if not s.verify:
             disable_warnings(InsecureRequestWarning)
-        s.auth = _get_auth(authtype, username, password)
+        if authtype == 'kerberos':
+            s.auth = requests_kerberos.HTTPKerberosAuth(
+                mutual_authentication=requests_kerberos.OPTIONAL)
+        else:
+            s.auth = requests.auth.HTTPBasicAuth(username, password)
         r = APIResponse(s.get(url), s)
         if r.response.status_code == 401:
             raise Unauthorized(

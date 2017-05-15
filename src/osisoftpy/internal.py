@@ -23,22 +23,13 @@ from __future__ import (absolute_import, division, unicode_literals)
 from future.builtins import *
 import logging
 import requests
-import requests_kerberos
-from requests.packages.urllib3 import disable_warnings
-from requests.packages.urllib3.exceptions import InsecureRequestWarning
 from osisoftpy.structures import APIResponse
 from osisoftpy.exceptions import (PIWebAPIError, Unauthorized, HTTPError)
 
 log = logging.getLogger(__name__)
 
 
-def get(url,
-        session=None,
-        params=None,
-        password=None,
-        username=None,
-        authtype=None,
-        verifyssl=False):
+def get(url, session, params=None):
     """Constructs a HTTP request to the provided url.
     
     Returns an APIResponse namedtuple with two named fields: response and 
@@ -48,26 +39,15 @@ def get(url,
     :param url: URL to send the HTTP request to.
     :param session: A Requests Session object.
     :param params: Paramaters to be passed to the GET request.
-    :param password: Optional password - passed to _get_auth as needed.
-    :param username: Optional password - passed to _get_auth as needed.
-    :param authtype: Optional password - passed to _get_auth as needed.
-    :param verifyssl: Optional SSL verification. If set to False, then
         InsecureRequestWarning will be disabled.
     
     :return: :class:`APIResponse <APIResponse>` object
     :rtype: osisoftpy.APIResponse
     """
-    s = session or requests.session()
+    s = session
 
     with s:
         try:
-            if verifyssl is not None:
-                s.verify = verifyssl
-            if not s.verify:
-                disable_warnings(InsecureRequestWarning)
-            if authtype is not None:
-                s.auth = _get_auth(authtype, username, password)
-            print(s.auth)
             r = APIResponse(s.get(url, params=params), s)
             if r.response.status_code == 401:
                 raise Unauthorized(
@@ -85,16 +65,12 @@ def get(url,
             raise
 
 
-def put(url, session=None, params=None, password=None, username=None,
-        authtype=None, verifyssl=False):
-    s = session or requests.session()
+def put(url, session, params=None):
+
+    s = session
 
     with s:
         try:
-            s.verify = s.verify or verifyssl
-            if not s.verify:
-                disable_warnings(InsecureRequestWarning)
-            s.auth = s.auth or _get_auth(authtype, username, password)
             r = APIResponse(s.put(url, params=params), s)
             if r.response.status_code == 401:
                 raise Unauthorized(
@@ -142,13 +118,3 @@ def _stringify(**kwargs):
     return (','.join('{0}={1!r}'.format(k, v)
                      for k, v in kwargs.items()))
 
-
-def _get_auth(authtype, username=None, password=None):
-    try:
-        if authtype == 'kerberos':
-            return requests_kerberos.HTTPKerberosAuth(
-                mutual_authentication=requests_kerberos.OPTIONAL)
-        else:
-            return requests.auth.HTTPBasicAuth(username, password)
-    except:
-        raise
