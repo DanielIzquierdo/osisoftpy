@@ -22,6 +22,7 @@ from __future__ import (absolute_import, division, unicode_literals)
 
 import requests
 import requests_kerberos
+from requests_kerberos import HTTPKerberosAuth
 import logging
 from requests.packages.urllib3 import disable_warnings
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
@@ -35,6 +36,8 @@ log = logging.getLogger(__name__)
 
 def webapi(
         url,
+        hostname_override=None,
+        principal=None,
         authtype='kerberos',
         username=None,
         password=None,
@@ -59,8 +62,11 @@ def webapi(
         if not s.verify:
             disable_warnings(InsecureRequestWarning)
         if authtype == 'kerberos':
-            s.auth = requests_kerberos.HTTPKerberosAuth(
-                mutual_authentication=requests_kerberos.OPTIONAL)
+            s.auth = HTTPKerberosAuth(
+                mutual_authentication=requests_kerberos.OPTIONAL,
+                sanitize_mutual_error_response=False,
+                hostname_override=hostname_override,
+                principal=principal)
         else:
             s.auth = requests.auth.HTTPBasicAuth(username, password)
         r = APIResponse(s.get(url), s)
@@ -68,9 +74,7 @@ def webapi(
             raise Unauthorized(
                 'Authorization denied - incorrect username or password.')
         if r.response.status_code != 200:
-            raise HTTPError(
-                'Wrong server response: %s %s' %
-                (r.response.status, r.response.reason))
+            raise HTTPError('Wrong server response: %s %s' % (r.response.status_code, r.response.reason))
         json = r.response.json()
         if 'Errors' in json and json.get('Errors').__len__() > 0:
             msg = 'PI Web API returned an error: {}'

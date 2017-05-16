@@ -28,27 +28,20 @@ import osisoftpy
 
 @pytest.fixture(scope='module')
 def url():
-    return 'https://sbb03.eecs.berkeley.edu/piwebapi'
-
-
-@pytest.fixture(scope='module')
-def username():
-    return 'albertxu'
-
+    return 'https://dev.dstcontrols.com/piwebapi'
 
 @pytest.fixture(scope='module')
-def password():
-    return 'Welcome2pi'
+def hostname_override():
+    return 'api.osisoft.dstcontrols.local'
 
+@pytest.fixture(scope='module')
+def verifyssl():
+    return False
 
 @pytest.fixture(scope='module')
 def authtype():
-    return 'basic'
+    return 'kerberos'
 
-
-@pytest.fixture(scope='module')
-def dataarchive():
-    return 'sbb03.eecs.berkeley.edu'
 
 @pytest.fixture(scope='module')
 def now():
@@ -69,7 +62,7 @@ def credentials():
     usernames = frozenset()
     passwords = frozenset()
 
-    valid = list(product(['basic', None], ['albertxu'], ['Welcome2pi']))
+    valid = list(product(['kerberos'], ['albertxu'], ['Welcome2pi']))
     unknown = list(product(authtypes, usernames, passwords))
 
     Credentials = namedtuple('Credentials', ['valid', 'unknown'])
@@ -84,9 +77,8 @@ def pointvalues():
 
 
 @pytest.fixture(scope='module')
-def webapi(url, authtype, username, password):
-    return osisoftpy.webapi(url,
-                            authtype=authtype,
-                            username=username,
-                            password=password)
+def webapi(url, authtype, verifyssl, hostname_override):
+    return osisoftpy.webapi(
+        url, authtype=authtype, verifyssl=False,
+        hostname_override=hostname_override)
 
