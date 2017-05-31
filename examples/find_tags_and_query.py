@@ -38,10 +38,10 @@ requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
 # Connect and instantiate the webapi object for kerberos
 # webapi = osisoftpy.webapi('https://piudnpiwebapi.sli.pge.com/piwebapi', authtype='kerberos', verifyssl=False)
-webapi = osisoftpy.webapi('https://dev.dstcontrols.com/piwebapi/',
-                          authtype='kerberos',
-                          verifyssl=False,
-                          hostname_override="api.osisoft.dstcontrols.local")
+# webapi = osisoftpy.webapi('https://dev.dstcontrols.com/piwebapi/', authtype='kerberos', verifyssl=False, hostname_override='api.osisoft.dstcontrols.local')
+webapi = osisoftpy.webapi('https://dev.dstcontrols.com/piwebapi/')
+
+# webapi = osisoftpy.webapi('https://gold.dstcontrols.local/piwebapi/')
 
 print('Connected to {}'.format(webapi.links.get('Self')))
 
@@ -59,10 +59,13 @@ updated_points = []
 # This will call a function, known as as the receiver. Here, We're creating
 # receiver named notify which will simply print out the changed Point's
 # attributes, and saving the updated point to a list for us to use later.
+
+
 def notify(sender):
     msg = 'Current value for {} has changed to {}'
-    updated_points.append(sender) # TODO: change ex to remove old point
+    updated_points.append(sender)  # TODO: change ex to remove old point
     print(msg.format(sender.name, sender.current_value))
+
 
 # Here is where we're connecting to the signals that will be emitted. We're
 # going through the signals we retrieved earlier, and connecting to each
@@ -75,6 +78,9 @@ for (k, signal) in iteritems(signals):
 #  when the value changes.
 # we'll just run this until we receive 10 point changes:
 starttime = time.time()
+
+for point in points:
+    point.recorded(starttime='*-14d', endtime='*', maxcount=1000)
 
 points.current()
 
@@ -89,43 +95,22 @@ for point in points:
 
     print('{} interpolated values for {} were retrieved; '
           'the data ranges from {} to {}.'.format(
-        values.__len__(),
-        point.name,
-        arrow.get(values[0].timestamp).humanize(),
-        arrow.get(values[-1].timestamp).humanize()))
+              values.__len__(),
+              point.name,
+              arrow.get(values[0].timestamp).humanize(),
+              arrow.get(values[-1].timestamp).humanize()))
 
 while updated_points.__len__() < 100:
     for point in points:
         point.current()
         # run every 500 milliseconds
-        sleep = 1/2
+        sleep = 1 / 2
         time.sleep(sleep - ((time.time() - starttime) % sleep))
+
 
 # print out the modified points
 for point in updated_points:
     print(point)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 # obs = osisoftpy.observable(points)
@@ -145,16 +130,12 @@ for point in updated_points:
 # print('foo')
 
 
-
 # Send the Web API an Indexed Search query for tags named SINU*
 # search_paramaters = {'q': "name:SINU*"}
 # points = webapi.points(params=search_paramaters)
 
 
-
 # points = webapi.foopoints(query='name:*SPF*', count=100)
-
-
 
 
 quit()
