@@ -64,6 +64,36 @@ def get(url, session, params=None):
         except:
             raise
 
+def post(url, session, params=None, json=None):
+    """Constructs a HTTP request to the provided url.
+
+    Returns an APIResponse namedtuple with two named fields: response and
+    session. Both objects are standard Requests objects: Requests.Response,
+    and Requests.Session
+
+    :param url: URL to send the HTTP request to.
+    :param session: A Requests Session object.
+    :param params: Paramaters to be passed to the GET request.
+        InsecureRequestWarning will be disabled.
+
+    :return: :class:`APIResponse <APIResponse>` object
+    :rtype: osisoftpy.APIResponse
+    """
+    s = session
+
+    with s:
+        try:
+            r = APIResponse(s.post(url, json=json, params=params), s)
+            if r.response.status_code == 401:
+                raise Unauthorized(
+                    'Server rejected request: wrong username or password')
+            if r.response.status_code != 202:
+                raise HTTPError(
+                    'Wrong server response: %s %s' %
+                    (r.response.status_code, r.response.reason))
+            return r
+        except:
+            raise
 
 def put(url, session, params=None):
 
