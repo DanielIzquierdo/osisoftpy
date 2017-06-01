@@ -24,13 +24,16 @@ from future.builtins import *
 
 import logging
 import warnings
+import json
 
 from osisoftpy.base import Base
 from osisoftpy.factory import Factory
 from osisoftpy.factory import create
 from osisoftpy.internal import get
 from osisoftpy.internal import put
+from osisoftpy.internal import post
 from osisoftpy.value import Value
+from osisoftpy.exceptions import MismatchEntriesError
 
 log = logging.getLogger(__name__)
 
@@ -76,12 +79,43 @@ class Point(Base):
             payload=payload, endpoint='attributes', controller='points')
 
     def update_attribute(self, name, value):
-
+        """
+        Update a point attribute value.
+        """
         url = 'points/{}/attributes/{}'.format(
             self.webapi.links.get('Self'), name)
         payload = {value}
         r = put(url, self.session, params=payload)
         return r.response
+
+    # https://dev.dstcontrols.com/piwebapi/help/controllers/stream/actions/updatevalue
+    def update_value(self, timestamp, value, unitsabbreviation=None, good=None, questionable=None, updateoption='Replace', bufferoption='BufferIfPossible'):
+        """
+        Updates a value for the specified stream.
+        """
+        url = '{}/{}/{}/{}'.format(
+            self.webapi.links.get('Self'), 'streams', self.webid, 'value')
+        payload = {'updateOption': updateoption, 'bufferOption': bufferoption }
+        request = {'Timestamp': timestamp, 'Value': value, 'UnitsAbbreviation': unitsabbreviation, 'Good':good, 'Questionable':questionable}
+        r = post(url, self.session, params=payload, json=request)
+
+    # https://dev.dstcontrols.com/piwebapi/help/controllers/stream/actions/updatevalues
+    def update_values(self, timestamps, values, unitsabbreviation=None, good=None, questionable=None, updateoption='Replace', bufferoption='BufferIfPossible'):
+        """
+        Updates multiple values for the specified stream.
+
+        Assumes values property remains the same within the single call
+        """
+        url = '{}/{}/{}/{}'.format(
+            self.webapi.links.get('Self'), 'streams', self.webid, 'recorded')
+        payload = {'updateOption': updateoption, 'bufferOption': bufferoption }
+        request = {'Timestamp': timestamp, 'Value': value, 'UnitsAbbreviation': unitsabbreviation, 'Good':good, 'Questionable':questionable}
+        if len(timestamps) != len(values)
+            raise MismatchEntriesError(
+                "The length of timestamps and values lists are not equal."
+            )
+        
+    
 
     def current(self, time=None, overwrite=True):
         """
@@ -329,8 +363,16 @@ class Point(Base):
     def summary(self, **kwargs):
         return self._get_summary(**kwargs)
 
-    def end(self, **kwargs):
-        return self._get_end(**kwargs)
+    def end(self):
+        end_value = self._get_value(payload=None, endpoint='end')
+        signalkey = '{}/end'.format(self.webid.__str__())
+        if self.end_value and self.end_value.value != end_value.value:
+            self.end_value = end_value
+            self.webapi.signals[signalkey].send(self)
+        elif not self.end_value:
+            self.end_value = end_value
+        return self.end_value
+
 
     def _get_value(self, payload, endpoint, controller='streams', **kwargs):
         # log.debug('payload: %s', payload)
@@ -350,59 +392,3 @@ class Point(Base):
             r.response.json().get('Items', None)
         ))
         return values
-
-    def _get_interpolatedattimes(self, **kwargs):
-        payload = {
-            'time': kwargs.get('starttime', None),
-            'time': kwargs.get('endtime', None),
-            'time': kwargs.get('interval', None),
-            'time': kwargs.get('filterexpression', None),
-            'time': kwargs.get('includefilteredvalues', None),
-        }
-        endpoint = 'interpolated'
-        return self._get_values(payload=payload, endpoint=endpoint, **kwargs)
-
-
-    def _get_recordedattime(self, **kwargs):
-        payload = {
-            'time': kwargs.get('starttime', None),
-            'time': kwargs.get('endtime', None),
-            'time': kwargs.get('interval', None),
-            'time': kwargs.get('filterexpression', None),
-            'time': kwargs.get('includefilteredvalues', None),
-        }
-        endpoint = 'interpolated'
-        return self._get_values(payload=payload, endpoint=endpoint, **kwargs)
-
-    def _get_plot(self, **kwargs):
-        payload = {
-            'time': kwargs.get('starttime', None),
-            'time': kwargs.get('endtime', None),
-            'time': kwargs.get('interval', None),
-            'time': kwargs.get('filterexpression', None),
-            'time': kwargs.get('includefilteredvalues', None),
-        }
-        endpoint = 'interpolated'
-        return self._get_values(payload=payload, endpoint=endpoint, **kwargs)
-
-    def _get_summary(self, **kwargs):
-        payload = {
-            'time': kwargs.get('starttime', None),
-            'time': kwargs.get('endtime', None),
-            'time': kwargs.get('interval', None),
-            'time': kwargs.get('filterexpression', None),
-            'time': kwargs.get('includefilteredvalues', None),
-        }
-        endpoint = 'interpolated'
-        return self._get_values(payload=payload, endpoint=endpoint, **kwargs)
-
-    def _get_end(self, **kwargs):
-        payload = {
-            'time': kwargs.get('starttime', None),
-            'time': kwargs.get('endtime', None),
-            'time': kwargs.get('interval', None),
-            'time': kwargs.get('filterexpression', None),
-            'time': kwargs.get('includefilteredvalues', None),
-        }
-        endpoint = 'interpolated'
-        return self._get_values(payload=payload, endpoint=endpoint, **kwargs)

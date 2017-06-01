@@ -105,6 +105,8 @@ class RetryError(OSIsoftPyException):
 class UnrewindableBodyError(OSIsoftPyException):
     """OSIsoftPy encountered an error when trying to rewind a body"""
 
+class MismatchEntriesError(OSIsoftPyException):
+    """Two lists are mismatched"""
 
 # Warnings
 
