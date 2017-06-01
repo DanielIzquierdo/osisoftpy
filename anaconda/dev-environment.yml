@@ -1,4 +1,4 @@
-name: venv-conda-dev
+name: osisoftpy-dev
 dependencies:
   - python=3.6   # or 2.7
   - ipython

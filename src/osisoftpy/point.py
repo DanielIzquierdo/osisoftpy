@@ -110,11 +110,6 @@ class Point(Base):
             self.webapi.links.get('Self'), 'streams', self.webid, 'recorded')
         payload = {'updateOption': updateoption, 'bufferOption': bufferoption }
         request = {'Timestamp': timestamp, 'Value': value, 'UnitsAbbreviation': unitsabbreviation, 'Good':good, 'Questionable':questionable}
-        if len(timestamps) != len(values)
-            raise MismatchEntriesError(
-                "The length of timestamps and values lists are not equal."
-            )
-        
     
 
     def current(self, time=None, overwrite=True):

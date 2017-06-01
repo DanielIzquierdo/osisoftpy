@@ -1,3 +1,7 @@
 {
-    "python.pythonPath": "C:/Users/jvin/.conda/envs/osisoftpy-prod/python"
+    "python.pythonPath": "C:/Program Files/Anaconda3/envs/osisoftpy-dev/python",
+    "python.unitTest.pyTestArgs": [
+        "tests"
+    ],
+    "python.unitTest.pyTestEnabled": true
 }
