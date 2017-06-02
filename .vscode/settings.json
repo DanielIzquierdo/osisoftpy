@@ -1,5 +1,6 @@
 {
     "python.pythonPath": "C:/Program Files/Anaconda3/envs/osisoftpy-dev/python",
+    "python.linting.pylintEnabled": false,
     "python.unitTest.pyTestArgs": [
         "tests"
     ],
