@@ -23,6 +23,7 @@ in the`osisoftpy.point` module.
 import osisoftpy
 import pytest
 
+# Testing values
 @pytest.mark.parametrize('query', ['name:EdwinPythonTest'])
 @pytest.mark.parametrize('timestamp', ['2017-02-01 06:00', '2017-03-05 15:00', '2017-04-15 17:00'])
 @pytest.mark.parametrize('value', [2017, 6, 549])
@@ -37,3 +38,27 @@ def test_point_update_value_single(webapi, query, timestamp, value):
 
         #timestamp formatting issue:
         # assert p.timestamp == timestamp
+
+# Testing "good"
+@pytest.mark.parametrize('query', ['name:EdwinPythonTest'])
+@pytest.mark.parametrize('timestamp', ['2017-02-01 06:00'])
+@pytest.mark.parametrize('value', [2017])
+@pytest.mark.parametrize('good', [True, False])
+def test_point_update_good_flag(webapi, query, timestamp, value, good):
+    points = webapi.points(query=query)
+    for point in points:
+        point.update_value(timestamp, value, good=good)
+        p = point.current(time=timestamp, overwrite=False)
+        assert p.good == good
+
+# Testing "questionable"
+@pytest.mark.parametrize('query', ['name:EdwinPythonTest'])
+@pytest.mark.parametrize('timestamp', ['2017-02-01 06:00'])
+@pytest.mark.parametrize('value', [2017])
+@pytest.mark.parametrize('questionable', [True, False])
+def test_point_update_questionable_flag(webapi, query, timestamp, value, questionable):
+    points = webapi.points(query=query)
+    for point in points:
+        point.update_value(timestamp, value, questionable=questionable)
+        p = point.current(time=timestamp, overwrite=False)
+        assert p.questionable == questionable
