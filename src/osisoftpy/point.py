@@ -88,7 +88,6 @@ class Point(Base):
         r = put(url, self.session, params=payload)
         return r.response
 
-    # https://dev.dstcontrols.com/piwebapi/help/controllers/stream/actions/updatevalue
     def update_value(self, timestamp, value, unitsabbreviation=None, good=None, questionable=None, updateoption='Replace', bufferoption='BufferIfPossible'):
         """
         Updates a value for the specified stream.
@@ -271,8 +270,40 @@ class Point(Base):
         endpoint = 'interpolatedattimes'
         return self._get_values(payload=payload, endpoint=endpoint)
 
-    def plot(self, **kwargs):
-        return self._get_plot(**kwargs)
+    def plot(
+        self, 
+        starttime=None,
+        endtime=None,
+        timezone=None,
+        intervals=None,
+        desiredunits=None,
+        selectedFields=None,
+        overwrite=True,
+        **kwargs):
+
+        payload={
+            'startTime': starttime,
+            'endTime': endtime,
+            'timeZone': timezone,
+            'intervals': intervals,
+            'desiredUnits': desiredunits,
+            'selectedFields': selectedFields
+        }
+
+        values = self._get_values(payload=payload, endpoint='plot')
+        if not overwrite:
+            warnings.warn('You have set the overwrite boolean to False - '
+                          'the plot value(s) has been retrieved, but not '
+                          'stored for this point.', UserWarning)
+            return values
+        signalkey = '{}/plot'.format(self.webid.__str__())
+        if self.plot_values and self.plot_values != values:
+            self.plot_values = values
+            self.webapi.signals[signalkey].send(self)
+        elif not self.plot_values:
+            self.plot_values = values
+
+        return self.plot_values
 
     def recorded(
             self,
@@ -282,7 +313,8 @@ class Point(Base):
             filterexpression=None,
             maxcount=1000,
             includefilteredvalues=False,
-            selectedfields=None, ):
+            selectedfields=None,
+            overwrite=True):
         """
         Returns a list of compressed values for the requested time range 
         from the source provider. 
@@ -346,7 +378,21 @@ class Point(Base):
             'includefilteredvalues': includefilteredvalues,
             'selectedfields': selectedfields,
         }
-        return self._get_values(payload=payload, endpoint='recorded')
+
+        values = self._get_values(payload=payload, endpoint='recorded')
+        if not overwrite:
+            warnings.warn('You have set the overwrite boolean to False - '
+                          'the current value has been retrieved, but not '
+                          'stored for this point.', UserWarning)
+            return values
+        signalkey = '{}/recorded'.format(self.webid.__str__())
+        if self.recorded_values and self.recorded_values != values:
+            self.recorded_values = values
+            self.webapi.signals[signalkey].send(self)
+        elif not self.recorded_values:
+            self.recorded_values = values
+
+        return self.recorded_values
 
     def recordedattime(
             self,
@@ -387,8 +433,50 @@ class Point(Base):
         endpoint = 'interpolatedattimes'
         return self._get_values(payload=payload, endpoint=endpoint)
 
-    def summary(self, **kwargs):
-        return self._get_summary(**kwargs)
+    def summary(
+        self,
+        starttime=None,
+        endtime=None,
+        timezone=None,
+        summarytype=None,
+        calculationbasis=None,
+        timetype=None,
+        summaryduration=None,
+        sampletype=None,
+        sampleinterval=None,
+        filterexpression=None,
+        selectedfields=None,
+        overwrite=True,
+        **kwargs):
+
+        payload = {
+            'startTime': starttime,
+            'endTime': endtime,
+            'timeZone': timezone,
+            'summaryType': summarytype,
+            'calculationBasis': calculationbasis,
+            'timeType': timetype,
+            'summaryDuration': summaryduration,
+            'sampleType': sampletype,
+            'sampleInterval': sampleinterval,
+            'filterExpression': filterexpression,
+            'selectedFields': selectedfields
+        }
+
+        values = self._get_summary(payload=payload)
+        if not overwrite:
+            warnings.warn('You have set the overwrite boolean to False - '
+                          'the summary value(s) has been retrieved, but not '
+                          'stored for this point.', UserWarning)
+            return value
+        signalkey = '{}/summary'.format(self.webid.__str__())
+        if self.summary_values and self.summary_values != values:
+            self.summary_values = values
+            self.webapi.signals[signalkey].send(self)
+        elif not self.summary_values:
+            self.summary_values = values
+
+        return self.summary_values
 
     def end(self):
         """
@@ -423,6 +511,22 @@ class Point(Base):
             lambda x: create(Factory(Value), x, self.session, self.webapi),
             r.response.json().get('Items', None)
         ))
+        return values
+
+    def _get_summary(self, payload, endpoint='summary', controller='streams', **kwargs):
+        url = '{}/{}/{}/{}'.format(
+            self.webapi.links.get('Self'), controller, self.webid, endpoint)
+        r = get(url, self.session, params=payload, **kwargs)
+
+        items = r.response.json().get('Items')
+        for item in items:
+            item.get('Value')['calculationtype'] = item.get('Type')
+
+        values = list(map(
+            lambda x: create(Factory(Value), x.get('Value'), self.session, self.webapi),
+                items
+        ))
+        
         return values
 
     def _post_values(self, payload, request, endpoint):
