@@ -22,6 +22,9 @@ in the`osisoftpy.point` module.
 """
 import osisoftpy
 import pytest
+import time
+import pytz
+from datetime import datetime
 
 # Testing values
 @pytest.mark.parametrize('query', ['name:EdwinPythonTest'])
@@ -30,15 +33,14 @@ import pytest
 def test_point_update_value_single(webapi, query, timestamp, value):
     points = webapi.points(query=query)
     #for some reason points increments by 1 for each test
-    # assert(points.__len__() == 1)
+    assert(len(points) == 1)
     for point in points:
+        points.pop(0)
         point.update_value(timestamp, value)
         p = point.current(time=timestamp, overwrite=False)
         assert p.value == value
-
-        #timestamp formatting issue:
-        # assert p.timestamp == timestamp
-
+        _compare_pi_and_local_datetime(p.timestamp, timestamp)
+        
 # Testing "good"
 @pytest.mark.parametrize('query', ['name:EdwinPythonTest'])
 @pytest.mark.parametrize('timestamp', ['2017-02-01 06:00'])
@@ -62,3 +64,14 @@ def test_point_update_questionable_flag(webapi, query, timestamp, value, questio
         point.update_value(timestamp, value, questionable=questionable)
         p = point.current(time=timestamp, overwrite=False)
         assert p.questionable == questionable
+
+
+def _compare_pi_and_local_datetime(pidatetime, localdatetime):
+    pi = datetime.strptime(pidatetime, '%Y-%m-%dT%H:%M:%SZ')
+    local = datetime.strptime(localdatetime, '%Y-%m-%d %H:%M')
+    localtimezone = pytz.timezone('America/Los_Angeles')
+    localmoment = localtimezone.localize(local, is_dst=None)
+    utcmoment = localmoment.astimezone(pytz.utc)
+    # print(utcmoment.strftime('%Y-%m-%d %H:%M'))
+    # print(pi.strftime('%Y-%m-%d %H:%M'))
+    assert utcmoment.strftime('%Y-%m-%d %H:%M') == pi.strftime('%Y-%m-%d %H:%M')
