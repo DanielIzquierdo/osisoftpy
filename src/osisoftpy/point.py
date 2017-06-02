@@ -37,15 +37,15 @@ log = logging.getLogger(__name__)
 
 class Point(Base):
     """An :class:`OSIsoftPy <osisoftpy.dataarchive.Point>` object.
-    
+
     Representation of a PI System Point as described by the PI Web API. 
-    
+
     :param name: Point name
     :param description: Description for the PI Point
     :param webid: Unique GUID for the Point created by the PI Web API
     :param uniqueid: Unique GUID for the Point created by the PI System
     :param datatype: PI Point datatype
-    
+
     :return: :class:`OSIsoftPy <osisoftpy.Point>` object
     :rtype: osisoftpy.Point
     """
@@ -112,7 +112,6 @@ class Point(Base):
             self.webapi.signals[signalkey].send(self)
         elif not self.current_value:
             self.current_value = value
-            self.webapi.signals[signalkey].send(self)
 
         return self.current_value
 
@@ -177,7 +176,7 @@ class Point(Base):
         """
         Retrieves interpolated values over the specified time range at the 
         specified sampling interval. 
- 
+
         :param time: A list of timestamps at which to retrieve interpolated 
                 values. 
         :param filterexpression: An 
@@ -226,7 +225,7 @@ class Point(Base):
         """
         Returns a list of compressed values for the requested time range 
         from the source provider. 
-        
+
         Returned times are affected by the specified boundary type. If no 
         values are found for the time range and conditions specified then 
         the HTTP response will be success, with a body containing an empty 
@@ -296,7 +295,7 @@ class Point(Base):
         """
         Returns a single recorded value based on the passed time and 
         retrieval mode from the stream. 
- 
+
         :param time: A list of timestamps at which to retrieve interpolated 
                 values. 
         :param retrievalmode: An optional value that determines the value to 
@@ -363,16 +362,6 @@ class Point(Base):
         endpoint = 'interpolated'
         return self._get_values(payload=payload, endpoint=endpoint, **kwargs)
 
-    def _get_recorded(self, **kwargs):
-        payload = {
-            'time': kwargs.get('starttime', None),
-            'time': kwargs.get('endtime', None),
-            'time': kwargs.get('interval', None),
-            'time': kwargs.get('filterexpression', None),
-            'time': kwargs.get('includefilteredvalues', None),
-        }
-        endpoint = 'interpolated'
-        return self._get_values(payload=payload, endpoint=endpoint, **kwargs)
 
     def _get_recordedattime(self, **kwargs):
         payload = {

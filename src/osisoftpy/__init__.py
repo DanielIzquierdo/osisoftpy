@@ -38,7 +38,7 @@ __version__ = '2.0.14'
 def init_log():
     format = logging.Formatter(
         '[%(filename)s:%(lineno)s %(funcName)5s() ] %(levelname).1s %(message)s')
-    log_level = logging.INFO
+    log_level = logging.DEBUG
     stream_handler = logging.StreamHandler()
     stream_handler.setFormatter(format)
     stream_handler.setLevel(log_level)
@@ -52,7 +52,7 @@ def init_log():
     klog.setLevel(log_level)
 
     log.addHandler(stream_handler)
-    rklog.addHandler(stream_handler)
+    # rklog.addHandler(stream_handler)
     # klog.addHandler(stream_handler)
 
 init_log()

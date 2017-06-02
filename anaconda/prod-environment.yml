@@ -1,4 +1,4 @@
-name: venv-conda-prod
+name: osisoftpy-prod
 dependencies:
   - python=2.7   # or 2.7
   - ipython

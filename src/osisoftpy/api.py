@@ -66,6 +66,7 @@ def webapi(
                 mutual_authentication=requests_kerberos.OPTIONAL,
                 sanitize_mutual_error_response=False,
                 hostname_override=hostname_override,
+                force_preemptive=True,
                 principal=principal)
         else:
             s.auth = requests.auth.HTTPBasicAuth(username, password)
@@ -74,7 +75,8 @@ def webapi(
             raise Unauthorized(
                 'Authorization denied - incorrect username or password.')
         if r.response.status_code != 200:
-            raise HTTPError('Wrong server response: %s %s' % (r.response.status_code, r.response.reason))
+            raise HTTPError('Wrong server response: %s %s' %
+                            (r.response.status_code, r.response.reason))
         json = r.response.json()
         if 'Errors' in json and json.get('Errors').__len__() > 0:
             msg = 'PI Web API returned an error: {}'

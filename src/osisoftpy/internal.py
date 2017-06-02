@@ -31,16 +31,16 @@ log = logging.getLogger(__name__)
 
 def get(url, session, params=None):
     """Constructs a HTTP request to the provided url.
-    
-    Returns an APIResponse namedtuple with two named fields: response and 
-    session. Both objects are standard Requests objects: Requests.Response, 
-    and Requests.Session 
-    
+
+    Returns an APIResponse namedtuple with two named fields: response and
+    session. Both objects are standard Requests objects: Requests.Response,
+    and Requests.Session
+
     :param url: URL to send the HTTP request to.
     :param session: A Requests Session object.
     :param params: Paramaters to be passed to the GET request.
         InsecureRequestWarning will be disabled.
-    
+
     :return: :class:`APIResponse <APIResponse>` object
     :rtype: osisoftpy.APIResponse
     """
@@ -117,4 +117,3 @@ def _stringify(**kwargs):
     """
     return (','.join('{0}={1!r}'.format(k, v)
                      for k, v in kwargs.items()))
-
