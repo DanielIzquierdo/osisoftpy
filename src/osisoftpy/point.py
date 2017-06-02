@@ -391,15 +391,12 @@ class Point(Base):
         return self._get_summary(**kwargs)
 
     def end(self):
-<<<<<<< HEAD
-=======
         """
         Retrieves the end-of-stream (latest) value of the PI Tag.
         
         :return: :class:`OSIsoftPy <osisoftpy.dataarchive.Point>` object 
         :rtype: osisoftpy.osisoftpy.Point
         """
->>>>>>> insertdata
         end_value = self._get_value(payload=None, endpoint='end')
         signalkey = '{}/end'.format(self.webid.__str__())
         if self.end_value and self.end_value.value != end_value.value:
@@ -408,10 +405,6 @@ class Point(Base):
         elif not self.end_value:
             self.end_value = end_value
         return self.end_value
-<<<<<<< HEAD
-
-=======
->>>>>>> insertdata
 
     def _get_value(self, payload, endpoint, controller='streams', **kwargs):
         # log.debug('payload: %s', payload)
@@ -431,12 +424,9 @@ class Point(Base):
             r.response.json().get('Items', None)
         ))
         return values
-<<<<<<< HEAD
-=======
 
     def _post_values(self, payload, request, endpoint):
         url = '{}/{}/{}/{}'.format(
             self.webapi.links.get('Self'), 'streams', self.webid, endpoint)
         post(url, self.session, params=payload, json=request)
-        
->>>>>>> insertdata
+
