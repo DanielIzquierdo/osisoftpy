@@ -88,34 +88,60 @@ class Point(Base):
         r = put(url, self.session, params=payload)
         return r.response
 
-    # https://dev.dstcontrols.com/piwebapi/help/controllers/stream/actions/updatevalue
     def update_value(self, timestamp, value, unitsabbreviation=None, good=None, questionable=None, updateoption='Replace', bufferoption='BufferIfPossible'):
         """
         Updates a value for the specified stream.
+        Exception and Compression rules take effort in a batch POST request.
+
+        :param timestamp: Manual entry of a datetime to be inserted
+            into the PI tag
+        :param value: Manual entry of value to be inserted 
+        :param unitsabbreviation: Optional. Unit of measure abbreviation
+            of the value. Defaults to "".
+        :param good: Optional. The status indicates whether 
+            the value is good or bad. Defaults to True
+        :param questionable: Optional. The status indicates whether
+            the data quality is accurate. Defaults to False
+        :param updateoption: Optional. Indicates how to treat multiple values
+            with the same timestamp. Default is 'Replace'. 
+        :param bufferoption: Optional. Indicates how to buffer values
+            updates. Default is 'BufferIfPossible'. 
         """
-        url = '{}/{}/{}/{}'.format(
-            self.webapi.links.get('Self'), 'streams', self.webid, 'value')
         payload = {'updateOption': updateoption, 'bufferOption': bufferoption }
         request = {'Timestamp': timestamp, 'Value': value, 'UnitsAbbreviation': unitsabbreviation, 'Good':good, 'Questionable':questionable}
-        r = post(url, self.session, params=payload, json=request)
+        self._post_values(payload, request, 'value')
 
-    # https://dev.dstcontrols.com/piwebapi/help/controllers/stream/actions/updatevalues
     def update_values(self, timestamps, values, unitsabbreviation=None, good=None, questionable=None, updateoption='Replace', bufferoption='BufferIfPossible'):
         """
         Updates multiple values for the specified stream.
+        Assumes values property remains the same within the single call.
+        Exception and Compression rules take effort in a batch POST request.
 
-        Assumes values property remains the same within the single call
+        :param timestamps: Manual entry of a list of datetimes to be inserted
+            into the PI tag
+        :param values: Manual entry of a list of values to be inserted 
+        :param unitsabbreviation: Optional. Unit of measure abbreviation
+            of the value. Defaults to "".
+        :param good: Optional. The status indicates whether 
+            the value is good or bad. Defaults to True
+        :param questionable: Optional. The status indicates whether
+            the data quality is accurate. Defaults to False
+        :param updateoption: Optional. Indicates how to treat multiple values
+            with the same timestamp. Default is 'Replace'. 
+        :param bufferoption: Optional. Indicates how to buffer values
+            updates. Default is 'BufferIfPossible'. 
         """
-        url = '{}/{}/{}/{}'.format(
-            self.webapi.links.get('Self'), 'streams', self.webid, 'recorded')
-        payload = {'updateOption': updateoption, 'bufferOption': bufferoption }
-        request = {'Timestamp': timestamp, 'Value': value, 'UnitsAbbreviation': unitsabbreviation, 'Good':good, 'Questionable':questionable}
-        if len(timestamps) != len(values)
+        #throws error if number of timestamps doesn't correspond to number of values
+        if len(timestamps) != len(values):
             raise MismatchEntriesError(
                 "The length of timestamps and values lists are not equal."
-            )
-        
-    
+            )   
+            return None
+        payload = {'updateOption': updateoption, 'bufferOption': bufferoption }
+        request = []
+        for timestamp, value in zip(timestamps, values):
+            request.append({'Timestamp': timestamp, 'Value': value, 'UnitsAbbreviation': unitsabbreviation, 'Good':good, 'Questionable':questionable})
+        self._post_values(payload, request, 'recorded')
 
     def current(self, time=None, overwrite=True):
         """
@@ -364,6 +390,12 @@ class Point(Base):
         return self._get_summary(**kwargs)
 
     def end(self):
+        """
+        Retrieves the end-of-stream (latest) value of the PI Tag.
+        
+        :return: :class:`OSIsoftPy <osisoftpy.dataarchive.Point>` object 
+        :rtype: osisoftpy.osisoftpy.Point
+        """
         end_value = self._get_value(payload=None, endpoint='end')
         signalkey = '{}/end'.format(self.webid.__str__())
         if self.end_value and self.end_value.value != end_value.value:
@@ -372,7 +404,6 @@ class Point(Base):
         elif not self.end_value:
             self.end_value = end_value
         return self.end_value
-
 
     def _get_value(self, payload, endpoint, controller='streams', **kwargs):
         # log.debug('payload: %s', payload)
@@ -392,3 +423,9 @@ class Point(Base):
             r.response.json().get('Items', None)
         ))
         return values
+
+    def _post_values(self, payload, request, endpoint):
+        url = '{}/{}/{}/{}'.format(
+            self.webapi.links.get('Self'), 'streams', self.webid, endpoint)
+        post(url, self.session, params=payload, json=request)
+        
