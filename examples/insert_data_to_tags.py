@@ -1,9 +1,49 @@
+from __future__ import (absolute_import, division,
+                        print_function, unicode_literals)
+from future.utils import iteritems
+
 import osisoftpy  # main package
 
 webapi = osisoftpy.webapi('https://dev.dstcontrols.com/piwebapi/')
 print('Connected to {}'.format(webapi.links.get('Self')))
-points = webapi.points(query='name:Edwin*')
+points = webapi.points(query='name:EdwinPythonTest*')
+shittyPoints = webapi.points(query='name:EdwinPythonTest2')
+print('good points: {}'.format(points))
+print('shitty points: {}'.format(shittyPoints))
+
+
+def callback(sender):
+    print('{} changed! {}'.format(sender.name, sender))
+
+subscriptions = webapi.subscribe(points, 'current', callback)
+
+print(subscriptions)
+
+print(points)
+print(len(points))
+
 for point in points:
+    #current
+    point.current(time='2017-05-15')
+    point.current(time='2017-05-16')
+    point.current(time='2017-05-16')
+
+
+
+subscriptions = webapi.unsubscribe(shittyPoints, 'current')
+
+print(subscriptions)
+    
+    # point.current('2017-05-20')
+
+    #recorded
+    # recordedpoints = point.recorded()
+    # print(len(recordedpoints))
+
+    # recordedpoints = point.recordedattime('2016-06-01')
+    # print(len(recordedpoints))
+
+    #interpolated
     # interpolatedpoints = point.interpolatedattimes(time = ['2016-06-01','2016-05-31','2016-05-30'])
     # interpolatedpoints = point.interpolated()
     # print(interpolatedpoints.__len__())
@@ -16,7 +56,8 @@ for point in points:
     # print(p[0].value)
 
     # p = point.recorded(starttime='*-2d')
-    q = point.summary(summarytype='Average')
+    # q = point.summary(summarytype='Average')
+    # print(q)
 
     #update insert
     # point.update_value('2017-06-01 06:00', 900, updateoption='Insert')
@@ -24,7 +65,6 @@ for point in points:
     # print(len(p))
     # print(len(p.timestamp))
     # print(len(p.value))
-    
     
     #updating     
     #  point.update_values(["2017-06-01 04:20","2017-06-01 04:25","2017-06-01 04:30"], [5,2,4])

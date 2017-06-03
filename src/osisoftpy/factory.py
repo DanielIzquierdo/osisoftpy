@@ -31,9 +31,20 @@ def create(factory, thing, session, webapi=None):
     :param session: 
     :return: 
     """
-    kwargs = dict(map(lambda k_v: (k_v[0].lower(), k_v[1]), iteritems(thing)))
-    kwargs.update({'session': session, 'webapi': webapi})
-    thing = factory.create(**kwargs)
+
+
+    payload = dict(map(lambda k_v: (k_v[0].lower(), k_v[1]), iteritems(thing)))
+
+    # added to avoid creating Value objects if the value was considered bad values
+    # but we don't need this since we don't want the library to cull bad values that
+    # the pi web api gave us.
+    #
+    # if 'good' in payload:
+    #     if not payload['good']:
+    #         return None
+
+    payload.update({'session': session, 'webapi': webapi})
+    thing = factory.create(**payload)
     return thing
 
 

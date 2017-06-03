@@ -85,18 +85,19 @@ starttime = time.time()
 # points.current()
 
 
-# for point in points:
-#     print('The current value for {} is {}, recorded {}'.format(
-#         point.name,
-#         point.current_value.value,
-#         arrow.get(point.current_value.timestamp).humanize()))
-
 for point in points:
-    point.end()
-    print('The end value for {} is {}, recorded {}'.format(
+    point.current()
+    print('The current value for {} is {}, recorded {}'.format(
         point.name,
-        point.end_value.value,
-        arrow.get(point.end_value.timestamp).humanize()))
+        point.current_value.value,
+        arrow.get(point.current_value.timestamp).humanize()))
+
+# for point in points:
+#     point.end()
+#     print('The end value for {} is {}, recorded {}'.format(
+#         point.name,
+#         point.end_value.value,
+#         arrow.get(point.end_value.timestamp).humanize()))
 
 # for point in points:
 #     values = point.interpolated(starttime='*-14d', endtime='*', interval='1m')
@@ -108,7 +109,7 @@ for point in points:
 #               arrow.get(values[0].timestamp).humanize(),
 #               arrow.get(values[-1].timestamp).humanize()))
 
-while updated_points.__len__() < 100:
+while updated_points.__len__() < 10:
     for point in points:
         point.current()
         # run every 500 milliseconds

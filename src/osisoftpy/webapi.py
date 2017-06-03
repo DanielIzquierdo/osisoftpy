@@ -20,6 +20,7 @@ Some blah blah about what this file is for...
 """
 from __future__ import (absolute_import, division, unicode_literals)
 from future.builtins import *
+from future.utils import iteritems
 import logging
 import blinker
 from osisoftpy.base import Base
@@ -40,8 +41,8 @@ class WebAPI(Base):
     def __init__(self, **kwargs):
         super(self.__class__, self).__init__(**kwargs)
 
-        p = Points(list(), self)
-        self._points = p
+        # p = Points(list(), self)
+        # self._points = p
         self.signals = {}
 
     def __str__(self):
@@ -110,8 +111,9 @@ class WebAPI(Base):
             create(Factory(Point), x, self.session, self)
             for x in r.json().get('Items', None)
         ]), self)
-        self._points.extend(p)
-        return self._points
+        # self._points.extend(p)
+        # return self._points
+        return p
 
     def request(
             self,
@@ -171,13 +173,7 @@ class WebAPI(Base):
         except Exception as e:
             raise e
 
-    def observe(self, points, stream):
-        """
-
-        :param points: 
-        :param stream: 
-        :return: 
-        """
+    def subscribe(self, points, stream, callback=None):
         if not isinstance(points, Points):
             raise TypeError('The object "{}" is not of type "{}"'.format(
                 points, Points))
@@ -186,4 +182,19 @@ class WebAPI(Base):
             if signalkey not in self.signals:
                 s = blinker.signal(signalkey)
                 self.signals[signalkey] = s
+        if callback:
+            for (k, signal) in iteritems(self.signals):
+                signal.connect(callback)
+        return self.signals
+
+    def unsubscribe(self, points, stream):
+        if not isinstance(points, Points):
+            raise TypeError('The object "{}" is not of type "{}"'.format(
+                points, Points))
+        for p in points:
+            signalkey = '{}/{}'.format(p.webid.__str__(), stream)
+            try:
+                self.signals.pop(signalkey)
+            except KeyError:
+                pass
         return self.signals

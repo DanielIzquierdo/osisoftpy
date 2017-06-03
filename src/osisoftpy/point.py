@@ -34,6 +34,7 @@ from osisoftpy.internal import put
 from osisoftpy.internal import post
 from osisoftpy.value import Value
 from osisoftpy.exceptions import MismatchEntriesError
+from osisoftpy.internal import _stringify
 
 log = logging.getLogger(__name__)
 
@@ -160,18 +161,45 @@ class Point(Base):
         :rtype: osisoftpy.Point
         """
         payload = {'time': time}
-        value = self._get_value(payload=payload, endpoint='value')
+        
+        # save the "old" current value before grabbing the "latest" current value
+        oldvalue = self.current_value
+        
+        # grab and set the current value
+        self.current_value = self._get_value(payload=payload, endpoint='value')
+
+        log.debug(self.current_value)
+
         if not overwrite:
             warnings.warn('You have set the overwrite boolean to False - '
                           'the current value has been retrieved, but not '
                           'stored for this point.', UserWarning)
             return value
-        signalkey = '{}/current'.format(self.webid.__str__())
-        if self.current_value and self.current_value.value != value.value:
-            self.current_value = value
+        
+        # emit a signal if the value changes. exclude changes to booleans or timestmap
+        # currently, checking the Value objects doesn't work, so we compare the
+        # Value.value values.
+        # if oldvalue and oldvalue != self.current_value:
+        if oldvalue and oldvalue.value != self.current_value.value:
+            signalkey = '{}/current'.format(self.webid.__str__())
+
+            # log.debug('{} is emitting signal for a change in current value. signalkey: {}'.format(
+            #     self.name,
+            #     signalkey
+            #     ))
+
+            # log.debug('current signals: {}: {}'.format(self.webapi.signals.__len__(), _stringify(list=self.webapi.signals)))
+
             self.webapi.signals[signalkey].send(self)
-        elif not self.current_value:
-            self.current_value = value
+
+        
+        
+        
+        # if self.current_value and self.current_value.value != value.value:
+        #     self.current_value = value
+        #     self.webapi.signals[signalkey].send(self)
+        # elif not self.current_value:
+        #     self.current_value = value
 
         return self.current_value
 
@@ -182,7 +210,8 @@ class Point(Base):
             interval='1h',
             filterexpression=None,
             includefilteredvalues=False,
-            selectedfields=None, ):
+            selectedfields=None,
+            overwrite=True ):
         """
         Retrieves interpolated values over the specified time range at 
         the specified sampling interval. 
@@ -224,7 +253,20 @@ class Point(Base):
             'includefilteredvalues': includefilteredvalues,
             'selectedfields': selectedfields,
         }
-        return self._get_values(payload=payload, endpoint='interpolated')
+        values = self._get_values(payload=payload, endpoint='interpolated')
+        if not overwrite:
+            warnings.warn('You have set the overwrite boolean to False - '
+                          'the interpolated value(s) has been retrieved, but not '
+                          'stored for this point.', UserWarning)
+            return values
+        signalkey = '{}/interpolated'.format(self.webid.__str__())
+        if self.interpolated_values and self.interpolated_values != values:
+            self.interpolated_values = values
+            self.webapi.signals[signalkey].send(self)
+        elif not self.interpolated_values:
+            self.interpolated_values = values
+
+        return self.interpolated_values
 
     def interpolatedattimes(
             self,
@@ -232,7 +274,8 @@ class Point(Base):
             filterexpression=None,
             includefilteredvalues=False,
             sortorder='Ascending',
-            selectedfields=None, ):
+            selectedfields=None,
+            overwrite=True ):
         """
         Retrieves interpolated values over the specified time range at the 
         specified sampling interval. 
@@ -267,8 +310,22 @@ class Point(Base):
             'sortorder': sortorder,
             'selectedfields': selectedfields,
         }
-        endpoint = 'interpolatedattimes'
-        return self._get_values(payload=payload, endpoint=endpoint)
+
+        values = self._get_values(payload=payload, endpoint='interpolatedattimes')
+        if not overwrite:
+            warnings.warn('You have set the overwrite boolean to False - '
+                          'the interpolated value(s) has been retrieved, but not '
+                          'stored for this point.', UserWarning)
+            return values
+        signalkey = '{}/interpolated'.format(self.webid.__str__())
+        if self.interpolated_values and self.interpolated_values != values:
+            self.interpolated_values = values
+            self.webapi.signals[signalkey].send(self)
+        elif not self.interpolated_values:
+            self.interpolated_values = values
+
+        return self.interpolated_values
+
 
     def plot(
         self, 
@@ -382,7 +439,7 @@ class Point(Base):
         values = self._get_values(payload=payload, endpoint='recorded')
         if not overwrite:
             warnings.warn('You have set the overwrite boolean to False - '
-                          'the current value has been retrieved, but not '
+                          'the recorded value(s) has been retrieved, but not '
                           'stored for this point.', UserWarning)
             return values
         signalkey = '{}/recorded'.format(self.webid.__str__())
@@ -398,7 +455,8 @@ class Point(Base):
             self,
             time,
             retrievalmode='Auto',
-            selectedfields=None, ):
+            selectedfields=None,
+            overwrite=True ):
         """
         Returns a single recorded value based on the passed time and 
         retrieval mode from the stream. 
@@ -430,8 +488,21 @@ class Point(Base):
             'retrievalmode': retrievalmode,
             'selectedfields': selectedfields,
         }
-        endpoint = 'interpolatedattimes'
-        return self._get_values(payload=payload, endpoint=endpoint)
+
+        values = self._get_value(payload=payload, endpoint='recordedattime')
+        if not overwrite:
+            warnings.warn('You have set the overwrite boolean to False - '
+                          'the recorded value has been retrieved, but not '
+                          'stored for this point.', UserWarning)
+            return values
+        signalkey = '{}/recordedattime'.format(self.webid.__str__())
+        if self.recorded_values and self.recorded_values != values:
+            self.recorded_values = values
+            self.webapi.signals[signalkey].send(self)
+        elif not self.recorded_values:
+            self.recorded_values = values
+
+        return self.recorded_values
 
     def summary(
         self,
@@ -478,7 +549,9 @@ class Point(Base):
 
         return self.summary_values
 
-    def end(self):
+    def end(
+        self,
+        overwrite=True):
         """
         Retrieves the end-of-stream (latest) value of the PI Tag.
         
@@ -486,6 +559,11 @@ class Point(Base):
         :rtype: osisoftpy.osisoftpy.Point
         """
         end_value = self._get_value(payload=None, endpoint='end')
+        if not overwrite:
+            warnings.warn('You have set the overwrite boolean to False - '
+                          'the end value has been retrieved, but not '
+                          'stored for this point.', UserWarning)
+            return end_value
         signalkey = '{}/end'.format(self.webid.__str__())
         if self.end_value and self.end_value.value != end_value.value:
             self.end_value = end_value
@@ -503,8 +581,8 @@ class Point(Base):
                        self.webapi)
         return value
 
-    def _get_values(self, payload, endpoint, **kwargs):
-        url = '{}/streams/{}/{}'.format(self.webapi.links.get('Self'),
+    def _get_values(self, payload, endpoint, controller='streams', **kwargs):
+        url = '{}/{}/{}/{}'.format(self.webapi.links.get('Self'), controller,
                                         self.webid, endpoint)
         r = get(url, self.session, params=payload, **kwargs)
         values = list(map(

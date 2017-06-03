@@ -14,5 +14,10 @@ obs = server.Observable(tags)
 d = obs.subscribe(lambda x: print(x))
 
 connection = obs.connect()
+
+with connection:
+    sleep(60)
+
+
 sleep(60)
 connection.dispose()
