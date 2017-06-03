@@ -26,6 +26,16 @@ import time
 import pytz
 from datetime import datetime
 
+def _compare_pi_and_local_datetime(pidatetime, localdatetime):
+    pi = datetime.strptime(pidatetime, '%Y-%m-%dT%H:%M:%SZ')
+    local = datetime.strptime(localdatetime, '%Y-%m-%d %H:%M')
+    localtimezone = pytz.timezone('America/Los_Angeles')
+    localmoment = localtimezone.localize(local, is_dst=None)
+    utcmoment = localmoment.astimezone(pytz.utc)
+    # print(utcmoment.strftime('%Y-%m-%d %H:%M'))
+    # print(pi.strftime('%Y-%m-%d %H:%M'))
+    assert utcmoment.strftime('%Y-%m-%d %H:%M') == pi.strftime('%Y-%m-%d %H:%M')
+
 # Testing values
 @pytest.mark.parametrize('query', ['name:EdwinPythonTest'])
 @pytest.mark.parametrize('timestamp', ['2017-02-01 06:00', '2017-03-05 15:00', '2017-04-15 17:00'])
@@ -66,12 +76,92 @@ def test_point_update_questionable_flag(webapi, query, timestamp, value, questio
         assert p.questionable == questionable
 
 
-def _compare_pi_and_local_datetime(pidatetime, localdatetime):
-    pi = datetime.strptime(pidatetime, '%Y-%m-%dT%H:%M:%SZ')
-    local = datetime.strptime(localdatetime, '%Y-%m-%d %H:%M')
-    localtimezone = pytz.timezone('America/Los_Angeles')
-    localmoment = localtimezone.localize(local, is_dst=None)
-    utcmoment = localmoment.astimezone(pytz.utc)
-    # print(utcmoment.strftime('%Y-%m-%d %H:%M'))
-    # print(pi.strftime('%Y-%m-%d %H:%M'))
-    assert utcmoment.strftime('%Y-%m-%d %H:%M') == pi.strftime('%Y-%m-%d %H:%M')
+# Testing "unitsabbreviation"
+@pytest.mark.parametrize('query', ['name:EdwinPythonTest'])
+@pytest.mark.parametrize('timestamp', ['2017-02-01 06:00'])
+@pytest.mark.parametrize('value', [2017])
+@pytest.mark.parametrize('unitsabbreviation', ['m', 's', 'm/s', 'A', 'K'])
+def test_point_update_unitsabbreviation(webapi, query, timestamp, value, unitsabbreviation):
+    points = webapi.points(query=query)
+    for point in points:
+        point.update_value(timestamp, value, unitsabbreviation=unitsabbreviation)
+        p = point.current(time=timestamp, overwrite=False)
+        assert p.unitsabbreviation == unitsabbreviation
+
+# Testing "updateoption" Replace
+@pytest.mark.parametrize('query', ['name:EdwinPythonTest'])
+@pytest.mark.parametrize('timestamp', ['2017-02-01 06:00'])
+@pytest.mark.parametrize('value', [2017])
+@pytest.mark.parametrize('updateoption', ['Replace'])
+def test_point_update_unitsabbreviation(webapi, query, timestamp, value, updateoption):
+    points = webapi.points(query=query)
+    for point in points:
+        point.update_value(timestamp, 0, updateoption='Replace')
+        point.update_value(timestamp, value, updateoption=updateoption)
+        p = point.current(time=timestamp, overwrite=False)
+        assert p.value == value
+
+# Testing "updateoption" Insert
+@pytest.mark.parametrize('query', ['name:EdwinPythonTest'])
+@pytest.mark.parametrize('timestamp', ['2017-02-01 06:00'])
+@pytest.mark.parametrize('value', [2017])
+@pytest.mark.parametrize('updateoption', ['Insert'])
+def test_point_update_unitsabbreviation(webapi, query, timestamp, value, updateoption):
+    points = webapi.points(query=query)
+    for point in points:
+        point.update_value(timestamp, 0, updateoption='Replace')
+        point.update_value(timestamp, value, updateoption=updateoption)
+        p = point.current(time=timestamp, overwrite=False)
+        assert p.value == value
+
+# Testing "updateoption" NoReplace
+@pytest.mark.parametrize('query', ['name:EdwinPythonTest'])
+@pytest.mark.parametrize('timestamp', ['2017-02-01 06:00'])
+@pytest.mark.parametrize('value', [2017])
+@pytest.mark.parametrize('updateoption', ['NoReplace'])
+def test_point_update_unitsabbreviation(webapi, query, timestamp, value, updateoption):
+    points = webapi.points(query=query)
+    for point in points:
+        point.update_value(timestamp, 0, updateoption='Replace')
+        point.update_value(timestamp, value, updateoption=updateoption)
+        p = point.current(time=timestamp, overwrite=False)
+        assert p.value == 0
+
+# Testing "updateoption" ReplaceOnly
+@pytest.mark.parametrize('query', ['name:EdwinPythonTest'])
+@pytest.mark.parametrize('timestamp', ['2017-02-01 06:00'])
+@pytest.mark.parametrize('value', [2017])
+@pytest.mark.parametrize('updateoption', ['ReplaceOnly'])
+def test_point_update_unitsabbreviation(webapi, query, timestamp, value, updateoption):
+    points = webapi.points(query=query)
+    for point in points:
+        point.update_value(timestamp, 0, updateoption='Replace')
+        point.update_value(timestamp, value, updateoption=updateoption)
+        p = point.current(time=timestamp, overwrite=False)
+        assert p.value == 0
+
+# Testing "updateoption" InsertNoCompression
+@pytest.mark.parametrize('query', ['name:EdwinPythonTest'])
+@pytest.mark.parametrize('timestamp', ['2017-02-01 06:00'])
+@pytest.mark.parametrize('value', [2017])
+@pytest.mark.parametrize('updateoption', ['InsertNoCompression'])
+def test_point_update_unitsabbreviation(webapi, query, timestamp, value, updateoption):
+    points = webapi.points(query=query)
+    for point in points:
+        point.update_value(timestamp, 0, updateoption='Replace')
+        point.update_value(timestamp, value, updateoption=updateoption)
+        p = point.current(time=timestamp, overwrite=False)
+        assert p.value == value
+
+# Testing "updateoption" Remove
+@pytest.mark.parametrize('query', ['name:EdwinPythonTest'])
+@pytest.mark.parametrize('timestamp', ['2017-02-01 06:00'])
+@pytest.mark.parametrize('value', [2017])
+@pytest.mark.parametrize('updateoption', ['Remove'])
+def test_point_update_unitsabbreviation(webapi, query, timestamp, value, updateoption):
+    points = webapi.points(query=query)
+    for point in points:
+        point.update_value(timestamp, 0, updateoption='Replace')
+        point.update_value(timestamp, value, updateoption=updateoption)
+        p = point.current(time=timestamp, overwrite=False)
+        assert p.value == value

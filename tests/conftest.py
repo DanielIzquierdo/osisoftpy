@@ -24,7 +24,10 @@ from itertools import product
 import arrow
 import pytest
 import osisoftpy
+import requests
+from requests.packages.urllib3.exceptions import InsecureRequestWarning
 
+requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
 @pytest.fixture(scope='module')
 def url():
