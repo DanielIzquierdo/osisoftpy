@@ -24,13 +24,16 @@ from future.builtins import *
 
 import logging
 import warnings
+import json
 
 from osisoftpy.base import Base
 from osisoftpy.factory import Factory
 from osisoftpy.factory import create
 from osisoftpy.internal import get
 from osisoftpy.internal import put
+from osisoftpy.internal import post
 from osisoftpy.value import Value
+from osisoftpy.exceptions import MismatchEntriesError
 
 log = logging.getLogger(__name__)
 
@@ -76,12 +79,69 @@ class Point(Base):
             payload=payload, endpoint='attributes', controller='points')
 
     def update_attribute(self, name, value):
-
+        """
+        Update a point attribute value.
+        """
         url = 'points/{}/attributes/{}'.format(
             self.webapi.links.get('Self'), name)
         payload = {value}
         r = put(url, self.session, params=payload)
         return r.response
+
+    def update_value(self, timestamp, value, unitsabbreviation=None, good=None, questionable=None, updateoption='Replace', bufferoption='BufferIfPossible'):
+        """
+        Updates a value for the specified stream.
+        Exception and Compression rules take effort in a batch POST request.
+
+        :param timestamp: Manual entry of a datetime to be inserted
+            into the PI tag
+        :param value: Manual entry of value to be inserted 
+        :param unitsabbreviation: Optional. Unit of measure abbreviation
+            of the value. Defaults to "".
+        :param good: Optional. The status indicates whether 
+            the value is good or bad. Defaults to True
+        :param questionable: Optional. The status indicates whether
+            the data quality is accurate. Defaults to False
+        :param updateoption: Optional. Indicates how to treat multiple values
+            with the same timestamp. Default is 'Replace'. 
+        :param bufferoption: Optional. Indicates how to buffer values
+            updates. Default is 'BufferIfPossible'. 
+        """
+        payload = {'updateOption': updateoption, 'bufferOption': bufferoption }
+        request = {'Timestamp': timestamp, 'Value': value, 'UnitsAbbreviation': unitsabbreviation, 'Good':good, 'Questionable':questionable}
+        self._post_values(payload, request, 'value')
+
+    def update_values(self, timestamps, values, unitsabbreviation=None, good=None, questionable=None, updateoption='Replace', bufferoption='BufferIfPossible'):
+        """
+        Updates multiple values for the specified stream.
+        Assumes values property remains the same within the single call.
+        Exception and Compression rules take effort in a batch POST request.
+
+        :param timestamps: Manual entry of a list of datetimes to be inserted
+            into the PI tag
+        :param values: Manual entry of a list of values to be inserted 
+        :param unitsabbreviation: Optional. Unit of measure abbreviation
+            of the value. Defaults to "".
+        :param good: Optional. The status indicates whether 
+            the value is good or bad. Defaults to True
+        :param questionable: Optional. The status indicates whether
+            the data quality is accurate. Defaults to False
+        :param updateoption: Optional. Indicates how to treat multiple values
+            with the same timestamp. Default is 'Replace'. 
+        :param bufferoption: Optional. Indicates how to buffer values
+            updates. Default is 'BufferIfPossible'. 
+        """
+        #throws error if number of timestamps doesn't correspond to number of values
+        if len(timestamps) != len(values):
+            raise MismatchEntriesError(
+                "The length of timestamps and values lists are not equal."
+            )   
+            return None
+        payload = {'updateOption': updateoption, 'bufferOption': bufferoption }
+        request = []
+        for timestamp, value in zip(timestamps, values):
+            request.append({'Timestamp': timestamp, 'Value': value, 'UnitsAbbreviation': unitsabbreviation, 'Good':good, 'Questionable':questionable})
+        self._post_values(payload, request, 'recorded')
 
     def current(self, time=None, overwrite=True):
         """
@@ -329,8 +389,21 @@ class Point(Base):
     def summary(self, **kwargs):
         return self._get_summary(**kwargs)
 
-    def end(self, **kwargs):
-        return self._get_end(**kwargs)
+    def end(self):
+        """
+        Retrieves the end-of-stream (latest) value of the PI Tag.
+        
+        :return: :class:`OSIsoftPy <osisoftpy.dataarchive.Point>` object 
+        :rtype: osisoftpy.osisoftpy.Point
+        """
+        end_value = self._get_value(payload=None, endpoint='end')
+        signalkey = '{}/end'.format(self.webid.__str__())
+        if self.end_value and self.end_value.value != end_value.value:
+            self.end_value = end_value
+            self.webapi.signals[signalkey].send(self)
+        elif not self.end_value:
+            self.end_value = end_value
+        return self.end_value
 
     def _get_value(self, payload, endpoint, controller='streams', **kwargs):
         # log.debug('payload: %s', payload)
@@ -351,58 +424,8 @@ class Point(Base):
         ))
         return values
 
-    def _get_interpolatedattimes(self, **kwargs):
-        payload = {
-            'time': kwargs.get('starttime', None),
-            'time': kwargs.get('endtime', None),
-            'time': kwargs.get('interval', None),
-            'time': kwargs.get('filterexpression', None),
-            'time': kwargs.get('includefilteredvalues', None),
-        }
-        endpoint = 'interpolated'
-        return self._get_values(payload=payload, endpoint=endpoint, **kwargs)
-
-
-    def _get_recordedattime(self, **kwargs):
-        payload = {
-            'time': kwargs.get('starttime', None),
-            'time': kwargs.get('endtime', None),
-            'time': kwargs.get('interval', None),
-            'time': kwargs.get('filterexpression', None),
-            'time': kwargs.get('includefilteredvalues', None),
-        }
-        endpoint = 'interpolated'
-        return self._get_values(payload=payload, endpoint=endpoint, **kwargs)
-
-    def _get_plot(self, **kwargs):
-        payload = {
-            'time': kwargs.get('starttime', None),
-            'time': kwargs.get('endtime', None),
-            'time': kwargs.get('interval', None),
-            'time': kwargs.get('filterexpression', None),
-            'time': kwargs.get('includefilteredvalues', None),
-        }
-        endpoint = 'interpolated'
-        return self._get_values(payload=payload, endpoint=endpoint, **kwargs)
-
-    def _get_summary(self, **kwargs):
-        payload = {
-            'time': kwargs.get('starttime', None),
-            'time': kwargs.get('endtime', None),
-            'time': kwargs.get('interval', None),
-            'time': kwargs.get('filterexpression', None),
-            'time': kwargs.get('includefilteredvalues', None),
-        }
-        endpoint = 'interpolated'
-        return self._get_values(payload=payload, endpoint=endpoint, **kwargs)
-
-    def _get_end(self, **kwargs):
-        payload = {
-            'time': kwargs.get('starttime', None),
-            'time': kwargs.get('endtime', None),
-            'time': kwargs.get('interval', None),
-            'time': kwargs.get('filterexpression', None),
-            'time': kwargs.get('includefilteredvalues', None),
-        }
-        endpoint = 'interpolated'
-        return self._get_values(payload=payload, endpoint=endpoint, **kwargs)
+    def _post_values(self, payload, request, endpoint):
+        url = '{}/{}/{}/{}'.format(
+            self.webapi.links.get('Self'), 'streams', self.webid, endpoint)
+        post(url, self.session, params=payload, json=request)
+        

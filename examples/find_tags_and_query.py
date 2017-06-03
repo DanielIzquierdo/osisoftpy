@@ -79,26 +79,34 @@ for (k, signal) in iteritems(signals):
 # we'll just run this until we receive 10 point changes:
 starttime = time.time()
 
-for point in points:
-    point.recorded(starttime='*-14d', endtime='*', maxcount=1000)
+# for point in points:
+#     point.recorded(starttime='*-14d', endtime='*', maxcount=1000)
 
-points.current()
+# points.current()
+
+
+# for point in points:
+#     print('The current value for {} is {}, recorded {}'.format(
+#         point.name,
+#         point.current_value.value,
+#         arrow.get(point.current_value.timestamp).humanize()))
 
 for point in points:
-    print('The current value for {} is {}, recorded {}'.format(
+    point.end()
+    print('The end value for {} is {}, recorded {}'.format(
         point.name,
-        point.current_value.value,
-        arrow.get(point.current_value.timestamp).humanize()))
+        point.end_value.value,
+        arrow.get(point.end_value.timestamp).humanize()))
 
-for point in points:
-    values = point.interpolated(starttime='*-14d', endtime='*', interval='1m')
+# for point in points:
+#     values = point.interpolated(starttime='*-14d', endtime='*', interval='1m')
 
-    print('{} interpolated values for {} were retrieved; '
-          'the data ranges from {} to {}.'.format(
-              values.__len__(),
-              point.name,
-              arrow.get(values[0].timestamp).humanize(),
-              arrow.get(values[-1].timestamp).humanize()))
+#     print('{} interpolated values for {} were retrieved; '
+#           'the data ranges from {} to {}.'.format(
+#               values.__len__(),
+#               point.name,
+#               arrow.get(values[0].timestamp).humanize(),
+#               arrow.get(values[-1].timestamp).humanize()))
 
 while updated_points.__len__() < 100:
     for point in points:

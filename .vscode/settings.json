@@ -1,3 +1,8 @@
 {
-    "python.pythonPath": "C:/Users/apong/AppData/Local/conda/conda/envs/osisoftpy-prod/python"
+    "python.pythonPath": "C:/Users/eng/.conda/envs/osisoftpy-prod/python",
+    "python.linting.pylintEnabled": false,
+    "python.unitTest.pyTestArgs": [
+        "tests"
+    ],
+    "python.unitTest.pyTestEnabled": true
 }
