@@ -43,8 +43,15 @@ def verifyssl():
 
 @pytest.fixture(scope='module')
 def authtype():
-    return 'kerberos'
+    return 'basic'
 
+@pytest.fixture(scope='module')
+def username():
+    return 'ak-piwebapi-svc@dstcontrols.local'
+
+@pytest.fixture(scope='module')
+def password():
+    return 'DP$28GhMyp*!E&gc'
 
 @pytest.fixture(scope='module')
 def now():
@@ -80,7 +87,7 @@ def pointvalues():
 
 
 @pytest.fixture(scope='module')
-def webapi(url, authtype, verifyssl, hostname_override):
+def webapi(url, authtype, username, password, verifyssl, hostname_override):
     return osisoftpy.webapi(
         url, authtype=authtype, verifyssl=False,
         hostname_override=hostname_override)
