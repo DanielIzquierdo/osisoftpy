@@ -26,6 +26,9 @@ import logging
 import warnings
 import json
 
+from datetime import datetime
+from dateutil import parser
+
 from osisoftpy.base import Base
 from osisoftpy.factory import Factory
 from osisoftpy.factory import create
@@ -60,12 +63,14 @@ class Point(Base):
     def __init__(self, **kwargs):
         super(self.__class__, self).__init__(**kwargs)
 
-        self.current_value = None
+        self.end_value = None
         self.interpolated_values = None
         self.recorded_values = None
+        self.recorded_at_time_values = None
         self.plot_values = None
         self.summary_values = None
         self.end_value = None
+        self.value_value = None
 
     def __str__(self):
         self_str = '<OSIsoft PI Point [{} - {}]>'
@@ -78,16 +83,6 @@ class Point(Base):
         }
         return self._get_values(
             payload=payload, endpoint='attributes', controller='points')
-
-    # def update_attribute(self, name, value):
-    #     """
-    #     Update a point attribute value.
-    #     """
-    #     url = 'points/{}/attributes/{}'.format(
-    #         self.webapi.links.get('Self'), name)
-    #     payload = {value}
-    #     r = put(url, self.session, params=payload)
-    #     return r.response
 
     def update_value(self, timestamp, value, unitsabbreviation=None, good=None, questionable=None, updateoption='Replace', bufferoption='BufferIfPossible'):
         """
@@ -144,7 +139,7 @@ class Point(Base):
             request.append({'Timestamp': timestamp, 'Value': value, 'UnitsAbbreviation': unitsabbreviation, 'Good':good, 'Questionable':questionable})
         self._post_values(payload, request, 'recorded')
 
-    def current(self, time=None, overwrite=True):
+    def current(self, overwrite=True):
         """
         Returns the value of the stream at the specified time. By default, 
         this is usually the current value. 
@@ -160,8 +155,8 @@ class Point(Base):
         :return: :class:`OSIsoftPy <osisoftpy.Value>` object
         :rtype: osisoftpy.Value
         """
-        payload = {'time': time}
-        
+        payload={'time':'*'}
+
         # save the "old" current value before grabbing the "latest" current value
         oldvalue = self.current_value
         
@@ -179,8 +174,10 @@ class Point(Base):
         # emit a signal if the value changes. exclude changes to booleans or timestmap
         # currently, checking the Value objects doesn't work, so we compare the
         # Value.value values.
-        # if oldvalue and oldvalue != self.current_value:\
-        if self.current_value and self.current_value.value != newvalue.value:
+        # if oldvalue and oldvalue != self.end_value:\
+        if not oldvalue:
+            pass
+        elif self.current_value and self.current_value.value != oldvalue.value:
             signalkey = '{}/current'.format(self.webid.__str__())
 
             # log.debug('{} is emitting signal for a change in current value. signalkey: {}'.format(
@@ -195,15 +192,11 @@ class Point(Base):
         return self.current_value
         
         
-        # if self.current_value and self.current_value.value != value.value:
-        #     self.current_value = value
+        # if self.end_value and self.end_value.value != value.value:
+        #     self.end_value = value
         #     self.webapi.signals[signalkey].send(self)
-        # elif not self.current_value:
-        #     self.current_value = value
-
-        
-
-
+        # elif not self.end_value:
+        #     self.end_value = value
 
     def interpolated(
             self,
@@ -490,20 +483,24 @@ class Point(Base):
             'selectedfields': selectedfields,
         }
 
-        values = self._get_value(payload=payload, endpoint='recordedattime')
+        old_recorded_at_time_value = self.recorded_at_time_value
+
+        new_recorded_at_time_value = self._get_value(payload=payload, endpoint='recordedattime')
+
         if not overwrite:
             warnings.warn('You have set the overwrite boolean to False - '
-                          'the recorded value has been retrieved, but not '
-                          'stored for this point.', UserWarning)
-            return values
-        signalkey = '{}/recordedattime'.format(self.webid.__str__())
-        if self.recorded_values and self.recorded_values != values:
-            self.recorded_values = values
-            self.webapi.signals[signalkey].send(self)
-        elif not self.recorded_values:
-            self.recorded_values = values
+                          'the recorded at time value has been retrieved'
+                          ', but not stored for this point.', UserWarning)
+            return new_recorded_at_time_value
 
-        return self.recorded_values
+        self.recorded_at_time_value = new_recorded_at_time_value
+
+        if self.recorded_at_time_value and self.recorded_at_time_value.value != old_recorded_at_time_value.value:
+            # add time id here
+            signalkey = '{}/recordedattime'.format(self.webid.__str__())
+            self.webapi.signals[signalkey].send(self)
+
+        return self.recorded_at_time_value
 
     def summary(
         self,
@@ -556,22 +553,31 @@ class Point(Base):
         """
         Retrieves the end-of-stream (latest) value of the PI Tag.
         
-        :return: :class:`OSIsoftPy <osisoftpy.dataarchive.Point>` object 
-        :rtype: osisoftpy.osisoftpy.Point
+        :return: :class:`OSIsoftPy <osisoftpy.dataarchive.Value>` object 
+        :rtype: osisoftpy.osisoftpy.Value
         """
-        end_value = self._get_value(payload=None, endpoint='end')
+        # save the "old" end value before grabbing the "latest" end value
+        oldendvalue = self.end_value
+
+        newendvalue = self._get_value(payload=None, endpoint='end')
+
         if not overwrite:
             warnings.warn('You have set the overwrite boolean to False - '
                           'the end value has been retrieved, but not '
                           'stored for this point.', UserWarning)
-            return end_value
-        signalkey = '{}/end'.format(self.webid.__str__())
-        if self.end_value and self.end_value.value != end_value.value:
-            self.end_value = end_value
+            return newendvalue
+            
+        self.end_value = newendvalue
+
+        # emit a signal if the value changes. exclude changes to booleans or timestmap
+        # currently, checking the Value objects doesn't work, so we compare the
+        # Value.value values.
+        if self.end_value and self.end_value.value != oldendvalue.value:
+            signalkey = '{}/end'.format(self.webid.__str__())
             self.webapi.signals[signalkey].send(self)
-        elif not self.end_value:
-            self.end_value = end_value
+            
         return self.end_value
+
 
     def _get_value(self, payload, endpoint, controller='streams', **kwargs):
         # log.debug('payload: %s', payload)
@@ -613,3 +619,42 @@ class Point(Base):
             self.webapi.links.get('Self'), 'streams', self.webid, endpoint)
         post(url, self.session, params=payload, json=request)
 
+    def _parse_timestamp(self, datetime):
+        if datetime:
+            parseddatetime = parser.parse(datetime)
+            formatteddatetime = None if parseddatetime == None else parseddatetime.strftime('%Y%m%d%H%M%S')
+        else:  
+            formatteddatetime = None
+        return datetime
+    
+    def getvalue(self, time=None, overwrite=True):
+        """
+        Test method
+        """
+        payload={'time':time}
+
+        # save the "old" current value before grabbing the "latest" current value
+        oldvalue = self.value_value
+        
+        # grab and set the current value
+        newvalue = self._get_value(payload=payload, endpoint='value')
+
+        if not overwrite:
+            warnings.warn('You have set the overwrite boolean to False - '
+                          'the current value has been retrieved, but not '
+                          'stored for this point.', UserWarning)
+            return newvalue
+        
+        self.value_value = newvalue
+
+        # emit a signal if the value changes. exclude changes to booleans or timestmap
+        # currently, checking the Value objects doesn't work, so we compare the
+        # Value.value values.
+        # if oldvalue and oldvalue != self.end_value:\
+        if not oldvalue:
+            pass
+        elif self.value_value and self.value_value.value != oldvalue.value:
+            signalkey = '{}/getvalue'.format(self.webid.__str__())
+            self.webapi.signals[signalkey].send(self)
+
+        return self.value_value

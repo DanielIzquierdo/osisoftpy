@@ -21,6 +21,8 @@ Some blah blah about what this file is for...
 from __future__ import (absolute_import, division, unicode_literals)
 from future.builtins import *
 from future.utils import iteritems
+from dateutil import parser
+from datetime import datetime
 import logging
 import blinker
 from osisoftpy.base import Base
@@ -173,12 +175,16 @@ class WebAPI(Base):
         except Exception as e:
             raise e
 
-    def subscribe(self, points, stream, callback=None):
+    #TODO: Add doc
+    def subscribe(self, points, stream, startdatetime=None, enddatetime=None, callback=None):
         if not isinstance(points, Points):
             raise TypeError('The object "{}" is not of type "{}"'.format(
                 points, Points))
         for p in points:
-            signalkey = '{}/{}'.format(p.webid.__str__(), stream)
+            formattedstartdate = self._parse_timestamp(startdatetime)
+            formattedenddate = self._parse_timestamp(enddatetime)
+
+            signalkey = '{}{}{}/{}'.format(p.webid.__str__(), formattedstartdate or '', formattedenddate or '', stream)
             if signalkey not in self.signals:
                 s = blinker.signal(signalkey)
                 self.signals[signalkey] = s
@@ -187,14 +193,25 @@ class WebAPI(Base):
                 signal.connect(callback)
         return self.signals
 
-    def unsubscribe(self, points, stream):
+    #TODO: Add doc
+    def unsubscribe(self, points, stream, startdatetime=None, enddatetime=None,):
         if not isinstance(points, Points):
             raise TypeError('The object "{}" is not of type "{}"'.format(
                 points, Points))
         for p in points:
-            signalkey = '{}/{}'.format(p.webid.__str__(), stream)
+            formattedstartdate = self._parse_timestamp(startdatetime)
+            formattedenddate = self._parse_timestamp(enddatetime)
+            signalkey = '{}{}{}/{}'.format(p.webid.__str__(), formattedstartdate or '', formattedenddate or '', stream)
             try:
                 self.signals.pop(signalkey)
             except KeyError:
                 pass
         return self.signals
+
+    def _parse_timestamp(self, datetime):
+        if datetime:
+            parseddatetime = parser.parse(datetime)
+            formatteddatetime = None if parseddatetime == None else parseddatetime.strftime('%Y%m%d%H%M%S')
+        else:  
+            formatteddatetime = None
+        return datetime

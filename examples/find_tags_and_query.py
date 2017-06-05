@@ -50,7 +50,7 @@ points = webapi.points(query='name:CD* or name:SINU*', count=100)
 
 # Get a list of point signals for the points we'd like to monitor for changes.
 # We're passing in a list of points, and the Point's method we're monitoring.
-signals = webapi.observe(points, 'current')
+signals = webapi.subscribe(points, 'current')
 
 # a list to store modified points in:
 updated_points = []
@@ -83,7 +83,6 @@ starttime = time.time()
 #     point.recorded(starttime='*-14d', endtime='*', maxcount=1000)
 
 # points.current()
-
 
 for point in points:
     point.current()
