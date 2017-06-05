@@ -26,6 +26,8 @@ import time
 import pytz
 from datetime import datetime
 
+# TODO Convert timestamps to UTC
+
 def _compare_pi_and_local_datetime(pidatetime, localdatetime):
     pi = datetime.strptime(pidatetime, '%Y-%m-%dT%H:%M:%SZ')
     local = datetime.strptime(localdatetime, '%Y-%m-%d %H:%M')

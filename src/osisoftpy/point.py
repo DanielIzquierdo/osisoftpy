@@ -63,7 +63,7 @@ class Point(Base):
     def __init__(self, **kwargs):
         super(self.__class__, self).__init__(**kwargs)
 
-        self.end_value = None
+        self.current_value = None
         self.interpolated_values = None
         self.recorded_values = None
         self.recorded_at_time_values = None
