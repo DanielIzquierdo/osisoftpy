@@ -25,6 +25,7 @@ import re
 import osisoftpy
 import pytest
 import requests
+import random
 
 from .conftest import query
 
@@ -76,3 +77,55 @@ def test_webapi_points_query(webapi, query):
     assert all(isinstance(x, osisoftpy.Point) for x in points)
     msg = '{} points were retrieved with the query "{}"'
     print(msg.format(points.__len__(), query))
+
+# Subscription tests
+
+# a list to store modified points in:
+updated_points = []
+
+def callback(sender):
+    msg = 'Current value for {} has changed to {}'
+    updated_points.append(sender)
+    print(msg.format(sender.name, sender.current_value))
+
+# test getvalue
+@pytest.mark.parametrize('query', ['name:EdwinPythonTest*'])
+@pytest.mark.parametrize('stream', ['getvalue'])
+def test_subscription_getvalue(webapi, query, stream, callback=callback):
+    updated_points[:] = []
+    points = webapi.points(query=query)
+    subscriptions = webapi.subscribe(points, stream, callback=callback)
+    for point in points:
+        v1 = point.getvalue("5-16-2017 07:00")
+        v2 = point.getvalue("5-17-2017 07:00")
+    assert len(updated_points) > 0
+    subscriptions = webapi.unsubscribe(points, stream)
+
+# test current_value
+@pytest.mark.parametrize('query', ['name:EdwinPythonTest*'])
+@pytest.mark.parametrize('stream', ['current'])
+def test_subscription_current(webapi, query, stream, callback=callback):
+    updated_points[:] = []
+    points = webapi.points(query=query)
+    subscriptions = webapi.subscribe(points, stream, callback=callback)
+    for point in points:
+        v1 = point.current()
+        point.update_values(["*"], [random.uniform(0,100)])
+        v2 = point.current()
+    assert len(updated_points) == 2 # both points updated
+    subscriptions = webapi.unsubscribe(points, stream)
+
+
+# test end_value
+@pytest.mark.parametrize('query', ['name:EdwinPythonTest*'])
+@pytest.mark.parametrize('stream', ['end'])
+def test_subscription_end(webapi, query, stream, callback=callback):
+    updated_points[:] = []
+    points = webapi.points(query=query)
+    subscriptions = webapi.subscribe(points, stream, callback=callback)
+    for point in points:
+        v1 = point.end()
+        point.update_values(["5-17-2017 07:00"], [random.uniform(0,100)])
+        v2 = point.end()
+    assert len(updated_points) > 0
+    subscriptions = webapi.unsubscribe(points, stream)

@@ -26,6 +26,8 @@ import time
 import pytz
 from datetime import datetime
 
+# TODO Convert timestamps to UTC
+
 def _compare_pi_and_local_datetime(pidatetime, localdatetime):
     pi = datetime.strptime(pidatetime, '%Y-%m-%dT%H:%M:%SZ')
     local = datetime.strptime(localdatetime, '%Y-%m-%d %H:%M')
@@ -167,6 +169,17 @@ def test_point_update_unitsabbreviation(webapi, query, timestamp, value, updateo
         assert p.value == 0
 
 #update_values
-# TODO: Test Multiple Inputs 
+# Test Multiple Inputs
+@pytest.mark.parametrize('query', ['name:EdwinPythonTest'])
+@pytest.mark.parametrize('timestamps', [['2017-02-01 06:00','2017-02-01 07:00','2017-02-01 08:00','2017-02-01 09:00','2017-02-01 10:00']])
+@pytest.mark.parametrize('values', [[2017,2018,2019,2020,2021]])
+def test_point_multiple_update(webapi, query, timestamps, values):
+    points = webapi.points(query=query)
+    for point in points:
+        point.update_values(timestamps, values)
+        for timestamp, value in zip(timestamps, values):
+            p = point.current(time=timestamp, overwrite=False)
+            assert p.value == value
+
 # TODO: Test Mismatched arrays (Timestamps and Values)
 
