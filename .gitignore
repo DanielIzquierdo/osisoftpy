@@ -150,5 +150,5 @@ crashlytics-build.properties
 fabric.properties
 import/
 
-#vscode config settings for local virtual env. path
+# vscode config settings for local virtual env. path
 .vscode/settings.json

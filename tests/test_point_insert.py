@@ -164,4 +164,9 @@ def test_point_update_unitsabbreviation(webapi, query, timestamp, value, updateo
         point.update_value(timestamp, 0, updateoption='Replace')
         point.update_value(timestamp, value, updateoption=updateoption)
         p = point.current(time=timestamp, overwrite=False)
-        assert p.value == value
+        assert p.value == 0
+
+#update_values
+# TODO: Test Multiple Inputs 
+# TODO: Test Mismatched arrays (Timestamps and Values)
+
