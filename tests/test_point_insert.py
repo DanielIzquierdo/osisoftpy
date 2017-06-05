@@ -47,9 +47,9 @@ def test_point_update_value_single(webapi, query, timestamp, value):
     for point in points:
         points.pop(0)
         point.update_value(timestamp, value)
-        v = point.current(time=timestamp, overwrite=False)
+        v = point.recordedattime(time=timestamp, overwrite=False)
         assert v.value == value
-        # _compare_pi_and_local_datetime(p.timestamp, timestamp)
+        _compare_pi_and_local_datetime(v.timestamp, timestamp)
         
 # Testing "good"
 @pytest.mark.parametrize('query', ['name:EdwinPythonTest'])
@@ -60,7 +60,7 @@ def test_point_update_good_flag(webapi, query, timestamp, value, good):
     points = webapi.points(query=query)
     for point in points:
         point.update_value(timestamp, value, good=good)
-        p = point.current(time=timestamp, overwrite=False)
+        p = point.recordedattime(time=timestamp, overwrite=False)
         assert p.good == good
 
 # Testing "questionable"
@@ -72,7 +72,7 @@ def test_point_update_questionable_flag(webapi, query, timestamp, value, questio
     points = webapi.points(query=query)
     for point in points:
         point.update_value(timestamp, value, questionable=questionable)
-        p = point.current(time=timestamp, overwrite=False)
+        p = point.recordedattime(time=timestamp, overwrite=False)
         assert p.questionable == questionable
 
 
@@ -85,7 +85,7 @@ def test_point_update_unitsabbreviation(webapi, query, timestamp, value, unitsab
     points = webapi.points(query=query)
     for point in points:
         point.update_value(timestamp, value, unitsabbreviation=unitsabbreviation)
-        p = point.current(time=timestamp, overwrite=False)
+        p = point.recordedattime(time=timestamp, overwrite=False)
         assert p.unitsabbreviation == unitsabbreviation
 
 # Testing "updateoption" Replace
@@ -98,7 +98,7 @@ def test_point_update_unitsabbreviation(webapi, query, timestamp, value, updateo
     for point in points:
         point.update_value(timestamp, 0, updateoption='Replace')
         point.update_value(timestamp, value, updateoption=updateoption)
-        p = point.current(time=timestamp, overwrite=False)
+        p = point.recordedattime(time=timestamp, overwrite=False)
         assert p.value == value
 
 # Testing "updateoption" Insert
@@ -111,7 +111,7 @@ def test_point_update_unitsabbreviation(webapi, query, timestamp, value, updateo
     for point in points:
         point.update_value(timestamp, 0, updateoption='Replace')
         point.update_value(timestamp, value, updateoption=updateoption)
-        p = point.current(time=timestamp, overwrite=False)
+        p = point.recordedattime(time=timestamp, overwrite=False)
         assert p.value == value
 
 # Testing "updateoption" NoReplace
@@ -124,7 +124,7 @@ def test_point_update_unitsabbreviation(webapi, query, timestamp, value, updateo
     for point in points:
         point.update_value(timestamp, 0, updateoption='Replace')
         point.update_value(timestamp, value, updateoption=updateoption)
-        p = point.current(time=timestamp, overwrite=False)
+        p = point.recordedattime(time=timestamp, overwrite=False)
         assert p.value == 0
 
 # Testing "updateoption" ReplaceOnly
@@ -137,7 +137,7 @@ def test_point_update_unitsabbreviation(webapi, query, timestamp, value, updateo
     for point in points:
         point.update_value(timestamp, 0, updateoption='Replace')
         point.update_value(timestamp, value, updateoption=updateoption)
-        p = point.current(time=timestamp, overwrite=False)
+        p = point.recordedattime(time=timestamp, overwrite=False)
         assert p.value == 0
 
 # Testing "updateoption" InsertNoCompression
@@ -150,7 +150,7 @@ def test_point_update_unitsabbreviation(webapi, query, timestamp, value, updateo
     for point in points:
         point.update_value(timestamp, 0, updateoption='Replace')
         point.update_value(timestamp, value, updateoption=updateoption)
-        p = point.current(time=timestamp, overwrite=False)
+        p = point.recordedattime(time=timestamp, overwrite=False)
         assert p.value == value
 
 # Testing "updateoption" Remove
@@ -163,7 +163,7 @@ def test_point_update_unitsabbreviation(webapi, query, timestamp, value, updateo
     for point in points:
         point.update_value(timestamp, 0, updateoption='Replace')
         point.update_value(timestamp, value, updateoption=updateoption)
-        p = point.current(time=timestamp, overwrite=False)
+        p = point.recordedattime(time=timestamp, overwrite=False)
         assert p.value == 0
 
 #update_values

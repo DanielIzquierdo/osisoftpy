@@ -47,3 +47,6 @@ class Value(Base):
     def __str__(self):
         self_str = '<OSIsoft PI Value [{} - {}]>'
         return self_str.format(self.timestamp, self.value)
+
+    def __eq__(self, other): 
+        return self.__dict__ == other.__dict__

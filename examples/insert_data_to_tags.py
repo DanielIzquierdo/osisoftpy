@@ -1,41 +1,69 @@
 from __future__ import (absolute_import, division,
                         print_function, unicode_literals)
 from future.utils import iteritems
-
+from datetime import datetime
 import osisoftpy  # main package
+from dateutil import parser
+
+# x = parser.parse(None)
+# print(x)
+# print(None if x == None else x.strftime('%Y%m%d%H%M%S'))
+# print(datetime.strptime('05-24-2017', '%Y-%m-%dT%H:%M:%SZ'))
 
 webapi = osisoftpy.webapi('https://dev.dstcontrols.com/piwebapi/')
 print('Connected to {}'.format(webapi.links.get('Self')))
 points = webapi.points(query='name:EdwinPythonTest*')
-shittyPoints = webapi.points(query='name:EdwinPythonTest2')
+# shittyPoints = webapi.points(query='name:EdwinPythonTest2')
 print('good points: {}'.format(points))
-print('shitty points: {}'.format(shittyPoints))
-
+# print('shitty points: {}'.format(shittyPoints))
 
 def callback(sender):
     print('{} changed! {}'.format(sender.name, sender))
 
-subscriptions = webapi.subscribe(points, 'current', callback)
-
+subscriptions = webapi.subscribe(points, 'getvalue', callback=callback)
 print(subscriptions)
-
-print(points)
-print(len(points))
 
 for point in points:
-    #current
-    point.current(time='2017-05-15')
-    point.current(time='2017-05-16')
-    point.current(time='2017-05-16')
+#     #objects equality
+    v1 = point.getvalue("5-16-2017")
+    v2 = point.getvalue("5-17-2017")
 
-
-
-subscriptions = webapi.unsubscribe(shittyPoints, 'current')
-
+subscriptions = webapi.unsubscribe(points, 'getvalue')
 print(subscriptions)
-    
-    # point.current('2017-05-20')
+# #     if v1 == v2:    
+#         print('objects match')
+#         print(v1)
+#         print(v2)
+#     else:
+#         print('objects don''t match')
+#         print(v1)
+#         print(v2)
 
+
+#subscriber example
+# def callback(sender):
+#     print('{} changed! {}'.format(sender.name, sender))
+
+# subscriptions = webapi.subscribe(points, 'current', callback)
+
+# print(subscriptions)
+
+# print(points)
+# print(len(points))
+
+# for point in points:
+#     #current
+#     point.current(time='2017-05-15')
+#     point.current(time='2017-05-16')
+#     point.current(time='2017-05-16')
+
+
+
+# subscriptions = webapi.unsubscribe(shittyPoints, 'current')
+
+# print(subscriptions)
+    
+    
     #recorded
     # recordedpoints = point.recorded()
     # print(len(recordedpoints))
