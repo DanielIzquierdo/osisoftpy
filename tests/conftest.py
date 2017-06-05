@@ -43,7 +43,7 @@ def verifyssl():
 
 @pytest.fixture(scope='module')
 def authtype():
-    return 'basic'
+    return 'kerberos'
 
 @pytest.fixture(scope='module')
 def username():
