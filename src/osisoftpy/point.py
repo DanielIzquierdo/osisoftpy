@@ -572,7 +572,9 @@ class Point(Base):
         # emit a signal if the value changes. exclude changes to booleans or timestmap
         # currently, checking the Value objects doesn't work, so we compare the
         # Value.value values.
-        if self.end_value and self.end_value.value != oldendvalue.value:
+        if not oldendvalue : 
+            pass
+        elif self.end_value and self.end_value.value != oldendvalue.value:
             signalkey = '{}/end'.format(self.webid.__str__())
             self.webapi.signals[signalkey].send(self)
             

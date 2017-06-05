@@ -117,15 +117,16 @@ def test_subscription_current(webapi, query, stream, callback=callback):
 
 
 # test end_value
-@pytest.mark.parametrize('query', ['name:EdwinPythonTest*'])
+@pytest.mark.parametrize('query', ['name:EdwinPythonEndTest'])
 @pytest.mark.parametrize('stream', ['end'])
 def test_subscription_end(webapi, query, stream, callback=callback):
     updated_points[:] = []
     points = webapi.points(query=query)
     subscriptions = webapi.subscribe(points, stream, callback=callback)
     for point in points:
+        point.update_values(["*"], [random.uniform(0,100)])
         v1 = point.end()
-        point.update_values(["5-17-2017 07:00"], [random.uniform(0,100)])
+        point.update_values(["*+1m"], [random.uniform(0,100)])
         v2 = point.end()
-    assert len(updated_points) > 0
+    assert len(updated_points) == 1
     subscriptions = webapi.unsubscribe(points, stream)
