@@ -79,15 +79,15 @@ class Point(Base):
         return self._get_values(
             payload=payload, endpoint='attributes', controller='points')
 
-    def update_attribute(self, name, value):
-        """
-        Update a point attribute value.
-        """
-        url = 'points/{}/attributes/{}'.format(
-            self.webapi.links.get('Self'), name)
-        payload = {value}
-        r = put(url, self.session, params=payload)
-        return r.response
+    # def update_attribute(self, name, value):
+    #     """
+    #     Update a point attribute value.
+    #     """
+    #     url = 'points/{}/attributes/{}'.format(
+    #         self.webapi.links.get('Self'), name)
+    #     payload = {value}
+    #     r = put(url, self.session, params=payload)
+    #     return r.response
 
     def update_value(self, timestamp, value, unitsabbreviation=None, good=None, questionable=None, updateoption='Replace', bufferoption='BufferIfPossible'):
         """
@@ -157,8 +157,8 @@ class Point(Base):
             References, this means the snapshot value of the PI Point on the 
             Data Server.
         :param overwrite: An optional boolean. 
-        :return: :class:`OSIsoftPy <osisoftpy.Point>` object
-        :rtype: osisoftpy.Point
+        :return: :class:`OSIsoftPy <osisoftpy.Value>` object
+        :rtype: osisoftpy.Value
         """
         payload = {'time': time}
         
@@ -166,21 +166,21 @@ class Point(Base):
         oldvalue = self.current_value
         
         # grab and set the current value
-        self.current_value = self._get_value(payload=payload, endpoint='value')
-
-        log.debug(self.current_value)
+        newvalue = self._get_value(payload=payload, endpoint='value')
 
         if not overwrite:
             warnings.warn('You have set the overwrite boolean to False - '
                           'the current value has been retrieved, but not '
                           'stored for this point.', UserWarning)
-            return value
+            return newvalue
         
+        self.current_value = newvalue
+
         # emit a signal if the value changes. exclude changes to booleans or timestmap
         # currently, checking the Value objects doesn't work, so we compare the
         # Value.value values.
-        # if oldvalue and oldvalue != self.current_value:
-        if oldvalue and oldvalue.value != self.current_value.value:
+        # if oldvalue and oldvalue != self.current_value:\
+        if self.current_value and self.current_value.value != newvalue.value:
             signalkey = '{}/current'.format(self.webid.__str__())
 
             # log.debug('{} is emitting signal for a change in current value. signalkey: {}'.format(
@@ -192,7 +192,7 @@ class Point(Base):
 
             self.webapi.signals[signalkey].send(self)
 
-        
+        return self.current_value
         
         
         # if self.current_value and self.current_value.value != value.value:
@@ -201,7 +201,9 @@ class Point(Base):
         # elif not self.current_value:
         #     self.current_value = value
 
-        return self.current_value
+        
+
+
 
     def interpolated(
             self,
@@ -461,8 +463,7 @@ class Point(Base):
         Returns a single recorded value based on the passed time and 
         retrieval mode from the stream. 
 
-        :param time: A list of timestamps at which to retrieve interpolated 
-                values. 
+        :param time: The timestamp at which the value is desired.
         :param retrievalmode: An optional value that determines the value to 
             return when a value doesn't exist at the exact time specified.
             The default is 'Auto'. The retrieval mode is an enumeration of the 
