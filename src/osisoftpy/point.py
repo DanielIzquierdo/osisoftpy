@@ -65,11 +65,13 @@ class Point(Base):
 
         self.current_value = None
         self.interpolated_values = None
+        self.interpolated_at_time_values = {}
         self.recorded_values = None
-        self.recorded_at_time_values = None
+        self.recorded_at_time_values = {}
         self.plot_values = None
         self.summary_values = None
         self.end_value = None
+        #test
         self.value_value = None
 
     def __str__(self):
@@ -178,7 +180,7 @@ class Point(Base):
         if not oldvalue:
             pass
         elif self.current_value and self.current_value.value != oldvalue.value:
-            signalkey = '{}/current'.format(self.webid.__str__())
+            signalkey = '{}/current/'.format(self.webid.__str__())
 
             # log.debug('{} is emitting signal for a change in current value. signalkey: {}'.format(
             #     self.name,
@@ -265,7 +267,7 @@ class Point(Base):
 
     def interpolatedattimes(
             self,
-            time,
+            timestamps,
             filterexpression=None,
             includefilteredvalues=False,
             sortorder='Ascending',
@@ -299,27 +301,40 @@ class Point(Base):
         :rtype: osisoftpy.TypedList<osisoftpy.Point>
         """
         payload = {
-            'time': time,
+            'time': timestamps,
             'filterexpression': filterexpression,
             'includefilteredvalues': includefilteredvalues,
             'sortorder': sortorder,
             'selectedfields': selectedfields,
         }
-
-        values = self._get_values(payload=payload, endpoint='interpolatedattimes')
+        new_intp_values = self._get_values(payload=payload, endpoint='interpolatedattimes')
         if not overwrite:
             warnings.warn('You have set the overwrite boolean to False - '
                           'the interpolated value(s) has been retrieved, but not '
                           'stored for this point.', UserWarning)
-            return values
-        signalkey = '{}/interpolated'.format(self.webid.__str__())
-        if self.interpolated_values and self.interpolated_values != values:
-            self.interpolated_values = values
-            self.webapi.signals[signalkey].send(self)
-        elif not self.interpolated_values:
-            self.interpolated_values = values
+            return new_intp_values
 
-        return self.interpolated_values
+        oldvalues = {}
+        newvalues = {}
+        for timestamp in timestamps:
+            formattedtimestamp = self._parse_timestamp(timestamp)
+            oldvalues[formattedtimestamp] = self.interpolated_at_time_values.get(formattedtimestamp)
+
+        for value in new_intp_values:
+            #assume pi and inputted timestamps are the same UTC timestamp
+            pitimestamp = self._parse_timestamp(value.timestamp)
+            oldvalue = oldvalues[pitimestamp]
+            self.interpolated_at_time_values[pitimestamp] = self.interpolated_at_time_values.get(pitimestamp)
+
+            #first run, when the timestamped value is first run
+            if not oldvalue:
+                pass
+            #compares old and new value to see if new value has changed
+            elif value and value.value != oldvalue.value:
+                signalkey = '{}/interpolated/{}'.format(self.webid.__str__(), pitimestamp)
+                self.webapi.signals[signalkey].send(self)
+
+        return new_intp_values
 
 
     def plot(
@@ -348,7 +363,7 @@ class Point(Base):
                           'the plot value(s) has been retrieved, but not '
                           'stored for this point.', UserWarning)
             return values
-        signalkey = '{}/plot'.format(self.webid.__str__())
+        signalkey = '{}/plot/'.format(self.webid.__str__())
         if self.plot_values and self.plot_values != values:
             self.plot_values = values
             self.webapi.signals[signalkey].send(self)
@@ -437,7 +452,7 @@ class Point(Base):
                           'the recorded value(s) has been retrieved, but not '
                           'stored for this point.', UserWarning)
             return values
-        signalkey = '{}/recorded'.format(self.webid.__str__())
+        signalkey = '{}/recorded/'.format(self.webid.__str__())
         if self.recorded_values and self.recorded_values != values:
             self.recorded_values = values
             self.webapi.signals[signalkey].send(self)
@@ -483,8 +498,9 @@ class Point(Base):
             'selectedfields': selectedfields,
         }
 
-        old_recorded_at_time_value = self.recorded_at_time_value
-
+        formattedtime = self._parse_timestamp(time)
+        old_recorded_at_time_value = self.recorded_at_time_values.get(formattedtime)
+        
         new_recorded_at_time_value = self._get_value(payload=payload, endpoint='recordedattime')
 
         if not overwrite:
@@ -493,14 +509,14 @@ class Point(Base):
                           ', but not stored for this point.', UserWarning)
             return new_recorded_at_time_value
 
-        self.recorded_at_time_value = new_recorded_at_time_value
-
-        if self.recorded_at_time_value and self.recorded_at_time_value.value != old_recorded_at_time_value.value:
-            # add time id here
-            signalkey = '{}/recordedattime'.format(self.webid.__str__())
+        self.recorded_at_time_values[formattedtime] = new_recorded_at_time_value
+        if not old_recorded_at_time_value:
+            pass
+        elif self.recorded_at_time_values[formattedtime] and self.recorded_at_time_value.value != old_recorded_at_time_value.value:
+            signalkey = '{}/recordedattime/{}'.format(self.webid.__str__(),formattedtime or '')
             self.webapi.signals[signalkey].send(self)
 
-        return self.recorded_at_time_value
+        return self.recorded_at_time_values
 
     def summary(
         self,
@@ -538,7 +554,7 @@ class Point(Base):
                           'the summary value(s) has been retrieved, but not '
                           'stored for this point.', UserWarning)
             return value
-        signalkey = '{}/summary'.format(self.webid.__str__())
+        signalkey = '{}/summary/'.format(self.webid.__str__())
         if self.summary_values and self.summary_values != values:
             self.summary_values = values
             self.webapi.signals[signalkey].send(self)
@@ -572,10 +588,10 @@ class Point(Base):
         # emit a signal if the value changes. exclude changes to booleans or timestmap
         # currently, checking the Value objects doesn't work, so we compare the
         # Value.value values.
-        if not oldendvalue : 
+        if not oldendvalue:
             pass
         elif self.end_value and self.end_value.value != oldendvalue.value:
-            signalkey = '{}/end'.format(self.webid.__str__())
+            signalkey = '{}/end/'.format(self.webid.__str__())
             self.webapi.signals[signalkey].send(self)
             
         return self.end_value
@@ -627,7 +643,7 @@ class Point(Base):
             formatteddatetime = None if parseddatetime == None else parseddatetime.strftime('%Y%m%d%H%M%S')
         else:  
             formatteddatetime = None
-        return datetime
+        return formatteddatetime
     
     def getvalue(self, time=None, overwrite=True):
         """
@@ -656,7 +672,7 @@ class Point(Base):
         if not oldvalue:
             pass
         elif self.value_value and self.value_value.value != oldvalue.value:
-            signalkey = '{}/getvalue'.format(self.webid.__str__())
+            signalkey = '{}/getvalue/'.format(self.webid.__str__())
             self.webapi.signals[signalkey].send(self)
 
         return self.value_value

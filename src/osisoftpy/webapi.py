@@ -184,7 +184,7 @@ class WebAPI(Base):
             formattedstartdate = self._parse_timestamp(startdatetime)
             formattedenddate = self._parse_timestamp(enddatetime)
 
-            signalkey = '{}{}{}/{}'.format(p.webid.__str__(), formattedstartdate or '', formattedenddate or '', stream)
+            signalkey = '{}/{}/{}{}'.format(p.webid.__str__(), stream, formattedstartdate or '', formattedenddate or '')
             if signalkey not in self.signals:
                 s = blinker.signal(signalkey)
                 self.signals[signalkey] = s
@@ -201,7 +201,7 @@ class WebAPI(Base):
         for p in points:
             formattedstartdate = self._parse_timestamp(startdatetime)
             formattedenddate = self._parse_timestamp(enddatetime)
-            signalkey = '{}{}{}/{}'.format(p.webid.__str__(), formattedstartdate or '', formattedenddate or '', stream)
+            signalkey = '{}/{}/{}{}'.format(p.webid.__str__(), stream, formattedstartdate or '', formattedenddate or '')
             try:
                 self.signals.pop(signalkey)
             except KeyError:
@@ -214,4 +214,4 @@ class WebAPI(Base):
             formatteddatetime = None if parseddatetime == None else parseddatetime.strftime('%Y%m%d%H%M%S')
         else:  
             formatteddatetime = None
-        return datetime
+        return formatteddatetime

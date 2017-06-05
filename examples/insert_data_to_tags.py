@@ -12,7 +12,7 @@ from dateutil import parser
 
 webapi = osisoftpy.webapi('https://dev.dstcontrols.com/piwebapi/')
 print('Connected to {}'.format(webapi.links.get('Self')))
-points = webapi.points(query='name:EdwinPythonTest*')
+points = webapi.points(query='name:EdwinPythonTest')
 # shittyPoints = webapi.points(query='name:EdwinPythonTest2')
 print('good points: {}'.format(points))
 # print('shitty points: {}'.format(shittyPoints))
@@ -20,16 +20,23 @@ print('good points: {}'.format(points))
 def callback(sender):
     print('{} changed! {}'.format(sender.name, sender))
 
-subscriptions = webapi.subscribe(points, 'getvalue', callback=callback)
-print(subscriptions)
+webapi.subscribe(points, 'interpolatedattimes', startdatetime='2015-01-01T00:00:00Z', callback=callback)
+subscriptions = webapi.subscribe(points, 'interpolatedattimes', startdatetime='2015-01-01T00:00:00Z', callback=callback)
+print(len(subscriptions))
 
 for point in points:
-#     #objects equality
-    v1 = point.getvalue("5-16-2017")
-    v2 = point.getvalue("5-17-2017")
+    # point.update_value('2015-01-01T00:00:00Z', 123)
+    x = point.interpolatedattimes(['2015-01-01T00:00:00Z','2015-01-02T00:00:00Z'])
+    # x = point.interpolatedattimes('2015-01-01T00:00:00Z')
+    for value in x:
+        print('{} : {}'.format(value.timestamp, value.value))
 
-subscriptions = webapi.unsubscribe(points, 'getvalue')
-print(subscriptions)
+# subscriptions = webapi.unsubscribe(points, 'interpolatedattimes', '05-20-2017')
+# print(len(subscriptions))
+# subscriptions = webapi.unsubscribe(points, 'interpolatedattimes', '05-21-2017')
+# print(len(subscriptions))
+# subscriptions = webapi.unsubscribe(points, 'getvalue')
+# print(subscriptions)
 # #     if v1 == v2:    
 #         print('objects match')
 #         print(v1)
