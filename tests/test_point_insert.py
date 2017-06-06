@@ -30,7 +30,7 @@ from datetime import datetime
 # Testing values
 @pytest.mark.parametrize('query', ['name:EdwinPythonTest'])
 @pytest.mark.parametrize('timestamp', ['2017-02-01 11:00', '2017-03-05 15:00', '2017-04-15 17:00'])
-@pytest.mark.parametrize('value', [618, 6, 549])
+@pytest.mark.parametrize('value', [618])
 def test_point_update_value_single(webapi, query, timestamp, value):
     points = webapi.points(query=query)
     assert(len(points) == 1)
