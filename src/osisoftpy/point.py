@@ -324,14 +324,14 @@ class Point(Base):
             #assume pi and inputted timestamps are the same UTC timestamp
             pitimestamp = self._parse_timestamp(value.timestamp)
             oldvalue = oldvalues[pitimestamp]
-            self.interpolated_at_time_values[pitimestamp] = self.interpolated_at_time_values.get(pitimestamp)
+            self.interpolated_at_time_values[pitimestamp] = value
 
             #first run, when the timestamped value is first run
             if not oldvalue:
                 pass
             #compares old and new value to see if new value has changed
             elif value and value.value != oldvalue.value:
-                signalkey = '{}/interpolated/{}'.format(self.webid.__str__(), pitimestamp)
+                signalkey = '{}/interpolatedattimes/{}'.format(self.webid.__str__(), pitimestamp)
                 self.webapi.signals[signalkey].send(self)
 
         return new_intp_values
@@ -512,11 +512,11 @@ class Point(Base):
         self.recorded_at_time_values[formattedtime] = new_recorded_at_time_value
         if not old_recorded_at_time_value:
             pass
-        elif self.recorded_at_time_values[formattedtime] and self.recorded_at_time_value.value != old_recorded_at_time_value.value:
+        elif self.recorded_at_time_values[formattedtime] and self.recorded_at_time_values[formattedtime].value != old_recorded_at_time_value.value:
             signalkey = '{}/recordedattime/{}'.format(self.webid.__str__(),formattedtime or '')
             self.webapi.signals[signalkey].send(self)
 
-        return self.recorded_at_time_values
+        return new_recorded_at_time_value
 
     def summary(
         self,
