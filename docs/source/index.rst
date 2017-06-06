@@ -1,17 +1,15 @@
 .. osisoftpy documentation master file, created by
-   sphinx-quickstart on Tue May  2 22:28:56 2017.
+   sphinx-quickstart on Tue Jun  6 11:35:34 2017.
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
 Welcome to osisoftpy's documentation!
 =====================================
 
-.. toctree::
-    :maxdepth: 2
-    :caption: Contents:
+Contents:
 
-.. automodule:: osisoftpy.api
-    :members:
+.. toctree::
+   :maxdepth: 2
 
 Indices and tables
 ==================
@@ -20,4 +18,4 @@ Indices and tables
 * :ref:`modindex`
 * :ref:`search`
 
-{I, l, 1}, {Q, O, 0}, {S, 5}, {Z, 2}
+
