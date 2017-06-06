@@ -23,21 +23,9 @@ in the`osisoftpy.point` module.
 import osisoftpy
 import pytest
 import time
-import pytz
 from osisoftpy.exceptions import MismatchEntriesError
 from datetime import datetime
 
-# TODO Convert timestamps to UTC
-
-def _compare_pi_and_local_datetime(pidatetime, localdatetime):
-    pi = datetime.strptime(pidatetime, '%Y-%m-%dT%H:%M:%SZ')
-    local = datetime.strptime(localdatetime, '%Y-%m-%d %H:%M')
-    localtimezone = pytz.timezone('America/Los_Angeles')
-    localmoment = localtimezone.localize(local, is_dst=None)
-    utcmoment = localmoment.astimezone(pytz.utc)
-    # print(utcmoment.strftime('%Y-%m-%d %H:%M'))
-    # print(pi.strftime('%Y-%m-%d %H:%M'))
-    assert utcmoment.strftime('%Y-%m-%d %H:%M') == pi.strftime('%Y-%m-%d %H:%M')
 
 # Testing values
 @pytest.mark.parametrize('query', ['name:EdwinPythonTest'])
@@ -50,7 +38,6 @@ def test_point_update_value_single(webapi, query, timestamp, value):
         point.update_value(timestamp, value)
         v = point.recordedattime(time=timestamp)
         assert v.value == value
-        _compare_pi_and_local_datetime(v.timestamp, timestamp)
         
 # Testing "good"
 @pytest.mark.parametrize('query', ['name:EdwinPythonTest'])
