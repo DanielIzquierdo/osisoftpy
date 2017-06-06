@@ -25,7 +25,7 @@ from .conftest import credentials
 
 import osisoftpy
 
-skip = False
+skip = True
 
 
 @pytest.mark.skipif(skip, reason="Takes an extra 3s...")
