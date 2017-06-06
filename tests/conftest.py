@@ -96,4 +96,3 @@ def webapi(url, authtype, username, password, verifyssl, hostname_override):
     return osisoftpy.webapi(
         url, authtype=authtype, verifyssl=False,
         hostname_override=hostname_override)
-
