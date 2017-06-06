@@ -29,6 +29,8 @@ from requests.packages.urllib3.exceptions import InsecureRequestWarning
 
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
+usekerberos = False
+
 @pytest.fixture(scope='module')
 def url():
     return 'https://dev.dstcontrols.com/piwebapi'
@@ -43,7 +45,10 @@ def verifyssl():
 
 @pytest.fixture(scope='module')
 def authtype():
-    return 'kerberos'
+    if usekerberos:
+        return 'kerberos'
+    else:
+        return 'basic'
 
 @pytest.fixture(scope='module')
 def username():
