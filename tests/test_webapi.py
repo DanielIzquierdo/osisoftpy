@@ -200,7 +200,7 @@ def test_subscription_interpolatedattimes_single_timestamp_notify_two(webapi, qu
             point.update_value(date2, 500)
 
     point.interpolatedattimes(times)
-    assert len(updated_points) == 2
+    assert updated_points.__len__() == 2
     webapi.unsubscribe(points, 'interpolatedattimes')
 
 # test recordedattimes - assumes no one has used this tag
