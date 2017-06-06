@@ -24,6 +24,7 @@ import osisoftpy
 import pytest
 import time
 import pytz
+from osisoftpy.exceptions import MismatchEntriesError
 from datetime import datetime
 
 # TODO Convert timestamps to UTC
@@ -178,8 +179,15 @@ def test_point_multiple_update(webapi, query, timestamps, values):
     for point in points:
         point.update_values(timestamps, values)
         for timestamp, value in zip(timestamps, values):
-            p = point.current(time=timestamp, overwrite=False)
+            p = point.recordedattime(time=timestamp, overwrite=False)
             assert p.value == value
 
-# TODO: Test Mismatched arrays (Timestamps and Values)
-
+# Test Mismatched arrays (Timestamps and Values)
+@pytest.mark.parametrize('query', ['name:EdwinPythonTest'])
+@pytest.mark.parametrize('timestamps', [['2017-02-01 06:00','2017-02-01 07:00','2017-02-01 08:00','2017-02-01 09:00','2017-02-01 10:00']])
+@pytest.mark.parametrize('values', [[2017,2018,2019,2020]])
+def test_point_multiple_mismatch(webapi, query, timestamps, values):
+    points = webapi.points(query=query)
+    with pytest.raises(MismatchEntriesError) as err:
+        for point in points:
+            point.update_values(timestamps, values)
