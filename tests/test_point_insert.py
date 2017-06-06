@@ -45,12 +45,11 @@ def _compare_pi_and_local_datetime(pidatetime, localdatetime):
 @pytest.mark.parametrize('value', [2017, 6, 549])
 def test_point_update_value_single(webapi, query, timestamp, value):
     points = webapi.points(query=query)
-    #for some reason points increments by 1 for each test
     assert(len(points) == 1)
     for point in points:
         points.pop(0)
         point.update_value(timestamp, value)
-        v = point.recordedattime(time=timestamp, overwrite=False)
+        v = point.recordedattime(time=timestamp)
         assert v.value == value
         _compare_pi_and_local_datetime(v.timestamp, timestamp)
         
@@ -61,9 +60,10 @@ def test_point_update_value_single(webapi, query, timestamp, value):
 @pytest.mark.parametrize('good', [True, False])
 def test_point_update_good_flag(webapi, query, timestamp, value, good):
     points = webapi.points(query=query)
+    assert(len(points) == 1)
     for point in points:
         point.update_value(timestamp, value, good=good)
-        p = point.recordedattime(time=timestamp, overwrite=False)
+        p = point.recordedattime(time=timestamp)
         assert p.good == good
 
 # Testing "questionable"
@@ -73,22 +73,25 @@ def test_point_update_good_flag(webapi, query, timestamp, value, good):
 @pytest.mark.parametrize('questionable', [True, False])
 def test_point_update_questionable_flag(webapi, query, timestamp, value, questionable):
     points = webapi.points(query=query)
+    assert(len(points) == 1)
     for point in points:
         point.update_value(timestamp, value, questionable=questionable)
-        p = point.recordedattime(time=timestamp, overwrite=False)
+        p = point.recordedattime(time=timestamp)
         assert p.questionable == questionable
 
 
 # Testing "unitsabbreviation"
+@pytest.mark.skipif(True, reason="units of measure aren't being written")
 @pytest.mark.parametrize('query', ['name:EdwinPythonTest'])
 @pytest.mark.parametrize('timestamp', ['2017-02-01 06:00'])
 @pytest.mark.parametrize('value', [2017])
 @pytest.mark.parametrize('unitsabbreviation', ['m', 's', 'm/s', 'A', 'K'])
 def test_point_update_unitsabbreviation(webapi, query, timestamp, value, unitsabbreviation):
     points = webapi.points(query=query)
+    assert(len(points) == 1)
     for point in points:
         point.update_value(timestamp, value, unitsabbreviation=unitsabbreviation)
-        p = point.recordedattime(time=timestamp, overwrite=False)
+        p = point.recordedattime(time=timestamp)
         assert p.unitsabbreviation == unitsabbreviation
 
 # Testing "updateoption" Replace
@@ -96,12 +99,13 @@ def test_point_update_unitsabbreviation(webapi, query, timestamp, value, unitsab
 @pytest.mark.parametrize('timestamp', ['2017-02-01 06:00'])
 @pytest.mark.parametrize('value', [2017])
 @pytest.mark.parametrize('updateoption', ['Replace'])
-def test_point_update_unitsabbreviation(webapi, query, timestamp, value, updateoption):
+def test_point_update_updatereplace(webapi, query, timestamp, value, updateoption):
     points = webapi.points(query=query)
+    assert(len(points) == 1)
     for point in points:
         point.update_value(timestamp, 0, updateoption='Replace')
         point.update_value(timestamp, value, updateoption=updateoption)
-        p = point.recordedattime(time=timestamp, overwrite=False)
+        p = point.recordedattime(time=timestamp)
         assert p.value == value
 
 # Testing "updateoption" Insert
@@ -109,12 +113,13 @@ def test_point_update_unitsabbreviation(webapi, query, timestamp, value, updateo
 @pytest.mark.parametrize('timestamp', ['2017-02-01 06:00'])
 @pytest.mark.parametrize('value', [2017])
 @pytest.mark.parametrize('updateoption', ['Insert'])
-def test_point_update_unitsabbreviation(webapi, query, timestamp, value, updateoption):
+def test_point_update_updateinsert(webapi, query, timestamp, value, updateoption):
     points = webapi.points(query=query)
+    assert(len(points) == 1)
     for point in points:
         point.update_value(timestamp, 0, updateoption='Replace')
         point.update_value(timestamp, value, updateoption=updateoption)
-        p = point.recordedattime(time=timestamp, overwrite=False)
+        p = point.recordedattime(time=timestamp)
         assert p.value == value
 
 # Testing "updateoption" NoReplace
@@ -122,12 +127,13 @@ def test_point_update_unitsabbreviation(webapi, query, timestamp, value, updateo
 @pytest.mark.parametrize('timestamp', ['2017-02-01 06:00'])
 @pytest.mark.parametrize('value', [2017])
 @pytest.mark.parametrize('updateoption', ['NoReplace'])
-def test_point_update_unitsabbreviation(webapi, query, timestamp, value, updateoption):
+def test_point_update_updatenoreplace(webapi, query, timestamp, value, updateoption):
     points = webapi.points(query=query)
+    assert(len(points) == 1)
     for point in points:
         point.update_value(timestamp, 0, updateoption='Replace')
         point.update_value(timestamp, value, updateoption=updateoption)
-        p = point.recordedattime(time=timestamp, overwrite=False)
+        p = point.recordedattime(time=timestamp)
         assert p.value == 0
 
 # Testing "updateoption" ReplaceOnly
@@ -135,12 +141,13 @@ def test_point_update_unitsabbreviation(webapi, query, timestamp, value, updateo
 @pytest.mark.parametrize('timestamp', ['2017-02-01 06:00'])
 @pytest.mark.parametrize('value', [2017])
 @pytest.mark.parametrize('updateoption', ['ReplaceOnly'])
-def test_point_update_unitsabbreviation(webapi, query, timestamp, value, updateoption):
+def test_point_update_updatereplaceonly(webapi, query, timestamp, value, updateoption):
     points = webapi.points(query=query)
+    assert(len(points) == 1)
     for point in points:
         point.update_value(timestamp, 0, updateoption='Replace')
         point.update_value(timestamp, value, updateoption=updateoption)
-        p = point.recordedattime(time=timestamp, overwrite=False)
+        p = point.recordedattime(time=timestamp)
         assert p.value == 0
 
 # Testing "updateoption" InsertNoCompression
@@ -148,12 +155,13 @@ def test_point_update_unitsabbreviation(webapi, query, timestamp, value, updateo
 @pytest.mark.parametrize('timestamp', ['2017-02-01 06:00'])
 @pytest.mark.parametrize('value', [2017])
 @pytest.mark.parametrize('updateoption', ['InsertNoCompression'])
-def test_point_update_unitsabbreviation(webapi, query, timestamp, value, updateoption):
+def test_point_update_updateinsertnocomp(webapi, query, timestamp, value, updateoption):
     points = webapi.points(query=query)
+    assert(len(points) == 1)
     for point in points:
         point.update_value(timestamp, 0, updateoption='Replace')
         point.update_value(timestamp, value, updateoption=updateoption)
-        p = point.recordedattime(time=timestamp, overwrite=False)
+        p = point.recordedattime(time=timestamp)
         assert p.value == value
 
 # Testing "updateoption" Remove
@@ -161,12 +169,13 @@ def test_point_update_unitsabbreviation(webapi, query, timestamp, value, updateo
 @pytest.mark.parametrize('timestamp', ['2017-02-01 06:00'])
 @pytest.mark.parametrize('value', [2017])
 @pytest.mark.parametrize('updateoption', ['Remove'])
-def test_point_update_unitsabbreviation(webapi, query, timestamp, value, updateoption):
+def test_point_update_updateremove(webapi, query, timestamp, value, updateoption):
     points = webapi.points(query=query)
+    assert(len(points) == 1)
     for point in points:
         point.update_value(timestamp, 0, updateoption='Replace')
         point.update_value(timestamp, value, updateoption=updateoption)
-        p = point.recordedattime(time=timestamp, overwrite=False)
+        p = point.recordedattime(time=timestamp)
         assert p.value == 0
 
 #update_values
@@ -176,10 +185,11 @@ def test_point_update_unitsabbreviation(webapi, query, timestamp, value, updateo
 @pytest.mark.parametrize('values', [[2017,2018,2019,2020,2021]])
 def test_point_multiple_update(webapi, query, timestamps, values):
     points = webapi.points(query=query)
+    assert(len(points) == 1)
     for point in points:
         point.update_values(timestamps, values)
         for timestamp, value in zip(timestamps, values):
-            p = point.recordedattime(time=timestamp, overwrite=False)
+            p = point.recordedattime(time=timestamp)
             assert p.value == value
 
 # Test Mismatched arrays (Timestamps and Values)
@@ -188,6 +198,7 @@ def test_point_multiple_update(webapi, query, timestamps, values):
 @pytest.mark.parametrize('values', [[2017,2018,2019,2020]])
 def test_point_multiple_mismatch(webapi, query, timestamps, values):
     points = webapi.points(query=query)
+    assert(len(points) == 1)
     with pytest.raises(MismatchEntriesError) as err:
         for point in points:
             point.update_values(timestamps, values)
