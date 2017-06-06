@@ -41,13 +41,12 @@ def _compare_pi_and_local_datetime(pidatetime, localdatetime):
 
 # Testing values
 @pytest.mark.parametrize('query', ['name:EdwinPythonTest'])
-@pytest.mark.parametrize('timestamp', ['2017-02-01 06:00', '2017-03-05 15:00', '2017-04-15 17:00'])
-@pytest.mark.parametrize('value', [2017, 6, 549])
+@pytest.mark.parametrize('timestamp', ['2017-02-01 11:00', '2017-03-05 15:00', '2017-04-15 17:00'])
+@pytest.mark.parametrize('value', [618, 6, 549])
 def test_point_update_value_single(webapi, query, timestamp, value):
     points = webapi.points(query=query)
     assert(len(points) == 1)
     for point in points:
-        points.pop(0)
         point.update_value(timestamp, value)
         v = point.recordedattime(time=timestamp)
         assert v.value == value
@@ -55,7 +54,7 @@ def test_point_update_value_single(webapi, query, timestamp, value):
         
 # Testing "good"
 @pytest.mark.parametrize('query', ['name:EdwinPythonTest'])
-@pytest.mark.parametrize('timestamp', ['2017-02-01 06:00'])
+@pytest.mark.parametrize('timestamp', ['2017-02-01 07:00'])
 @pytest.mark.parametrize('value', [2017])
 @pytest.mark.parametrize('good', [True, False])
 def test_point_update_good_flag(webapi, query, timestamp, value, good):
@@ -68,7 +67,7 @@ def test_point_update_good_flag(webapi, query, timestamp, value, good):
 
 # Testing "questionable"
 @pytest.mark.parametrize('query', ['name:EdwinPythonTest'])
-@pytest.mark.parametrize('timestamp', ['2017-02-01 06:00'])
+@pytest.mark.parametrize('timestamp', ['2017-02-01 08:00'])
 @pytest.mark.parametrize('value', [2017])
 @pytest.mark.parametrize('questionable', [True, False])
 def test_point_update_questionable_flag(webapi, query, timestamp, value, questionable):
@@ -124,8 +123,8 @@ def test_point_update_updateinsert(webapi, query, timestamp, value, updateoption
 
 # Testing "updateoption" NoReplace
 @pytest.mark.parametrize('query', ['name:EdwinPythonTest'])
-@pytest.mark.parametrize('timestamp', ['2017-02-01 06:00'])
-@pytest.mark.parametrize('value', [2017])
+@pytest.mark.parametrize('timestamp', ['2017-02-01 09:00'])
+@pytest.mark.parametrize('value', [2000])
 @pytest.mark.parametrize('updateoption', ['NoReplace'])
 def test_point_update_updatenoreplace(webapi, query, timestamp, value, updateoption):
     points = webapi.points(query=query)
@@ -148,7 +147,7 @@ def test_point_update_updatereplaceonly(webapi, query, timestamp, value, updateo
         point.update_value(timestamp, 0, updateoption='Replace')
         point.update_value(timestamp, value, updateoption=updateoption)
         p = point.recordedattime(time=timestamp)
-        assert p.value == 0
+        assert p.value == value
 
 # Testing "updateoption" InsertNoCompression
 @pytest.mark.parametrize('query', ['name:EdwinPythonTest'])
@@ -176,7 +175,7 @@ def test_point_update_updateremove(webapi, query, timestamp, value, updateoption
         point.update_value(timestamp, 0, updateoption='Replace')
         point.update_value(timestamp, value, updateoption=updateoption)
         p = point.recordedattime(time=timestamp)
-        assert p.value == 0
+        assert p.value == value
 
 #update_values
 # Test Multiple Inputs
