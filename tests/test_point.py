@@ -110,16 +110,16 @@ def test_points_interpolated_return_expected_value_count(
 @pytest.mark.parametrize('count', [10])
 @pytest.mark.parametrize('key', ['interpolatedattimes'])
 @pytest.mark.parametrize('params', [
-    {'time': now(), 'expected_count': 1},
-    {'time': [now(), now().replace(weeks=-1)], 'expected_count': 2},
-    {'time': [
-        now(),
-        now().replace(weeks=-1),
-        now().replace(weeks=-2),
-        now().replace(weeks=-3),
-        now().replace(weeks=-4),
-        now().replace(weeks=-5),
-        now().replace(weeks=-6),
+    {'timestamps': now().format('YYYY-MM-DD HH:mm:ss ZZ'), 'expected_count': 1},
+    {'timestamps': [now().format('YYYY-MM-DD HH:mm:ss ZZ'), now().replace(weeks=-1).format('YYYY-MM-DD HH:mm:ss ZZ')], 'expected_count': 2},
+    {'timestamps': [
+        now().format('YYYY-MM-DD HH:mm:ss ZZ'),
+        now().replace(weeks=-1).format('YYYY-MM-DD HH:mm:ss ZZ'),
+        now().replace(weeks=-2).format('YYYY-MM-DD HH:mm:ss ZZ'),
+        now().replace(weeks=-3).format('YYYY-MM-DD HH:mm:ss ZZ'),
+        now().replace(weeks=-4).format('YYYY-MM-DD HH:mm:ss ZZ'),
+        now().replace(weeks=-5).format('YYYY-MM-DD HH:mm:ss ZZ'),
+        now().replace(weeks=-6).format('YYYY-MM-DD HH:mm:ss ZZ'),
 
     ], 'expected_count': 7},
 ])
@@ -172,10 +172,9 @@ def test_points_recorded_returns_one_value(
     assert all(isinstance(x, osisoftpy.Point) for x in points)
     for point in points:
         valuekey = getattr(point, key)
-        payload = {'time': now, 'retrievalmode': retrievalmode}
-        values = valuekey(**payload)
-        assert all(isinstance(x, osisoftpy.Value) for x in values)
-        assert values.__len__() == 1
-        for value in values:
-            print('Point {}, recorded value {} {}: {}'.format(
-                point.name, retrievalmode, now, value.value))
+        payload = {'time': now.format('YYYY-MM-DD HH:mm:ss ZZ'), 'retrievalmode': retrievalmode}
+        value = valuekey(**payload)
+        assert isinstance(value, osisoftpy.Value)
+        # for value in values:
+        #     print('Point {}, recorded value {} {}: {}'.format(
+        #         point.name, retrievalmode, now, value.value))

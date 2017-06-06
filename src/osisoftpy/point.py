@@ -193,12 +193,6 @@ class Point(Base):
 
         return self.current_value
         
-        
-        # if self.end_value and self.end_value.value != value.value:
-        #     self.end_value = value
-        #     self.webapi.signals[signalkey].send(self)
-        # elif not self.end_value:
-        #     self.end_value = value
 
     def interpolated(
             self,
@@ -251,19 +245,20 @@ class Point(Base):
             'selectedfields': selectedfields,
         }
         values = self._get_values(payload=payload, endpoint='interpolated')
-        if not overwrite:
-            warnings.warn('You have set the overwrite boolean to False - '
-                          'the interpolated value(s) has been retrieved, but not '
-                          'stored for this point.', UserWarning)
-            return values
-        signalkey = '{}/interpolated'.format(self.webid.__str__())
-        if self.interpolated_values and self.interpolated_values != values:
-            self.interpolated_values = values
-            self.webapi.signals[signalkey].send(self)
-        elif not self.interpolated_values:
-            self.interpolated_values = values
+        return values
+        # if not overwrite:
+        #     warnings.warn('You have set the overwrite boolean to False - '
+        #                   'the interpolated value(s) has been retrieved, but not '
+        #                   'stored for this point.', UserWarning)
+        #     return values
+        # signalkey = '{}/interpolated'.format(self.webid.__str__())
+        # if self.interpolated_values and self.interpolated_values != values:
+        #     self.interpolated_values = values
+        #     self.webapi.signals[signalkey].send(self)
+        # elif not self.interpolated_values:
+        #     self.interpolated_values = values
 
-        return self.interpolated_values
+        # return self.interpolated_values
 
     def interpolatedattimes(
             self,
@@ -316,6 +311,10 @@ class Point(Base):
 
         oldvalues = {}
         newvalues = {}
+        
+        if not isinstance(timestamps, list):
+            timestamps = [timestamps]
+
         for timestamp in timestamps:
             formattedtimestamp = self._parse_timestamp(timestamp)
             oldvalues[formattedtimestamp] = self.interpolated_at_time_values.get(formattedtimestamp)
@@ -358,19 +357,20 @@ class Point(Base):
         }
 
         values = self._get_values(payload=payload, endpoint='plot')
-        if not overwrite:
-            warnings.warn('You have set the overwrite boolean to False - '
-                          'the plot value(s) has been retrieved, but not '
-                          'stored for this point.', UserWarning)
-            return values
-        signalkey = '{}/plot/'.format(self.webid.__str__())
-        if self.plot_values and self.plot_values != values:
-            self.plot_values = values
-            self.webapi.signals[signalkey].send(self)
-        elif not self.plot_values:
-            self.plot_values = values
+        return values
+        # if not overwrite:
+        #     warnings.warn('You have set the overwrite boolean to False - '
+        #                   'the plot value(s) has been retrieved, but not '
+        #                   'stored for this point.', UserWarning)
+        #     return values
+        # signalkey = '{}/plot/'.format(self.webid.__str__())
+        # if self.plot_values and self.plot_values != values:
+        #     self.plot_values = values
+        #     self.webapi.signals[signalkey].send(self)
+        # elif not self.plot_values:
+        #     self.plot_values = values
 
-        return self.plot_values
+        # return self.plot_values
 
     def recorded(
             self,
@@ -447,19 +447,20 @@ class Point(Base):
         }
 
         values = self._get_values(payload=payload, endpoint='recorded')
-        if not overwrite:
-            warnings.warn('You have set the overwrite boolean to False - '
-                          'the recorded value(s) has been retrieved, but not '
-                          'stored for this point.', UserWarning)
-            return values
-        signalkey = '{}/recorded/'.format(self.webid.__str__())
-        if self.recorded_values and self.recorded_values != values:
-            self.recorded_values = values
-            self.webapi.signals[signalkey].send(self)
-        elif not self.recorded_values:
-            self.recorded_values = values
+        return values
+        # if not overwrite:
+        #     warnings.warn('You have set the overwrite boolean to False - '
+        #                   'the recorded value(s) has been retrieved, but not '
+        #                   'stored for this point.', UserWarning)
+        #     return values
+        # signalkey = '{}/recorded/'.format(self.webid.__str__())
+        # if self.recorded_values and self.recorded_values != values:
+        #     self.recorded_values = values
+        #     self.webapi.signals[signalkey].send(self)
+        # elif not self.recorded_values:
+        #     self.recorded_values = values
 
-        return self.recorded_values
+        # return self.recorded_values
 
     def recordedattime(
             self,
@@ -549,19 +550,20 @@ class Point(Base):
         }
 
         values = self._get_summary(payload=payload)
-        if not overwrite:
-            warnings.warn('You have set the overwrite boolean to False - '
-                          'the summary value(s) has been retrieved, but not '
-                          'stored for this point.', UserWarning)
-            return value
-        signalkey = '{}/summary/'.format(self.webid.__str__())
-        if self.summary_values and self.summary_values != values:
-            self.summary_values = values
-            self.webapi.signals[signalkey].send(self)
-        elif not self.summary_values:
-            self.summary_values = values
+        return values
+        # if not overwrite:
+        #     warnings.warn('You have set the overwrite boolean to False - '
+        #                   'the summary value(s) has been retrieved, but not '
+        #                   'stored for this point.', UserWarning)
+        #     return value
+        # signalkey = '{}/summary/'.format(self.webid.__str__())
+        # if self.summary_values and self.summary_values != values:
+        #     self.summary_values = values
+        #     self.webapi.signals[signalkey].send(self)
+        # elif not self.summary_values:
+        #     self.summary_values = values
 
-        return self.summary_values
+        # return self.summary_values
 
     def end(
         self,
