@@ -19,7 +19,7 @@ before_install:
 install:
   - pip install -q -e .
 script:
-  - python -m pytest --cov
+  - python -m pytest --cov -ci=travis
 after_success:
   - codecov
   - codeclimate-test-reporter
@@ -33,5 +33,5 @@ notifications:
     rooms:
       - dstcontrols:SUPzxzw8n9xyevY5kUkajRAm#pge
     template:
-      - "(<https://github.com/%{repository_slug}/%{branch}|[%{repository_name}:%{branch}]) build <%{build_url}|#%{build_number}> by %{author} %{result} in %{elapsed_time}."
+      - "Build <%{build_url}|#%{build_number}> by %{author} %{result} in %{elapsed_time}."
       - "(<%{compare_url}|%{commit}>) %{commit_message} - %{author}"
