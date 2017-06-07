@@ -1,0 +1,3 @@
+name: osisoftpy-freeze
+dependencies:
+  - python=3.6

@@ -1,0 +1,13 @@
+arrow==0.10.0
+blinker==1.4
+certifi==2017.4.17
+chardet==3.0.3
+future==0.16.0
+idna==2.5
+osisoftpy==2.0.17
+pykerberos==1.1.14
+python-dateutil==2.6.0
+requests==2.17.3
+requests-kerberos==0.11.0
+six==1.10.0
+urllib3==1.21.1

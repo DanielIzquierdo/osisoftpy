@@ -47,6 +47,12 @@ conda env create --file anaconda/dev-environment.yml
 source activate osisoftpy-dev
 
 
+#anaconda virtual environment
+source deactivate
+conda env remove --name osisoftpy-freeze -y
+conda env create --file anaconda/freeze-environment.yml
+source activate osisoftpy-freeze
+
 source deactivate
 conda env remove --name osisoftpy-prod -y
 conda env create --file anaconda/prod-environment.yml
