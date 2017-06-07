@@ -177,19 +177,9 @@ class Point(Base):
         # currently, checking the Value objects doesn't work, so we compare the
         # Value.value values.
         # if oldvalue and oldvalue != self.end_value:\
-        if not oldvalue:
-            pass
-        elif self.current_value and self.current_value.value != oldvalue.value:
+        if oldvalue and self.current_value and self.current_value.value != oldvalue.value:
             signalkey = '{}/current/'.format(self.webid.__str__())
-
-            # log.debug('{} is emitting signal for a change in current value. signalkey: {}'.format(
-            #     self.name,
-            #     signalkey
-            #     ))
-
-            # log.debug('current signals: {}: {}'.format(self.webapi.signals.__len__(), _stringify(list=self.webapi.signals)))
-
-            self.webapi.signals[signalkey].send(self)
+            self._send_signal(signalkey)
 
         return self.current_value
         
@@ -325,13 +315,10 @@ class Point(Base):
             oldvalue = oldvalues[pitimestamp]
             self.interpolated_at_time_values[pitimestamp] = value
 
-            #first run, when the timestamped value is first run
-            if not oldvalue:
-                pass
             #compares old and new value to see if new value has changed
-            elif value and value.value != oldvalue.value:
+            if oldvalue and value and value.value != oldvalue.value:
                 signalkey = '{}/interpolatedattimes/{}'.format(self.webid.__str__(), pitimestamp)
-                self.webapi.signals[signalkey].send(self)
+                self._send_signal(signalkey)
 
         return new_intp_values
 
@@ -511,11 +498,9 @@ class Point(Base):
             return new_recorded_at_time_value
 
         self.recorded_at_time_values[formattedtime] = new_recorded_at_time_value
-        if not old_recorded_at_time_value:
-            pass
-        elif self.recorded_at_time_values[formattedtime] and self.recorded_at_time_values[formattedtime].value != old_recorded_at_time_value.value:
+        if old_recorded_at_time_value and self.recorded_at_time_values[formattedtime] and self.recorded_at_time_values[formattedtime].value != old_recorded_at_time_value.value:
             signalkey = '{}/recordedattime/{}'.format(self.webid.__str__(),formattedtime or '')
-            self.webapi.signals[signalkey].send(self)
+            self._send_signal(signalkey)
 
         return new_recorded_at_time_value
 
@@ -590,11 +575,9 @@ class Point(Base):
         # emit a signal if the value changes. exclude changes to booleans or timestmap
         # currently, checking the Value objects doesn't work, so we compare the
         # Value.value values.
-        if not oldendvalue:
-            pass
-        elif self.end_value and self.end_value.value != oldendvalue.value:
+        if oldendvalue and self.end_value and self.end_value.value != oldendvalue.value:
             signalkey = '{}/end/'.format(self.webid.__str__())
-            self.webapi.signals[signalkey].send(self)
+            self._send_signal(signalkey)
             
         return self.end_value
 
@@ -638,6 +621,10 @@ class Point(Base):
         url = '{}/{}/{}/{}'.format(
             self.webapi.links.get('Self'), 'streams', self.webid, endpoint)
         post(url, self.session, params=payload, json=request)
+
+    def _send_signal(self, signalkey):
+        if signalkey in self.webapi.signals:
+            self.webapi.signals[signalkey].send(self)
 
     def _parse_timestamp(self, datetime):
         if datetime:
