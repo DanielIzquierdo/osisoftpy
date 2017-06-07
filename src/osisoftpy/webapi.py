@@ -188,9 +188,8 @@ class WebAPI(Base):
             if signalkey not in self.signals:
                 s = blinker.signal(signalkey)
                 self.signals[signalkey] = s
-        if callback:
-            for (k, signal) in iteritems(self.signals):
-                signal.connect(callback)
+                if callback:
+                    self.signals[signalkey].connect(callback)
         return self.signals
 
     #TODO: Add doc

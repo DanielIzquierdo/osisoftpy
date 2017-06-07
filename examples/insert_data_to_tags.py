@@ -20,8 +20,8 @@ print('good points: {}'.format(points))
 def callback(sender):
     print('{} changed! {}'.format(sender.name, sender))
 
-webapi.subscribe(points, 'interpolatedattimes', startdatetime='2015-01-01T00:00:00Z', callback=callback)
 subscriptions = webapi.subscribe(points, 'interpolatedattimes', startdatetime='2015-01-01T00:00:00Z', callback=callback)
+# subscriptions = webapi.subscribe(points, 'interpolatedattimes', startdatetime='2015-01-01T00:00:00Z', callback=callback)
 print(len(subscriptions))
 
 for point in points:
