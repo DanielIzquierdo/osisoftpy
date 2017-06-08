@@ -29,6 +29,14 @@ from requests.packages.urllib3.exceptions import InsecureRequestWarning
 
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
+def pytest_addoption(parser):
+    parser.addoption("--ci", action="store", default="travis",
+                     help="my option: travis, circle, or appveyor")
+
+@pytest.fixture
+def ci(request):
+    return request.config.getoption("--ci")
+
 usekerberos = False
 
 @pytest.fixture(scope='module')
