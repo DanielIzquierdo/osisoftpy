@@ -90,6 +90,7 @@ def callback(sender):
     updated_points.append(sender)
 
 # test getvalue
+@pytest.mark.skipif(True, reason='Method only used for internal testing')
 @pytest.mark.parametrize('query', ['name:EdwinPythonTest*'])
 @pytest.mark.parametrize('stream', ['getvalue'])
 def test_subscription_getvalue(webapi, query, stream, callback=callback):
@@ -168,7 +169,7 @@ def test_subscription_interpolatedattimes_single_timestamp_notify_one(webapi, qu
     
 # test interpolatedattimes - assumes no one has used this tag
 @pytest.mark.parametrize('query', ['name:PythonInterpolatedAtTime'])
-@pytest.mark.parametrize('times', [['2016-02-01T00:00:00Z', '2016-01-04T00:00:00Z']])
+@pytest.mark.parametrize('times', [['2016-05-01T00:00:00Z','2016-06-01T00:00:00Z']])
 def test_subscription_interpolatedattimes_single_timestamp_notify_two(webapi, query, times, ci, callback=callback):
     #clear array from previous tests
     updated_points[:] = []
@@ -213,7 +214,6 @@ def test_subscription_recordedattimes(webapi, query, time, ci, callback=callback
     #query points (should be 1)
     points = webapi.points(query='{}_{}'.format(query, ci))
     for point in points:
-        print(point.name)
         webapi.subscribe(points, 'recordedattime', startdatetime=time, callback=callback)
         # parseddatetime = parser.parse(time)
         # date = (parseddatetime + timedelta(days=-1)).strftime('%Y-%m-%dT%H:%M:%SZ')
