@@ -134,14 +134,14 @@ def test_subscription_end(webapi, query, stream, callback=callback):
 
 
 # test interpolatedattimes - assumes no one has used this tag
-@pytest.mark.parametrize('query', ['name:PythonInterpolatedAtTimeTest'])
+@pytest.mark.parametrize('query', ['name:PythonInterpolatedAtTime'])
 @pytest.mark.parametrize('times', [['2017-01-01T00:00:00Z']])
-def test_subscription_interpolatedattimes_single_timestamp_notify_one(webapi, query, times, callback=callback):
+def test_subscription_interpolatedattimes_single_timestamp_notify_one(webapi, query, times, ci, callback=callback):
     #clear array from previous tests
     updated_points[:] = []
     
     #query points (should be 1)
-    points = webapi.points(query=query)
+    points = webapi.points(query='{}_{}'.format(query, ci))
     for point in points:
         for time in times:
             #subscriber each timestamp for this point
@@ -167,14 +167,14 @@ def test_subscription_interpolatedattimes_single_timestamp_notify_one(webapi, qu
     webapi.unsubscribe(points, 'interpolatedattimes')
     
 # test interpolatedattimes - assumes no one has used this tag
-@pytest.mark.parametrize('query', ['name:PythonInterpolatedAtTimeTest'])
+@pytest.mark.parametrize('query', ['name:PythonInterpolatedAtTime'])
 @pytest.mark.parametrize('times', [['2016-02-01T00:00:00Z', '2016-01-04T00:00:00Z']])
-def test_subscription_interpolatedattimes_single_timestamp_notify_two(webapi, query, times, callback=callback):
+def test_subscription_interpolatedattimes_single_timestamp_notify_two(webapi, query, times, ci, callback=callback):
     #clear array from previous tests
     updated_points[:] = []
     
     #query points (should be 1)
-    points = webapi.points(query=query)
+    points = webapi.points(query='{}_{}'.format(query, ci))
     for point in points:
         for time in times:
             #subscriber each timestamp for this point
@@ -204,15 +204,16 @@ def test_subscription_interpolatedattimes_single_timestamp_notify_two(webapi, qu
     webapi.unsubscribe(points, 'interpolatedattimes')
 
 # test recordedattimes - assumes no one has used this tag
-@pytest.mark.parametrize('query', ['name:PythonRecordedAtTimeTest'])
+@pytest.mark.parametrize('query', ['name:PythonRecordedAtTime'])
 @pytest.mark.parametrize('time', ['2017-01-01T00:00:00Z','2017-01-02T00:00:00Z'])
-def test_subscription_recordedattimes(webapi, query, time, callback=callback):
+def test_subscription_recordedattimes(webapi, query, time, ci, callback=callback):
     #clear array from previous test
     updated_points[:] = []
 
     #query points (should be 1)
-    points = webapi.points(query=query)
+    points = webapi.points(query='{}_{}'.format(query, ci))
     for point in points:
+        print(point.name)
         webapi.subscribe(points, 'recordedattime', startdatetime=time, callback=callback)
         # parseddatetime = parser.parse(time)
         # date = (parseddatetime + timedelta(days=-1)).strftime('%Y-%m-%dT%H:%M:%SZ')

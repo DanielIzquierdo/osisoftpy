@@ -30,7 +30,7 @@ from requests.packages.urllib3.exceptions import InsecureRequestWarning
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
 def pytest_addoption(parser):
-    parser.addoption("--ci", action="store", default="travis",
+    parser.addoption("--ci", action="store", default="test",
                      help="my option: travis, circle, or appveyor")
 
 @pytest.fixture
@@ -65,12 +65,6 @@ def username():
 @pytest.fixture(scope='module')
 def password():
     return 'DP$28GhMyp*!E&gc'
-
-# def ci_input(value=None):
-#     if value:
-#         return '_' + value.__str__()
-#     else:
-#         return 'Test'
 
 @pytest.fixture(scope='module')
 def now():
@@ -114,12 +108,3 @@ def webapi(url, authtype, username, password, verifyssl, hostname_override):
         return osisoftpy.webapi(
             url, authtype=authtype, username='ak-piwebapi-svc@dstcontrols.local', password='DP$28GhMyp*!E&gc',
             verifyssl=False, hostname_override=hostname_override)
-
-# adding command line option parameters
-def pytest_addoption(parser):
-    parser.addoption("--ci", action="store", default="None",
-        help="CI Tool Name")
-
-@pytest.fixture(scope='module')
-def ci(request):
-    return request.config.getoption("--ci")

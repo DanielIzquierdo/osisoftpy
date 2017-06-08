@@ -45,7 +45,7 @@ install:
 build: off
 
 test_script:
-  - "%PYTHON%\\python.exe -m pytest --cov"
+  - "%PYTHON%\\python.exe -m pytest --cov --ci=appveyor"
 
 after_test:
   - "%PYTHON%\\python.exe -m pip download --requirement requirements.txt --dest dist\\deps"

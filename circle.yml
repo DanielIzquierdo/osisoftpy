@@ -10,4 +10,4 @@ dependencies:
 # https://circleci.com/docs/1.0/parallel-manual-setup/
 test:
   override:
-    - python -m pytest
+    - python -m pytest --ci=circle
