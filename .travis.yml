@@ -6,11 +6,11 @@ branches:
 
 python:
   - 2.7
-  - 3.3
-  - 3.4
-  - 3.5
-  - 3.6
-  - nightly
+  # - 3.3
+  # - 3.4
+  # - 3.5
+  # - 3.6
+  # - nightly
 before_install:
   - pip install --upgrade pytest
   - pip install codecov
@@ -19,7 +19,7 @@ before_install:
 install:
   - pip install -q -e .
 script:
-  - python -m pytest --cov -ci=travis
+  - python -m pytest --cov --ci=travis
 after_success:
   - codecov
   - codeclimate-test-reporter

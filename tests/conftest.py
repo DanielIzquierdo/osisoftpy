@@ -58,10 +58,15 @@ def username():
 def password():
     return 'DP$28GhMyp*!E&gc'
 
+# def ci_input(value=None):
+#     if value:
+#         return '_' + value.__str__()
+#     else:
+#         return 'Test'
+
 @pytest.fixture(scope='module')
 def now():
     return arrow.utcnow()
-
 
 def query():
     Query = namedtuple('Query', ['single', 'partial', 'wildcard', 'multi'])
@@ -101,3 +106,12 @@ def webapi(url, authtype, username, password, verifyssl, hostname_override):
         return osisoftpy.webapi(
             url, authtype=authtype, username='ak-piwebapi-svc@dstcontrols.local', password='DP$28GhMyp*!E&gc',
             verifyssl=False, hostname_override=hostname_override)
+
+# adding command line option parameters
+def pytest_addoption(parser):
+    parser.addoption("--ci", action="store", default="None",
+        help="CI Tool Name")
+
+@pytest.fixture(scope='module')
+def ci(request):
+    return request.config.getoption("--ci")
