@@ -18,7 +18,7 @@ before_install:
 install:
   - pip install -q -e .
 script:
-  - python -m pytest --cov --ci=travis
+  - python -m pytest --cov --ci=travis --pythonversion=$TRAVIS_PYTHON_VERSION
 after_success:
   - codecov
   - codeclimate-test-reporter

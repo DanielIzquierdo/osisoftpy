@@ -31,9 +31,9 @@ from datetime import datetime
 @pytest.mark.parametrize('query', ['name:PythonInserted'])
 @pytest.mark.parametrize('timestamp', ['2017-02-01 11:00', '2017-03-05 15:00', '2017-04-15 17:00'])
 @pytest.mark.parametrize('value', [618])
-def test_point_update_value_single(webapi, query, timestamp, value, ci):
+def test_point_update_value_single(webapi, query, timestamp, value, ci, pythonversion):
 
-    points = webapi.points(query='{}_{}'.format(query, ci))
+    points = webapi.points(query='{}_{}{}'.format(query, ci, pythonversion))
     assert(len(points) == 1)
     for point in points:
         point.update_value(timestamp, value)
@@ -45,8 +45,8 @@ def test_point_update_value_single(webapi, query, timestamp, value, ci):
 @pytest.mark.parametrize('timestamp', ['2017-02-01 07:00'])
 @pytest.mark.parametrize('value', [2017])
 @pytest.mark.parametrize('good', [True, False])
-def test_point_update_good_flag(webapi, query, timestamp, value, good, ci):
-    points = webapi.points(query='{}_{}'.format(query, ci))
+def test_point_update_good_flag(webapi, query, timestamp, value, good, ci, pythonversion):
+    points = webapi.points(query='{}_{}{}'.format(query, ci, pythonversion))
     assert(len(points) == 1)
     for point in points:
         point.update_value(timestamp, value, good=good)
@@ -58,8 +58,8 @@ def test_point_update_good_flag(webapi, query, timestamp, value, good, ci):
 @pytest.mark.parametrize('timestamp', ['2017-02-01 08:00'])
 @pytest.mark.parametrize('value', [2018])
 @pytest.mark.parametrize('questionable', [True, False])
-def test_point_update_questionable_flag(webapi, query, timestamp, value, questionable, ci):
-    points = webapi.points(query='{}_{}'.format(query, ci))
+def test_point_update_questionable_flag(webapi, query, timestamp, value, questionable, ci, pythonversion):
+    points = webapi.points(query='{}_{}{}'.format(query, ci, pythonversion))
     assert(len(points) == 1)
     for point in points:
         point.update_value(timestamp, value, questionable=questionable)
@@ -73,8 +73,8 @@ def test_point_update_questionable_flag(webapi, query, timestamp, value, questio
 @pytest.mark.parametrize('timestamp', ['2017-02-01 06:00'])
 @pytest.mark.parametrize('value', [2017])
 @pytest.mark.parametrize('unitsabbreviation', ['m', 's', 'm/s', 'A', 'K'])
-def test_point_update_unitsabbreviation(webapi, query, timestamp, value, unitsabbreviation, ci):
-    points = webapi.points(query='{}_{}'.format(query, ci))
+def test_point_update_unitsabbreviation(webapi, query, timestamp, value, unitsabbreviation, ci, pythonversion):
+    points = webapi.points(query='{}_{}{}'.format(query, ci, pythonversion))
     assert(len(points) == 1)
     for point in points:
         point.update_value(timestamp, value, unitsabbreviation=unitsabbreviation)
@@ -86,8 +86,8 @@ def test_point_update_unitsabbreviation(webapi, query, timestamp, value, unitsab
 @pytest.mark.parametrize('timestamp', ['2017-03-01 06:00'])
 @pytest.mark.parametrize('value', [289])
 @pytest.mark.parametrize('updateoption', ['Replace'])
-def test_point_update_updatereplace(webapi, query, timestamp, value, updateoption, ci):
-    points = webapi.points(query='{}_{}'.format(query, ci))
+def test_point_update_updatereplace(webapi, query, timestamp, value, updateoption, ci, pythonversion):
+    points = webapi.points(query='{}_{}{}'.format(query, ci, pythonversion))
     assert(len(points) == 1)
     for point in points:
         point.update_value(timestamp, 0, updateoption='Replace')
@@ -100,8 +100,8 @@ def test_point_update_updatereplace(webapi, query, timestamp, value, updateoptio
 @pytest.mark.parametrize('timestamp', ['2017-03-02 07:00'])
 @pytest.mark.parametrize('value', [345])
 @pytest.mark.parametrize('updateoption', ['Insert'])
-def test_point_update_updateinsert(webapi, query, timestamp, value, updateoption, ci):
-    points = webapi.points(query='{}_{}'.format(query, ci))
+def test_point_update_updateinsert(webapi, query, timestamp, value, updateoption, ci, pythonversion):
+    points = webapi.points(query='{}_{}{}'.format(query, ci, pythonversion))
     assert(len(points) == 1)
     for point in points:
         point.update_value(timestamp, 0, updateoption='Replace')
@@ -114,8 +114,8 @@ def test_point_update_updateinsert(webapi, query, timestamp, value, updateoption
 @pytest.mark.parametrize('timestamp', ['2017-03-03 09:00'])
 @pytest.mark.parametrize('value', [2000])
 @pytest.mark.parametrize('updateoption', ['NoReplace'])
-def test_point_update_updatenoreplace(webapi, query, timestamp, value, updateoption, ci):
-    points = webapi.points(query='{}_{}'.format(query, ci))
+def test_point_update_updatenoreplace(webapi, query, timestamp, value, updateoption, ci, pythonversion):
+    points = webapi.points(query='{}_{}{}'.format(query, ci, pythonversion))
     assert(len(points) == 1)
     for point in points:
         point.update_value(timestamp, 0, updateoption='Replace')
@@ -128,8 +128,8 @@ def test_point_update_updatenoreplace(webapi, query, timestamp, value, updateopt
 @pytest.mark.parametrize('timestamp', ['2017-03-04 10:00'])
 @pytest.mark.parametrize('value', [65])
 @pytest.mark.parametrize('updateoption', ['ReplaceOnly'])
-def test_point_update_updatereplaceonly(webapi, query, timestamp, value, updateoption, ci):
-    points = webapi.points(query='{}_{}'.format(query, ci))
+def test_point_update_updatereplaceonly(webapi, query, timestamp, value, updateoption, ci, pythonversion):
+    points = webapi.points(query='{}_{}{}'.format(query, ci, pythonversion))
     assert(len(points) == 1)
     for point in points:
         point.update_value(timestamp, 0, updateoption='Replace')
@@ -142,8 +142,8 @@ def test_point_update_updatereplaceonly(webapi, query, timestamp, value, updateo
 @pytest.mark.parametrize('timestamp', ['2017-03-05 11:00'])
 @pytest.mark.parametrize('value', [1])
 @pytest.mark.parametrize('updateoption', ['InsertNoCompression'])
-def test_point_update_updateinsertnocomp(webapi, query, timestamp, value, updateoption, ci):
-    points = webapi.points(query='{}_{}'.format(query, ci))
+def test_point_update_updateinsertnocomp(webapi, query, timestamp, value, updateoption, ci, pythonversion):
+    points = webapi.points(query='{}_{}{}'.format(query, ci, pythonversion))
     assert(len(points) == 1)
     for point in points:
         point.update_value(timestamp, 0, updateoption='Replace')
@@ -156,8 +156,8 @@ def test_point_update_updateinsertnocomp(webapi, query, timestamp, value, update
 @pytest.mark.parametrize('timestamp', ['2017-03-06 12:00'])
 @pytest.mark.parametrize('value', [908])
 @pytest.mark.parametrize('updateoption', ['Remove'])
-def test_point_update_updateremove(webapi, query, timestamp, value, updateoption, ci):
-    points = webapi.points(query='{}_{}'.format(query, ci))
+def test_point_update_updateremove(webapi, query, timestamp, value, updateoption, ci, pythonversion):
+    points = webapi.points(query='{}_{}{}'.format(query, ci, pythonversion))
     assert(len(points) == 1)
     for point in points:
         point.update_value(timestamp, 0, updateoption='Replace')
@@ -170,8 +170,8 @@ def test_point_update_updateremove(webapi, query, timestamp, value, updateoption
 @pytest.mark.parametrize('query', ['name:PythonInserted'])
 @pytest.mark.parametrize('timestamps', [['2017-03-07 06:00','2017-03-07 07:00','2017-03-07 08:00','2017-03-07 09:00','2017-03-07 10:00']])
 @pytest.mark.parametrize('values', [[217,218,216,219,220]])
-def test_point_multiple_update(webapi, query, timestamps, values, ci):
-    points = webapi.points(query='{}_{}'.format(query, ci))
+def test_point_multiple_update(webapi, query, timestamps, values, ci, pythonversion):
+    points = webapi.points(query='{}_{}{}'.format(query, ci, pythonversion))
     assert(len(points) == 1)
     for point in points:
         point.update_values(timestamps, values)
@@ -183,8 +183,8 @@ def test_point_multiple_update(webapi, query, timestamps, values, ci):
 @pytest.mark.parametrize('query', ['name:PythonInserted'])
 @pytest.mark.parametrize('timestamps', [['2017-02-01 06:00','2017-02-01 07:00','2017-02-01 08:00','2017-02-01 09:00','2017-02-01 10:00']])
 @pytest.mark.parametrize('values', [[2017,2018,2019,2020]])
-def test_point_multiple_mismatch(webapi, query, timestamps, values, ci):
-    points = webapi.points(query='{}_{}'.format(query, ci))
+def test_point_multiple_mismatch(webapi, query, timestamps, values, ci, pythonversion):
+    points = webapi.points(query='{}_{}{}'.format(query, ci, pythonversion))
     assert(len(points) == 1)
     with pytest.raises(MismatchEntriesError) as err:
         for point in points:

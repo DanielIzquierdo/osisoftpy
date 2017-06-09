@@ -32,10 +32,16 @@ requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 def pytest_addoption(parser):
     parser.addoption("--ci", action="store", default="test",
                      help="my option: travis, circle, or appveyor")
+    parser.addoption("--pythonversion", action="store", default="",
+                     help="my option: 2.7 to nightly build")
 
 @pytest.fixture
 def ci(request):
     return request.config.getoption("--ci")
+
+@pytest.fixture
+def pythonversion(request):
+    return request.config.getoption("--pythonversion")
 
 usekerberos = False
 
