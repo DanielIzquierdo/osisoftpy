@@ -11,10 +11,12 @@ environment:
 #    - PYTHON: "C:\\Python35"
 #    - PYTHON: "C:\\Python36"
     - PYTHON: "C:\\Python27-x64"
+      PYTHON_VERSION: 2.7
 #    - PYTHON: "C:\\Python33-x64"
 #    - PYTHON: "C:\\Python34-x64"
 #    - PYTHON: "C:\\Python35-x64"
     - PYTHON: "C:\\Python36-x64"
+      PYTHON_VERSION: 3.6
 
 init:
   - ps: GWMI win32_logicaldisk | FT DeviceId, `
@@ -45,7 +47,7 @@ install:
 build: off
 
 test_script:
-  - "%PYTHON%\\python.exe -m pytest --cov --ci=appveyor"
+  - "%PYTHON%\\python.exe -m pytest --cov --ci=appveyor --pythonversion=%PYTHON_VERSION%"
 
 after_test:
   - "%PYTHON%\\python.exe -m pip download --requirement requirements.txt --dest dist\\deps"
