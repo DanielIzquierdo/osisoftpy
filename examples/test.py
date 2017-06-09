@@ -16,9 +16,19 @@ import time
 from datetime import datetime
 import pytz
 
-# webapi = osisoftpy.webapi('https://dev.dstcontrols.com/piwebapi/')
-# points = webapi.points(query='name:EdwinPythonTest')
-# print(len(points))
+webapi = osisoftpy.webapi('https://gold.dstcontrols.local/piwebapi')
+points = webapi.points(query='name:SIN*')
+print(len(points))
+def callback(sender):
+    print('Callback {} {}'.format(sender.name, sender.current_value.value))
+webapi.subscribe(points, 'current', callback=callback)
+
+points.current()
+# print('Point: {} has inital value {} at {}'.format(point.name, value.value, value.timestamp))
+
+time.sleep(30)
+
+points.current()
 # points = 0
 # points = webapi.points(query='name:EdwinPythonTest')
 # for point in points:
@@ -27,18 +37,6 @@ import pytz
 # point = points[0]
 # ts = point.current().timestamp
 # y = time.strptime(ts, '%Y-%m-%dT%H:%M:%SZ')
-
-def _compare_pi_and_local_datetime(pidatetime, localdatetime):
-    pi = datetime.strptime(pidatetime, '%Y-%m-%dT%H:%M:%SZ')
-
-    local = datetime.strptime(localdatetime, '%Y-%m-%d %H:%M')
-    localtimezone = pytz.timezone('America/Los_Angeles')
-    localmoment = localtimezone.localize(local, is_dst=None)
-    utcmoment = localmoment.astimezone(pytz.utc)
-    print(utcmoment.strftime('%Y-%m-%d %H:%M'))
-    print(pi.strftime('%Y-%m-%d %H:%M'))
-
-_compare_pi_and_local_datetime('2017-03-05T15:00:00Z', '2017-03-05 07:00')
 
 # localFormat = "%Y-%m-%d %H:%M"
 # localmoment_naive = datetime.strptime('2013-09-06 14:05', localFormat)

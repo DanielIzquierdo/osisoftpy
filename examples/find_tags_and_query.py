@@ -63,7 +63,8 @@ updated_points = []
 
 def notify(sender):
     msg = 'Current value for {} has changed to {}'
-    updated_points.append(sender)  # TODO: change ex to remove old point
+    if sender not in updated_points: 
+        updated_points.append(sender)  
     print(msg.format(sender.name, sender.current_value))
 
 

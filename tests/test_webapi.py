@@ -41,18 +41,22 @@ def test_webapi_has_session(webapi):
     print(', '.join("%s: %s" % item for item in vars(webapi).items()))
     assert type(webapi.session) == requests.Session
 
-
 def test_webapi_has_links(webapi):
     print(', '.join("%s: %s" % item for item in vars(webapi).items()))
     assert type(webapi.links) == dict
 
+def test_webapi_has_str_(webapi, url):
+    assert webapi.__str__() == '<OSIsoft PI Web API [{}]>'.format(url+'/')
 
 def test_webapi_has_self_url(webapi, url):
     assert webapi.links.get('Self') == url + '/'
 
+def test_webapi_has_self_url_property(webapi, url):
+    assert webapi.url == url+ '/'
 
 def test_webapi_has_search_url(webapi, url):
     assert webapi.links.get('Search') == url + '/search'
+
 
 def test_webapi_query_sinusoid(webapi):
     tag = 'sinusoid'
@@ -72,6 +76,13 @@ def test_webapi_points_sinusoid(webapi):
     assert all(isinstance(x, osisoftpy.Point) for x in r)
     assert r.__len__() == 1
 
+
+def test_webapi_subscribe_typeerror(webapi):
+    points = 1
+    try:
+        webapi.subscribe(points, 'current')
+    except Exception as err:
+        assert type(err) == TypeError
 
 @pytest.mark.parametrize('query', query())
 def test_webapi_points_query(webapi, query):

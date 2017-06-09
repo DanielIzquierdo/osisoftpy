@@ -134,7 +134,6 @@ class Point(Base):
             raise MismatchEntriesError(
                 "The length of timestamps and values lists are not equal."
             )   
-            return None
         payload = {'updateOption': updateoption, 'bufferOption': bufferoption }
         request = []
         for timestamp, value in zip(timestamps, values):

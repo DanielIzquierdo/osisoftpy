@@ -109,5 +109,12 @@ class Points(collections.MutableSequence):
             point = next((x for x in self if x.name == p[0]), None)
             v = create(Factory(Value), p[1].get('Content'), self.session,
                        self.webapi)
+
+            oldcurrent = point.current_value
             point.current_value = v
+
+            if v and oldcurrent and v.value != oldcurrent.value:
+                signalkey = '{}/current/'.format(point.webid.__str__())
+                point._send_signal(signalkey)
+
         return self
