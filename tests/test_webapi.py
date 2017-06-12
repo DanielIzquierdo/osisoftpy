@@ -96,7 +96,6 @@ def test_webapi_points_query(webapi, query):
 
 # a list to store modified points in:
 updated_points = []
-
 def callback(sender):
     updated_points.append(sender)
 
@@ -114,50 +113,64 @@ def test_subscription_getvalue(webapi, query, stream, callback=callback):
     assert len(updated_points) > 0
     subscriptions = webapi.unsubscribe(points, stream)
 
+updated_points_current = []
+def callback_current(sender):
+    updated_points_current.append(sender)
+
 # test current_value
 @pytest.mark.parametrize('query', ['name:EdwinPythonTest*'])
 @pytest.mark.parametrize('stream', ['current'])
-def test_subscription_current(webapi, query, stream, callback=callback):
-    updated_points[:] = []
+def test_subscription_current(webapi, query, stream, callback=callback_current):
+    #clear array from previous tests
+    updated_points_current[:] = []
+
     points = webapi.points(query=query)
-    subscriptions = webapi.subscribe(points, stream, callback=callback)
+    subscriptions = webapi.subscribe(points, stream, callback=callback_current)
     for point in points:
         v1 = point.current()
         point.update_values(["*"], [random.uniform(0,100)])
         v2 = point.current()
-    assert len(updated_points) == 2 # both points updated
+    assert len(updated_points_current) == 2 # both points updated
     subscriptions = webapi.unsubscribe(points, stream)
 
+updated_points_end = []
+def callback_end(sender):
+    updated_points_end.append(sender)
 
 # test end_value
 @pytest.mark.parametrize('query', ['name:EdwinPythonEndTest'])
 @pytest.mark.parametrize('stream', ['end'])
-def test_subscription_end(webapi, query, stream, callback=callback):
-    updated_points[:] = []
+def test_subscription_end(webapi, query, stream, callback=callback_end):
+    #clear array from previous tests
+    updated_points_end[:] = []
+
     points = webapi.points(query=query)
-    subscriptions = webapi.subscribe(points, stream, callback=callback)
+    subscriptions = webapi.subscribe(points, stream, callback=callback_end)
     for point in points:
         point.update_values(["*"], [random.uniform(0,100)])
         v1 = point.end()
         point.update_values(["*+1m"], [random.uniform(0,100)])
         v2 = point.end()
-    assert len(updated_points) == 1
+    assert len(updated_points_end) == 1
     subscriptions = webapi.unsubscribe(points, stream)
 
+updated_points_interp_1 = []
+def callback_interp_1(sender):
+    updated_points_interp_1.append(sender)
 
 # test interpolatedattimes - assumes no one has used this tag
 @pytest.mark.parametrize('query', ['name:PythonInterpolatedAtTime'])
 @pytest.mark.parametrize('times', [['2017-01-01T00:00:00Z']])
-def test_subscription_interpolatedattimes_single_timestamp_notify_one(webapi, query, times, ci, pythonversion, callback=callback):
+def test_subscription_interpolatedattimes_single_timestamp_notify_one(webapi, query, times, ci, pythonversion, callback=callback_interp_1):
     #clear array from previous tests
-    updated_points[:] = []
-    
+    updated_points_interp_1[:] = []
+
     #query points (should be 1)
     points = webapi.points(query='{}_{}{}'.format(query, ci, pythonversion))
     for point in points:
         for time in times:
             #subscriber each timestamp for this point
-            webapi.subscribe(points, 'interpolatedattimes', startdatetime=time, callback=callback)
+            webapi.subscribe(points, 'interpolatedattimes', startdatetime=time, callback=callback_interp_1)
 
             #setup with values here: insert a value 1 day before and after timestamp: 0 to 1000
             #datetime is parsed so days can added/subtracted
@@ -175,22 +188,26 @@ def test_subscription_interpolatedattimes_single_timestamp_notify_one(webapi, qu
 
             #queries new point and should trigger callback function
             point.interpolatedattimes([time])
-    assert len(updated_points) == 1
+    assert len(updated_points_interp_1) == 1
     webapi.unsubscribe(points, 'interpolatedattimes')
     
+updated_points_interp_2 = []
+def callback_interp_2(sender):
+    updated_points_interp_2.append(sender)
+
 # test interpolatedattimes - assumes no one has used this tag
 @pytest.mark.parametrize('query', ['name:PythonInterpolatedAtTime'])
 @pytest.mark.parametrize('times', [['2016-05-01T00:00:00Z','2016-06-01T00:00:00Z']])
-def test_subscription_interpolatedattimes_single_timestamp_notify_two(webapi, query, times, ci, pythonversion, callback=callback):
+def test_subscription_interpolatedattimes_single_timestamp_notify_two(webapi, query, times, ci, pythonversion, callback=callback_interp_2):
     #clear array from previous tests
-    updated_points[:] = []
+    updated_points_interp_2[:] = []
     
     #query points (should be 1)
     points = webapi.points(query='{}_{}{}'.format(query, ci, pythonversion))
     for point in points:
         for time in times:
             #subscriber each timestamp for this point
-            webapi.subscribe(points, 'interpolatedattimes', startdatetime=time, callback=callback)
+            webapi.subscribe(points, 'interpolatedattimes', startdatetime=time, callback=callback_interp_2)
 
             #setup with values here: insert a value 1 day before and after timestamp: 0 to 1000
             #datetime is parsed so days can added/subtracted
@@ -212,20 +229,24 @@ def test_subscription_interpolatedattimes_single_timestamp_notify_two(webapi, qu
             point.update_value(date2, 500)
 
     point.interpolatedattimes(times)
-    assert updated_points.__len__() == 2
+    assert updated_points_interp_2.__len__() == 2
     webapi.unsubscribe(points, 'interpolatedattimes')
+
+updated_points_recorded = []
+def callback_recorded(sender):
+    updated_points_recorded.append(sender)
 
 # test recordedattimes - assumes no one has used this tag
 @pytest.mark.parametrize('query', ['name:PythonRecordedAtTime'])
 @pytest.mark.parametrize('time', ['2017-01-01T00:00:00Z','2017-01-02T00:00:00Z'])
-def test_subscription_recordedattimes(webapi, query, time, ci, pythonversion, callback=callback):
+def test_subscription_recordedattimes(webapi, query, time, ci, pythonversion, callback=callback_recorded):
     #clear array from previous test
-    updated_points[:] = []
+    updated_points_recorded[:] = []
 
     #query points (should be 1)
     points = webapi.points(query='{}_{}{}'.format(query, ci, pythonversion))
     for point in points:
-        webapi.subscribe(points, 'recordedattime', startdatetime=time, callback=callback)
+        webapi.subscribe(points, 'recordedattime', startdatetime=time, callback=callback_recorded)
         # parseddatetime = parser.parse(time)
         # date = (parseddatetime + timedelta(days=-1)).strftime('%Y-%m-%dT%H:%M:%SZ')
         point.update_value(time, 134)
@@ -233,5 +254,5 @@ def test_subscription_recordedattimes(webapi, query, time, ci, pythonversion, ca
         point.update_value(time, 160)
         #should trigger callback function
         point.recordedattime(time)
-    assert len(updated_points) == 1
+    assert len(updated_points_recorded) == 1
     webapi.unsubscribe(points, 'recordedattime')
