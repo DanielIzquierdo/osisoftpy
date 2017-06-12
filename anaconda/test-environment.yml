@@ -26,3 +26,4 @@ dependencies:
     - pip-tools
     - click             # via pip-tools
     - first             # via pip-tools
+    - mock

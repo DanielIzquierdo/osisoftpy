@@ -19,6 +19,7 @@
 #
 import os
 import sys
+from unittest.mock import Mock
 sys.path.insert(0, os.path.abspath('../../src/osisoftpy'))
 
 # -- General configuration ------------------------------------------------
@@ -26,6 +27,12 @@ sys.path.insert(0, os.path.abspath('../../src/osisoftpy'))
 # If your documentation needs a minimal Sphinx version, state it here.
 #
 # needs_sphinx = '1.0'
+
+# Modules that need to be mocked so they don't throw import errors
+
+MOCK_MODULES = ['blinker','future','future.builtins','future.utils','osisoftpy','osisoftpy.factory','requests_kerberos']
+for mod_name in MOCK_MODULES:
+    sys.modules[mod_name] = Mock()
 
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
