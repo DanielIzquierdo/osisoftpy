@@ -5,13 +5,22 @@
 
 Welcome to osisoftpy's documentation!
 =====================================
+**osisoftpy**
 
+User Guide
+===========
 .. toctree::
-    :maxdepth: 2
-    :caption: Contents:
+   :maxdepth: 2
 
-.. automodule:: osisoftpy.api
-    :members:
+   user/intro
+
+Developer Reference
+===================
+.. toctree::
+   :maxdepth: 2
+
+   osisoftpy
+
 
 Indices and tables
 ==================
