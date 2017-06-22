@@ -5,21 +5,32 @@
 
 Welcome to osisoftpy's documentation!
 =====================================
-**osisoftpy**
 
-User Guide
-===========
-.. toctree::
-   :maxdepth: 2
 
-   user/intro
+.. module:: osisoftpy
 
-Developer Reference
-===================
-.. toctree::
-   :maxdepth: 2
+This part of the documentation covers all the interfaces of osisoftpy.
 
-   osisoftpy
+api
+----
+.. autofunction:: webapi
+
+
+webapi
+------
+.. autoclass:: osisoftpy.WebAPI
+   :inherited-members:
+
+
+point
+-----
+.. autoclass:: osisoftpy.Point
+   :inherited-members:
+
+value
+-----
+.. autoclass:: osisoftpy.Value
+   :inherited-members:
 
 
 Indices and tables
