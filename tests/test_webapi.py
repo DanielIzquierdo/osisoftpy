@@ -68,14 +68,12 @@ def test_webapi_query_sinusoid(webapi):
     assert bool(
         re.match(r.json().get('Items')[0].get('Name'), tag, re.IGNORECASE))
 
-
 def test_webapi_points_sinusoid(webapi):
     tag = 'sinusoid'
     payload = dict(query="name:{}".format(tag), count=10)
     r = webapi.points(**payload)
     assert all(isinstance(x, osisoftpy.Point) for x in r)
     assert r.__len__() == 1
-
 
 def test_webapi_subscribe_typeerror(webapi):
     points = 1

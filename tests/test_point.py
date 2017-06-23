@@ -85,7 +85,15 @@ def test_points_multivaluekeys_are_validtypes(webapi, query, count, keys):
             except AttributeError:
                 pass
 
+def test_points_only_create_pipoints(webapi):
+    afelement='PythonElement'
+    payload = dict(query="name:{}".format(afelement), count=10)
+    r = webapi.request(**payload)
+    assert r.json().get('TotalHits') > 0
+    points = webapi.points(**payload)
+    assert points.__len__() == 0
 
+    
 @pytest.mark.parametrize('query', ['name:sinusoid'])
 @pytest.mark.parametrize('count', [10])
 @pytest.mark.parametrize('key', ['interpolated'])

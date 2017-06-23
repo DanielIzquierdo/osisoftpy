@@ -109,9 +109,10 @@ class WebAPI(Base):
         """
         r = self.request(
             query=query, scope=scope, fields=fields, count=count, start=start)
+        y = r.json().get('Items', None)
         p = Points(list([
             create(Factory(Point), x, self.session, self)
-            for x in r.json().get('Items', None)
+            for x in r.json().get('Items', None) if x['ItemType'] == 'pipoint'
         ]), self)
         # self._points.extend(p)
         # return self._points
