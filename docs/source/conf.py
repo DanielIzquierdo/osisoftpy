@@ -18,8 +18,10 @@
 #
 import os
 import sys
+# mock package for python version 2.7-3.2
 from mock import Mock as MagicMock
-
+# unittest.test package for python version 3.3+
+# from unittest.mock import MagicMock
 sys.path.insert(0, os.path.abspath('../../src'))
 
 class Mock(MagicMock):
@@ -108,7 +110,7 @@ html_theme = 'alabaster'
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
-html_static_path = ['_static']
+# html_static_path = ['_static']
 
 
 # -- Options for HTMLHelp output ------------------------------------------

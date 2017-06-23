@@ -3,32 +3,14 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to osisoftpy's documentation!
-=====================================
+OSIsoftPy Reference Document
+==============================
 
-This part of the documentation covers all the interfaces of osisoftpy.
+.. toctree::
+    :caption: Table of Contents
 
-api
-----
-.. autofunction:: osisoftpy.webapi
-
-
-webapi
-------
-.. autoclass:: osisoftpy.WebAPI
-   :inherited-members:
-
-
-point
------
-.. autoclass:: osisoftpy.Point
-   :inherited-members:
-
-value
------
-.. autoclass:: osisoftpy.Value
-   :inherited-members:
-
+    quickstart
+    library
 
 Indices and tables
 ==================
