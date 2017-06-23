@@ -6,14 +6,11 @@
 Welcome to osisoftpy's documentation!
 =====================================
 
-
-.. module:: osisoftpy
-
 This part of the documentation covers all the interfaces of osisoftpy.
 
 api
 ----
-.. autofunction:: webapi
+.. autofunction:: osisoftpy.webapi
 
 
 webapi
