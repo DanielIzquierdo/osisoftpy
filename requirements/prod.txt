@@ -10,7 +10,6 @@ certifi==2017.4.17        # via requests
 chardet==3.0.3            # via requests
 future==0.16.0
 idna==2.5                 # via requests
-mock==2.0.0               # manually added
 pykerberos==1.1.14        # via requests-kerberos
 python-dateutil==2.6.0    # via arrow
 requests-kerberos==0.11.0

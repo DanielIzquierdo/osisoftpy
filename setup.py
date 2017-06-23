@@ -80,8 +80,7 @@ setuptools.setup(
         'future',
         'arrow',
         'requests',
-        'requests-kerberos',
-        'mock'
+        'requests-kerberos'
     ],
     extras_require={
         # eg:
