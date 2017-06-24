@@ -28,21 +28,19 @@ class Value(Base):
     """
     valid_attr = {'calculationtype', 'datatype', 'timestamp', 'value',
                   'unitsabbreviation', 'good', 'questionable', 'substituted'}
+    """
+    Attributes:
+        | type: data type
+        | timestamp: the time stamp for which the value was queried
+        | value: the value of the PI point at the given timestamp
+        | unitsabbreviation: abbreviation for the unit of measure for the PI point
+        | good: boolean flag indicating whether the value is a “good” or “bad” value in PI
+        | questionable: boolean flag indicating whether the value is a questionable value in PI
+        | substituted: boolean flag indicating whether the value was substituted
+    """
 
     def __init__(self, **kwargs):
         super(self.__class__, self).__init__(**kwargs)
-
-        """
-
-        :param type: 
-        :param timestamp: 
-        :param value: 
-        :param unitsabbreviation: 
-        :param good: 
-        :param questionable: 
-        :param substituted: 
-        :rtype: None
-        """
 
     def __str__(self):
         self_str = '<OSIsoft PI Value [{} - {}]>'

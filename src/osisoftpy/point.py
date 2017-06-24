@@ -145,14 +145,7 @@ class Point(Base):
         Returns the value of the stream at the specified time. By default, 
         this is usually the current value. 
 
-        :param time: An optional time. The default time context is 
-            determined from the owning object - for example, the time range of 
-            the event frame or transfer which holds this attribute. Otherwise, 
-            the implementation of the Data Reference determines the meaning of 
-            no context. For Points or simply configured PI Point Data 
-            References, this means the snapshot value of the PI Point on the 
-            Data Server.
-        :param overwrite: An optional boolean. 
+        :param overwrite: Optional – Boolean to determine whether to overwrite the value in Python. Defaults to true.
         :return: :class:`OSIsoftPy <osisoftpy.Value>` object
         :rtype: osisoftpy.Value
         """
@@ -192,9 +185,8 @@ class Point(Base):
             includefilteredvalues=False,
             selectedfields=None,
             overwrite=True ):
-        """
-        Retrieves interpolated values over the specified time range at 
-        the specified sampling interval. 
+        """Retrieves interpolated values over the specified time range at 
+        the specified sampling interval.
 
         :param starttime: An optional start time. The default is '*-1d' for 
             element attributes and points. For event frame attributes, 
@@ -211,8 +203,7 @@ class Point(Base):
             variables are relative to the data point. Use '.' to reference the 
             containing attribute. If the attribute does not support filtering, 
             the filter will be ignored. The default is no filtering. 
-        :param 
-            includefilteredvalues: Specify 'true' to indicate that values which 
+        :param includefilteredvalues: Specify 'true' to indicate that values which 
             fail the filter criteria are present in the returned data at the 
             times where they occurred with a value set to a 'Filtered' 
             enumeration value with bad status. Repeated consecutive failures 
