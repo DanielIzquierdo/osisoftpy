@@ -17,18 +17,53 @@ from datetime import datetime
 import pytz
 
 webapi = osisoftpy.webapi('https://gold.dstcontrols.local/piwebapi')
-points = webapi.points(query='name:SIN*')
-print(len(points))
-def callback(sender):
-    print('Callback {} {}'.format(sender.name, sender.current_value.value))
-webapi.subscribe(points, 'current', callback=callback)
+point = webapi.points(query='name:PythonInserted_test')[0]
+point.update_value('2000-01-01T07:00:00Z', 53)
 
-points.current()
-# print('Point: {} has inital value {} at {}'.format(point.name, value.value, value.timestamp))
+# end_value = point.end()
+# timestamp = end_value.timestamp
+# value = end_value.value
+# print('{}: {}'.format(timestamp, value))
 
-time.sleep(30)
+# summary_values = point.summary(summarytype='Total', starttime='*-1w', endtime='*', summaryduration='1d')
+# for summary_value in summary_values:
+#     calculationtype = summary_value.calculationtype
+#     timestamp = summary_value.timestamp
+#     value = summary_value.value
+#     print('{} is {} starting at {}'.format(calculationtype, value, timestamp))
 
-points.current()
+# def callback_current(sender):
+#     print('CALLBACK: Current Value of {} changed to {} at {}'.format(sender.name, sender.current_value.value, sender.current_value.timestamp))
+# def callback_end(sender):
+#     print('CALLBACK: End Value of {} changed to {} at {}'.format(sender.name, sender.end_value.value, sender.end_value.timestamp)) 
+# webapi.subscribe(points, 'current', callback=callback_current)
+# webapi.subscribe(points, 'end', callback=callback_end)
+# for point in points:
+#     point.current()
+#     point.end()
+# time.sleep(30)
+# for point in points:
+#     point.current()
+#     point.end()
+
+# interpolated_values_at_times = point.interpolatedattimes(['2017-01-01T00:00:00Z','2017-05-03T00:00:00Z'])
+# print('Number of Values for {}: {}'.format(point.name, interpolated_values_at_times.__len__()))
+# for interpolated_value in interpolated_values_at_times:
+#    timestamp = interpolated_value.timestamp
+#    value = interpolated_value.value
+#    print('{}: {}'.format(timestamp, value))
+
+# print(len(points))
+# def callback(sender):
+#     print('Callback {} {}'.format(sender.name, sender.current_value.value))
+# webapi.subscribe(points, 'current', callback=callback)
+
+# points.current()
+# # print('Point: {} has inital value {} at {}'.format(point.name, value.value, value.timestamp))
+
+# time.sleep(30)
+
+# points.current()
 # points = 0
 # points = webapi.points(query='name:EdwinPythonTest')
 # for point in points:

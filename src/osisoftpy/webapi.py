@@ -177,8 +177,17 @@ class WebAPI(Base):
         except Exception as e:
             raise e
 
-    #TODO: Add doc
     def subscribe(self, points, stream, startdatetime=None, enddatetime=None, callback=None):
+        """Monitor whenever the PI point is read and an update has occurred. 
+        Trigger the callback function when the value changes
+
+        :param points: List of Point objects to start monitoring
+        :param stream: Name of the reading method used for monitoring the point. 
+            Options are current, interpolatedattimes, recordedattime, end
+        :param startdatetime: Optional – Timestamp for when to start monitoring
+        :param enddatetime: Optional – Timestamp for when to stop monitoring
+        :param callback: Reference to the function to trigger when an update occurs
+        """
         if not isinstance(points, Points):
             raise TypeError('The object "{}" is not of type "{}"'.format(
                 points, Points))
@@ -194,8 +203,15 @@ class WebAPI(Base):
                     self.signals[signalkey].connect(callback)
         return self.signals
 
-    #TODO: Add doc
-    def unsubscribe(self, points, stream, startdatetime=None, enddatetime=None,):
+    def unsubscribe(self, points, stream, startdatetime=None, enddatetime=None):
+        """Stop monitoring a given list of PI Points for updates
+
+        :param points: List of Point objects to stop monitoring
+        :param stream: Name of the reading method used for monitoring the point. 
+            Options are current, interpolatedattimes, recordedattime, end
+        :param startdatetime: Optional – Timestamp for when to start monitoring
+        :param enddatetime: Optional – Timestamp for when to stop monitoring
+        """
         if not isinstance(points, Points):
             raise TypeError('The object "{}" is not of type "{}"'.format(
                 points, Points))

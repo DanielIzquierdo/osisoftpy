@@ -127,7 +127,10 @@ class Point(Base):
         :param updateoption: Optional. Indicates how to treat multiple values
             with the same timestamp. Default is 'Replace'. 
         :param bufferoption: Optional. Indicates how to buffer values
-            updates. Default is 'BufferIfPossible'. 
+            updates. Default is 'BufferIfPossible'.
+
+        :raises MismatchEntriesError: The number of values in the Timestamps and 
+            Values input list parameters are mismatched
         """
         #throws error if number of timestamps doesn't correspond to number of values
         if len(timestamps) != len(values):
@@ -248,32 +251,26 @@ class Point(Base):
             sortorder='Ascending',
             selectedfields=None,
             overwrite=True ):
-        """
-        Retrieves interpolated values over the specified time range at the 
+        """Retrieves interpolated values over the specified time range at the 
         specified sampling interval. 
 
-        :param time: A list of timestamps at which to retrieve interpolated 
-                values. 
-        :param filterexpression: An 
-            optional string containing a filter expression. Expression 
-            variables are relative to the data point. Use '.' to reference the 
-            containing attribute. If the attribute does not support filtering, 
-            the filter will be ignored. The default is no filtering. 
-        :param 
-            includefilteredvalues: Specify 'true' to indicate that values which 
-            fail the filter criteria are present in the returned data at the 
-            times where they occurred with a value set to a 'Filtered' 
-            enumeration value with bad status. Repeated consecutive failures 
-            are omitted. 
-        :param selectedfields: List of fields to be returned in the 
-            response, separated by semicolons (;). If this parameter is not 
-            specified, all available fields will be returned. 
-        :param sortorder The order that the returned collection is sorted. The 
-            default is 'Ascending'. 
+        :param time: A list of timestamps at which to retrieve interpolated values. 
+        :param filterexpression: Optional – String containing a filter expression. 
+            Expression variables are relative to the data point. Use '.' to reference 
+            the containing attribute. If the attribute does not support filtering, filter 
+            will be ignored. The default is no filtering.
+        :param includefilteredvalues: Optional – Boolean. Specify 'true' to indicate 
+            that values which the filter criteria are present in the returned data at the 
+            times where they occurred with a value set to a 'Filtered' value with bad 
+            status. Repeated consecutive failures are omitted.
+        :param selectedfields: Optional – List of fields to be returned in the response, 
+            separated by semicolons (;). If this parameter is not, all available fields will be returned.
+        :param sortorder: Optional – String ‘Ascending’ or ‘Descending’. Defaults to ‘Ascending’.
+        :param overwrite: Optional – Boolean to determine whether to overwrite the value in 
+            Python. Defaults to true.
         :return: :class:`OSIsoftPy <osisoftpy.structures.TypedList>` object 
-            containing a list of 
-            :class:`OSIsoftPy <osisoftpy.dataarchive.Point>` objects. 
-        :rtype: osisoftpy.TypedList<osisoftpy.Point>
+            containing a list of :class:`OSIsoftPy <osisoftpy.dataarchive.Value>` objects. 
+        :rtype: osisoftpy.TypedList<osisoftpy.Value>
         """
         payload = {
             'time': timestamps,
@@ -323,6 +320,37 @@ class Point(Base):
         selectedFields=None,
         overwrite=True,
         **kwargs):
+        """Retrieve values at intervals designed for plotting on a graph
+
+        :param starttime: Optional – Timestamp or time expression for the 
+            start of the interpolation period. The default is '*-1d' for element 
+            attributes and points. For event frame attributes, the default is 
+            the event frame's start time, or '*-1d' if that is not set.
+        :param endtime: Optional – Timestamp or time expression for the end 
+            of the interpolation period. The default is '*' for element attributes 
+            and points. For event frame attributes, the default is the event frame's 
+            end time, or '*' if that is not set. Note that if endTime is earlier than 
+            startTime, the resulting values will be in time-descending order.
+        :param timezone: Optional – The time zone in which the time string will 
+            be interpreted. This parameter will be ignored if a time zone is specified 
+            in the time string. If no time zone is specified in either places, the PI 
+            Web API server time zone will be used.
+        :param intervals: Optional – The number of intervals to plot over. Typically, 
+            this would be the number of horizontal pixels in the trend. The default is '24'.
+        :param desiredunits: Optional – The name or abbreviation of the desired units 
+            of measure for the returned value, as found in the UOM database associated with 
+            the attribute. If not specified for an attribute, the attribute's default unit 
+            of measure is used. If the underlying stream is a point, this value may not be 
+            specified, as points are not associated with a unit of measure.
+        :param selectedfields: Optional – List of fields to be returned in the response, 
+            eparated by semicolons (;). If this parameter is not, all available fields 
+            ill be returned.
+        :param overwrite: Optional – Boolean to determine whether to overwrite the value 
+            in Python. Defaults to true.
+        :return: :class:`OSIsoftPy<osisoftpy.structures.TypedList>` object 
+            containing a list of :class:`OSIsoftPy<osisoftpy.Value>` objects. 
+        :rtype: osisoftpy.TypedList<osisoftpy.Value>
+        """
 
         payload={
             'startTime': starttime,
@@ -359,8 +387,7 @@ class Point(Base):
             includefilteredvalues=False,
             selectedfields=None,
             overwrite=True):
-        """
-        Returns a list of compressed values for the requested time range 
+        """Returns a list of compressed values for the requested time range 
         from the source provider. 
 
         Returned times are affected by the specified boundary type. If no 
@@ -379,39 +406,33 @@ class Point(Base):
         "Filtered" when the filter conditions are not met at the boundary 
         time. If the includeFilteredValues parameter is false for this case, 
         no event is returned for the boundary time. 
-        :param maxcount: 
-        :param starttime: An optional start time. The default is '*-1d' for 
-            element attributes and points. For event frame attributes, 
-            the default is the event frame's start time, or '*-1d' if that is 
-            not set. 
-        :param endtime: An optional end time. The default is '*' 
-            for element attributes and points. For event frame attributes, 
-            the default is the event frame's end time, or '*' if that is not 
-            set. Note that if endTime is earlier than startTime, the resulting 
-            values will be in time-descending order. 
-        :param boundarytype: An optional value that determines how the times 
-            and values of the returned end points are determined.
-            The default is 'Inside'.
-        :param filterexpression: An optional string containing a filter 
-            expression. Expression variables are relative to the data point. 
-            Use '.' to reference the containing attribute. 
-            The default is no filtering.
-        :param includefilteredvalues: Specify 'true' to indicate that values 
-            which  fail the filter criteria are present in the returned data 
-            at the times where they occurred with a value set to a 'Filtered' 
-            enumeration value with bad status. Repeated consecutive failures 
-            are omitted. 
-        :param selectedfields: List of fields to be returned in the 
-            response, separated by semicolons (;). If this parameter is not 
-            specified, all available fields will be returned. This parameter 
-            filters PI Web API response so that the response only includes a 
-            selected set of fields. It allows PI Web API to return none but the 
-            information that you are interested in, and therefore reduce your 
-            bandwidth usage. 
-        :return: :class:`OSIsoftPy <osisoftpy.structures.TypedList>` 
-            object containing a list of :class:`OSIsoftPy 
-            <osisoftpy.dataarchive.Point>` objects. :rtype: 
-            osisoftpy.TypedList<osisoftpy.Point> 
+
+        :param starttime: Optional – Timestamp or time expression for the start 
+            of the interpolation period. The default is '*-1d' for element attributes 
+            and points. For event frame attributes, the default is the event frame's 
+            start time, or '*-1d' if that is not set.
+        :param endtime: Optional – Timestamp or time expression for the end of the 
+            interpolation period. The default is '*' for element attributes and points. 
+            For event frame attributes, the default is the event frame's end time, or '*' 
+            if that is not set. Note that if endTime is earlier than startTime, the 
+            resulting values will be in time-descending order.
+        :param boundarytype: Optional – String that determines how the times and values 
+            of the returned end points are determined. Default is 'Inside'.
+        :param filterexpression: Optional – String containing a filter expression. 
+            Expression variables are relative to the data point. Use '.' to reference the 
+            containing attribute. If the attribute does not support filtering, filter will 
+            be ignored. The default is no filtering.
+        :param maxcount: Optional – Maximum number of values to retrieve. Defaults to 1000.
+        :param includefilteredvalues: Optional – Boolean. Specify 'true' to indicate that 
+            values which the filter criteria are present in the returned data at the times 
+            where they occurred with a value set to a 'Filtered' value with bad status. 
+            Repeated consecutive failures are omitted.
+        :param selectedfields: Optional – List of fields to be returned in the response, 
+            separated by semicolons (;). If this parameter is not, all available fields 
+            will be returned.
+        :return: :class:`OSIsoftPy<osisoftpy.structures.TypedList>` 
+            object containing a list of :class:`OSIsoftPy<osisoftpy.Value>` objects. 
+        :rtype: osisoftpy.TypedList<osisoftpy.Value> 
         """
         payload = {
             'starttime': starttime,
@@ -455,15 +476,15 @@ class Point(Base):
             The default is 'Auto'. The retrieval mode is an enumeration of the 
             possible values for retrieving recorded values from a stream. 
             The following values are accepted:
-            Auto: Automatically determine the best retrieval mode.
-            AtOrBefore: Return a recorded value at the passed time or if no 
-                value exists at that time, the previous recorded value.
-            Before: Return the first recorded value before the passed time.
-            AtOrAfter: Return a recorded value at the passed time or if no 
-                value exists at that time, the next recorded value.
-            After: Return the first recorded value after the passed time.
-            Exact: Return a recorded value at the passed time or return an 
-                error if none exists.
+            * Auto: Automatically determine the best retrieval mode.
+            * AtOrBefore: Return a recorded value at the passed time or if no 
+            value exists at that time, the previous recorded value.
+            * Before: Return the first recorded value before the passed time.
+            * AtOrAfter: Return a recorded value at the passed time or if no 
+            value exists at that time, the next recorded value.
+            * After: Return the first recorded value after the passed time.
+            * Exact: Return a recorded value at the passed time or return an 
+            error if none exists.
         :param selectedfields: List of fields to be returned in the 
             response, separated by semicolons (;). If this parameter is not 
             specified, all available fields will be returned. 
