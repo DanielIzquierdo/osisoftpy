@@ -24,13 +24,14 @@ from osisoftpy.base import Base
 
 class Value(Base):
     """
-    The Value class provides methods for the available PI points
+    The Value class provides the response from methods for the available PI points
     """
     valid_attr = {'calculationtype', 'datatype', 'timestamp', 'value',
                   'unitsabbreviation', 'good', 'questionable', 'substituted'}
     """
     Attributes:
-        | type: data type
+        | calculationtype: time or event weighted / summary type
+        | datatype: data type
         | timestamp: the time stamp for which the value was queried
         | value: the value of the PI point at the given timestamp
         | unitsabbreviation: abbreviation for the unit of measure for the PI point

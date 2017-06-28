@@ -5,18 +5,15 @@
 
 OSIsoftPy Reference Document
 ==============================
+Release v\ |version|.
+
 
 .. toctree::
+    :maxdepth: 2
     :caption: Table of Contents
 
     quickstart
-    library
-
-Indices and tables
-==================
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
+    userguide
+    exceptions
 
 {I, l, 1}, {Q, O, 0}, {S, 5}, {Z, 2}

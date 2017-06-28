@@ -1,5 +1,5 @@
-Library
-========
+User Guide
+===========
 
 Importing the Library 
 ----------------------
@@ -28,6 +28,11 @@ Before performing any read/write operations, the webapi must be queried for PI p
 
 Example:
     >>> points = webapi.points(query='name:CD* or name:SINU*', count=100)
+
+Each point has the following proporties:
+
+.. autoclass:: osisoftpy.Point
+.. autoattribute:: osisoftpy.Point.valid_attr
 
 Reading Values from PI Points 
 ------------------------------

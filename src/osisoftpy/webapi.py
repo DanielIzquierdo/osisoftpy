@@ -35,9 +35,6 @@ log = logging.getLogger(__name__)
 
 
 class WebAPI(Base):
-    """
-
-    """
     valid_attr = {'links', 'session', 'debug'}
 
     def __init__(self, **kwargs):
@@ -66,9 +63,9 @@ class WebAPI(Base):
             count=10,
             start=0, ):
         """Sends a request to the PI Web API instance using the provided 
-        search query and returned item count. If successful, a list of 
-        Points will be returned. 
-
+        search query and returned item count. If successful, a Points object 
+        will be returned. 
+        
         :param query: One or many terms, in the form of field:value,
             like 'name:pump'. If no field is specfied, like 'pump', then the 
             following fields will all be used: name, description, afcategories, 
@@ -104,7 +101,7 @@ class WebAPI(Base):
             10 per page.
         :param start: Index of search result to begin with. The 
             default is to start at index 0.
-        :return: :class:`Points <Points>` object containing :class:`Point <Point>` object
+        :return: :class:`osisoftpy.Points` object containing :class:`osisoftpy.Point`
         :rtype: osisoftpy.Points
         """
         r = self.request(
@@ -181,12 +178,12 @@ class WebAPI(Base):
         """Monitor whenever the PI point is read and an update has occurred. 
         Trigger the callback function when the value changes
 
-        :param points: List of Point objects to start monitoring
-        :param stream: Name of the reading method used for monitoring the point. 
+        :param Points points: List of Point objects to start monitoring
+        :param string stream: Name of the reading method used for monitoring the point. 
             Options are current, interpolatedattimes, recordedattime, end
-        :param startdatetime: Optional – Timestamp for when to start monitoring
-        :param enddatetime: Optional – Timestamp for when to stop monitoring
-        :param callback: Reference to the function to trigger when an update occurs
+        :param string startdatetime: Optional – Timestamp for when to start monitoring
+        :param string enddatetime: Optional – Timestamp for when to stop monitoring
+        :param func callback: Reference to the function to trigger when an update occurs
         """
         if not isinstance(points, Points):
             raise TypeError('The object "{}" is not of type "{}"'.format(
@@ -206,11 +203,11 @@ class WebAPI(Base):
     def unsubscribe(self, points, stream, startdatetime=None, enddatetime=None):
         """Stop monitoring a given list of PI Points for updates
 
-        :param points: List of Point objects to stop monitoring
-        :param stream: Name of the reading method used for monitoring the point. 
+        :param Points points: List of Point objects to stop monitoring
+        :param string stream: Name of the reading method used for monitoring the point. 
             Options are current, interpolatedattimes, recordedattime, end
-        :param startdatetime: Optional – Timestamp for when to start monitoring
-        :param enddatetime: Optional – Timestamp for when to stop monitoring
+        :param string startdatetime: Optional – Timestamp for when to start monitoring
+        :param string enddatetime: Optional – Timestamp for when to stop monitoring
         """
         if not isinstance(points, Points):
             raise TypeError('The object "{}" is not of type "{}"'.format(
