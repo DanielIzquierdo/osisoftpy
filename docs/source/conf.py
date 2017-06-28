@@ -19,9 +19,9 @@
 import os
 import sys
 # mock package for python version 2.7-3.2 (use this for readthedocs)
-# from mock import Mock as MagicMock
+from mock import Mock as MagicMock
 # unittest.test package for python version 3.3+
-from unittest.mock import MagicMock
+# from unittest.mock import MagicMock
 sys.path.insert(0, os.path.abspath('../../src'))
 
 class Mock(MagicMock):

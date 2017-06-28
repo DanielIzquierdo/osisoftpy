@@ -99,7 +99,7 @@ def callback(sender):
 
 # test getvalue
 @pytest.mark.skipif(True, reason='Method only used for internal testing')
-@pytest.mark.parametrize('query', ['name:EdwinPythonTest*'])
+@pytest.mark.parametrize('query', ['name:PythonInserted_appveyor*'])
 @pytest.mark.parametrize('stream', ['getvalue'])
 def test_subscription_getvalue(webapi, query, stream, callback=callback):
     updated_points[:] = []
@@ -116,7 +116,7 @@ def callback_current(sender):
     updated_points_current.append(sender)
 
 # test current_value
-@pytest.mark.parametrize('query', ['name:EdwinPythonTest*'])
+@pytest.mark.parametrize('query', ['name:PythonInserted_appveyor'])
 @pytest.mark.parametrize('stream', ['current'])
 def test_subscription_current(webapi, query, stream, callback=callback_current):
     #clear array from previous tests
@@ -128,7 +128,7 @@ def test_subscription_current(webapi, query, stream, callback=callback_current):
         v1 = point.current()
         point.update_values(["*"], [random.uniform(0,100)])
         v2 = point.current()
-    assert len(updated_points_current) == 2 # both points updated
+    assert len(updated_points_current) == 1 # one point updated
     subscriptions = webapi.unsubscribe(points, stream)
 
 updated_points_end = []
@@ -136,7 +136,7 @@ def callback_end(sender):
     updated_points_end.append(sender)
 
 # test end_value
-@pytest.mark.parametrize('query', ['name:EdwinPythonEndTest'])
+@pytest.mark.parametrize('query', ['name:PythonInserted_travis'])
 @pytest.mark.parametrize('stream', ['end'])
 def test_subscription_end(webapi, query, stream, callback=callback_end):
     #clear array from previous tests
