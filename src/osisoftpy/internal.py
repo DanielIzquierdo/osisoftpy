@@ -23,6 +23,7 @@ from __future__ import (absolute_import, division, unicode_literals)
 from future.builtins import *
 import logging
 import requests
+import time
 from osisoftpy.structures import APIResponse
 from osisoftpy.exceptions import (PIWebAPIError, Unauthorized, HTTPError)
 
@@ -45,21 +46,33 @@ def get(url, session, params=None):
     :rtype: osisoftpy.APIResponse
     """
     s = session
+    isCrawling = True
 
     with s:
         try:
-            r = APIResponse(s.get(url, params=params), s)
-            if r.response.status_code == 401:
-                raise Unauthorized(
-                    'Authorization denied - incorrect username or password.')
-            if r.response.status_code != 200:
-                raise HTTPError(
-                    'Wrong server response: %s %s' %
-                    (r.response.status, r.response.reason))
-            json = r.response.json()
-            if 'Errors' in json and json.get('Errors').__len__() > 0:
-                msg = 'PI Web API returned an error: {}'
-                raise PIWebAPIError(msg.format(json.get('Errors')))
+            while isCrawling:
+                isCrawling = False
+                r = APIResponse(s.get(url, params=params), s)
+                if r.response.status_code == 401:
+                    raise Unauthorized(
+                        'Authorization denied - incorrect username or password.')
+                if r.response.status_code != 200:
+                    raise HTTPError(
+                        'Wrong server response: %s %s' %
+                        (r.response.status, r.response.reason))
+                json = r.response.json()
+                if 'Errors' in json and json.get('Errors').__len__() > 0:
+                    error = json.get('Errors')[0]
+                    if(error['ErrorCode'] == 20):
+                        print('Database is being crawled. Retrying in 5 sec.')
+                        isCrawling = True
+                        time.sleep(5)
+
+                        # should we terminate if database is stuck in crawling state?
+                        
+                    else:
+                        msg = 'PI Web API returned an error: {}'
+                        raise PIWebAPIError(msg.format(error))
             return r
         except:
             raise

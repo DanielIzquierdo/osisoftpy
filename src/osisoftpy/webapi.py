@@ -25,6 +25,7 @@ from dateutil import parser
 from datetime import datetime
 import logging
 import blinker
+import re
 from osisoftpy.base import Base
 from osisoftpy.factory import Factory, create
 from osisoftpy.internal import get
@@ -36,6 +37,7 @@ log = logging.getLogger(__name__)
 
 class WebAPI(Base):
     valid_attr = {'links', 'session', 'debug'}
+    dataservers = []
 
     def __init__(self, **kwargs):
         super(self.__class__, self).__init__(**kwargs)
@@ -60,7 +62,7 @@ class WebAPI(Base):
             query,
             scope=None,
             fields=None,
-            count=10,
+            count=100,
             start=0, ):
         """Sends a request to the PI Web API instance using the provided 
         search query and returned item count. If successful, a Points object 
@@ -104,16 +106,29 @@ class WebAPI(Base):
         :return: :class:`osisoftpy.Points` object containing :class:`osisoftpy.Point`
         :rtype: osisoftpy.Points
         """
-        r = self.request(
-            query=query, scope=scope, fields=fields, count=count, start=start)
-        y = r.json().get('Items', None)
-        p = Points(list([
-            create(Factory(Point), x, self.session, self)
-            for x in r.json().get('Items', None) if x['ItemType'] == 'pipoint'
-        ]), self)
-        # self._points.extend(p)
-        # return self._points
-        return p
+
+        # Later TODO: Implement PI Point / AF Attribute condition
+        # note, name: also returns af element; is there a need to return a list of attributes from that element
+
+        totalitems = 0
+        totalhits = None
+        points = Points([], self)
+        
+        while(not totalhits or totalitems < totalhits):
+            r = self.request(
+                query=query, scope=scope, fields=fields, count=count, start=start)
+            items = r.json().get('Items', None)
+            totalhits = r.json().get('TotalHits', None)
+            totalitems += items.__len__()
+            points = Points(points.list + list([
+                create(Factory(Point), x, self.session, self)
+                for x in items if x['ItemType'] == 'pipoint'
+            ]), self)
+            start = start + count
+
+        [self._map_dataserver_to_point(point) for point in points]
+        # [print point.Name for point in points]
+        return points
 
     def request(
             self,
@@ -222,6 +237,16 @@ class WebAPI(Base):
                 pass
         return self.signals
 
+    def piservers(self):
+        for dataserver in self.dataservers:
+            print('pi:' + dataserver.name)
+
+    def _map_dataserver_to_point(self, point):
+        uniqueid = point.uniqueid
+        serverid = re.search('{(.*?)}', uniqueid).group(1)
+        point.dataserver = next((dataserver for dataserver in self.dataservers if dataserver.id == serverid), None)
+        # next(dataserver for dataserver in self.dataservers if dataserver.Id==serverid)
+
     def _parse_timestamp(self, datetime):
         if datetime:
             parseddatetime = parser.parse(datetime)
@@ -229,3 +254,4 @@ class WebAPI(Base):
         else:  
             formatteddatetime = None
         return formatteddatetime
+    

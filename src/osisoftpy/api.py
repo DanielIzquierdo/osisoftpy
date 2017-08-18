@@ -30,6 +30,7 @@ from osisoftpy.structures import APIResponse
 from osisoftpy.exceptions import (PIWebAPIError, Unauthorized, HTTPError)
 from osisoftpy.factory import Factory, create
 from osisoftpy.webapi import WebAPI
+from osisoftpy.dataserver import DataServer
 
 log = logging.getLogger(__name__)
 
@@ -81,6 +82,15 @@ def webapi(
         if 'Errors' in json and json.get('Errors').__len__() > 0:
             msg = 'PI Web API returned an error: {}'
             raise PIWebAPIError(msg.format(json.get('Errors')))
-        return create(Factory(WebAPI), json, r.session)
+
+        piserverlink = json['Links']['DataServers']
+        piresponse = APIResponse(s.get(piserverlink), s)
+        pijson = piresponse.response.json().get('Items', None)
+
+        webapi = create(Factory(WebAPI), json, r.session)
+        webapi.dataservers = list([create(Factory(DataServer), serveritem, webapi.session, webapi) 
+            for serveritem in pijson])
+
+        return webapi
     except:
         raise

@@ -25,6 +25,7 @@ from future.builtins import *
 import logging
 import warnings
 import json
+import re
 
 from datetime import datetime
 from dateutil import parser
@@ -51,6 +52,8 @@ class Point(Base):
 
     valid_attr = {'name', 'description', 'uniqueid', 'webid', 'datatype',
                   'links', 'session', 'webapi'}
+    dataserver = None
+    
     """
     Attributes:
         | name: Point name
@@ -74,7 +77,6 @@ class Point(Base):
         self.plot_values = None
         self.summary_values = None
         self.end_value = None
-        #test
         self.value_value = None
 
     def __str__(self):
@@ -111,6 +113,7 @@ class Point(Base):
         payload = {'updateOption': updateoption, 'bufferOption': bufferoption }
         request = {'Timestamp': timestamp, 'Value': value, 'UnitsAbbreviation': unitsabbreviation, 'Good':good, 'Questionable':questionable}
         self._post_values(payload, request, 'value')
+        
 
     def update_values(self, timestamps, values, unitsabbreviation=None, good=None, questionable=None, updateoption='Replace', bufferoption='BufferIfPossible'):
         """
@@ -636,6 +639,7 @@ class Point(Base):
         url = '{}/{}/{}/{}'.format(
             self.webapi.links.get('Self'), controller, self.webid, endpoint)
         r = get(url, self.session, params=payload, **kwargs)
+        
         value = create(Factory(Value), r.response.json(), self.session,
                        self.webapi)
         return value
@@ -682,7 +686,7 @@ class Point(Base):
         else:  
             formatteddatetime = None
         return formatteddatetime
-    
+
     def getvalue(self, time=None, overwrite=True):
         """
         Test method
