@@ -80,8 +80,8 @@ def query():
     Query = namedtuple('Query', ['single', 'partial', 'wildcard', 'multi'])
     query = Query(single='name:sinusoid',
                   partial='name:sinusoid*',
-                  wildcard='*SPF_environment_sensor*',
-                  multi='name:sinusoid or name:cdt158 or name:cd*')
+                  wildcard='name:*SPF_environment_sensor*',
+                  multi='name:sinusoid OR name:cdt158 OR name:cd*')
     return query
 
 

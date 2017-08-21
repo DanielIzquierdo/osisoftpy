@@ -110,24 +110,28 @@ class WebAPI(Base):
         # Later TODO: Implement PI Point / AF Attribute condition
         # note, name: also returns af element; is there a need to return a list of attributes from that element
 
+        safetycount = 0
         totalitems = 0
         totalhits = None
         points = Points([], self)
         
-        while(not totalhits or totalitems < totalhits):
+        while((totalhits is None or totalitems < totalhits) and safetycount < 10):
             r = self.request(
                 query=query, scope=scope, fields=fields, count=count, start=start)
-            items = r.json().get('Items', None)
-            totalhits = r.json().get('TotalHits', None)
+            items = r.json().get('Items', [])
+            totalhits = r.json().get('TotalHits', 0)
             totalitems += items.__len__()
             points = Points(points.list + list([
                 create(Factory(Point), x, self.session, self)
                 for x in items if x['ItemType'] == 'pipoint'
             ]), self)
             start = start + count
+            safetycount += 1
+        
+        if safetycount == 10:
+            print('Max number of items returned. Please increase ''count'' parameter value for more results')
 
         [self._map_dataserver_to_point(point) for point in points]
-        # [print point.Name for point in points]
         return points
 
     def request(

@@ -41,7 +41,7 @@ sample_query = type('Query', (object,), {})()
 sample_query.single_tag = 'name:sinusoid'
 sample_query.multi_tag = 'name:sinusoid or name:cdt158 or name:cd*'
 sample_query.partial_tag = 'name:sinusoid*'
-sample_query.wildcard = '*SPF_environment_sensor*'
+sample_query.wildcard = 'name:*SPF_environment_sensor*'
 sample_query.calctypes = ['current', 'interpolated', 'interpolatedattimes',
                           'recorded', 'recordedattime', 'plot', 'summary']
 
