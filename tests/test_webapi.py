@@ -93,6 +93,11 @@ def test_webapi_points_query(webapi, query):
     msg = '{} points were retrieved with the query "{}"'
     print(msg.format(points.__len__(), query))
 
+def test_webapi_points_scope(webapi):
+    points = webapi.points(query='SINUSOID*', scope='pi:gold')
+    assert points.__len__() == 4
+
+
 # Subscription tests
 
 # a list to store modified points in:
