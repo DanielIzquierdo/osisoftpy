@@ -26,6 +26,7 @@ from osisoftpy.exceptions import (PIWebAPIError)
 from osisoftpy.webapi import (WebAPI)
 from osisoftpy.point import (Point)
 from osisoftpy.value import (Value)
+from osisoftpy.dataserver import DataServer
 from osisoftpy.api import webapi
 
 __author__ = 'Andrew Pong'

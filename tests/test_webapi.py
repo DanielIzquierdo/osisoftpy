@@ -26,12 +26,15 @@ import osisoftpy
 import pytest
 import requests
 import random
+import time
 
 from datetime import datetime, timedelta
 from dateutil import parser
 
 from .conftest import query
 
+# https://techsupport.osisoft.com/Troubleshooting/Known-Issues/176830
+piserverissue = True
 
 def test_get_webapi_object(webapi):
     assert type(webapi) == osisoftpy.WebAPI
@@ -127,6 +130,7 @@ def test_subscription_current(webapi, query, stream, callback=callback_current):
     for point in points:
         v1 = point.current()
         point.update_values(["*"], [random.uniform(0,100)])
+        time.sleep(0.5)
         v2 = point.current()
     assert len(updated_points_current) == 1 # one point updated
     subscriptions = webapi.unsubscribe(points, stream)
@@ -146,8 +150,10 @@ def test_subscription_end(webapi, query, stream, callback=callback_end):
     subscriptions = webapi.subscribe(points, stream, callback=callback_end)
     for point in points:
         point.update_values(["*"], [random.uniform(0,100)])
+        time.sleep(0.5)
         v1 = point.end()
         point.update_values(["*+1m"], [random.uniform(0,100)])
+        time.sleep(0.5)
         v2 = point.end()
     assert len(updated_points_end) == 1
     subscriptions = webapi.unsubscribe(points, stream)
@@ -157,35 +163,40 @@ def callback_interp_1(sender):
     updated_points_interp_1.append(sender)
 
 # test interpolatedattimes - assumes no one has used this tag
+# @pytest.mark.skipif(piserverissue, reason='PI Server times out when retrieving archived values')
 @pytest.mark.parametrize('query', ['name:PythonInterpolatedAtTime'])
-@pytest.mark.parametrize('times', [['2017-01-01T00:00:00Z']])
-def test_subscription_interpolatedattimes_single_timestamp_notify_one(webapi, query, times, ci, pythonversion, callback=callback_interp_1):
+# @pytest.mark.parametrize('times', [['2017-01-01T00:00:00Z']])
+def test_subscription_interpolatedattimes_single_timestamp_notify_one(webapi, query, now, ci, pythonversion, callback=callback_interp_1):
     #clear array from previous tests
     updated_points_interp_1[:] = []
-
+    times = [now.shift(hours=-168).format('YYYY-MM-DD HH:mm:ss ZZ')]
     #query points (should be 1)
     points = webapi.points(query='{}_{}{}'.format(query, ci, pythonversion))
     for point in points:
-        for time in times:
+        for t in times:
             #subscriber each timestamp for this point
-            webapi.subscribe(points, 'interpolatedattimes', startdatetime=time, callback=callback_interp_1)
+            webapi.subscribe(points, 'interpolatedattimes', startdatetime=t, callback=callback_interp_1)
 
             #setup with values here: insert a value 1 day before and after timestamp: 0 to 1000
             #datetime is parsed so days can added/subtracted
-            parseddatetime = parser.parse(time)
-            date1 = (parseddatetime + timedelta(days=-1)).strftime('%Y-%m-%dT%H:%M:%SZ')
+            parseddatetime = parser.parse(t)
+            date1 = (parseddatetime + timedelta(minutes=-1)).strftime('%Y-%m-%dT%H:%M:%SZ')
             point.update_value(date1, 0)
-            date2 = (parseddatetime + timedelta(days=1)).strftime('%Y-%m-%dT%H:%M:%SZ')
+            time.sleep(0.5)
+
+            date2 = (parseddatetime + timedelta(minutes=1)).strftime('%Y-%m-%dT%H:%M:%SZ')
             point.update_value(date2, 1000)
+            time.sleep(0.5)
 
             #gets initial value for subscriber
-            point.interpolatedattimes([time])
+            point.interpolatedattimes([t])
 
             #updates after value to 500, so there should be a new interpolated value
-            point.update_value(date2, 500)
+            point.update_value(date1, 500)
+            time.sleep(0.5)
 
             #queries new point and should trigger callback function
-            point.interpolatedattimes([time])
+            point.interpolatedattimes([t])
     assert len(updated_points_interp_1) == 1
     webapi.unsubscribe(points, 'interpolatedattimes')
     
@@ -194,37 +205,42 @@ def callback_interp_2(sender):
     updated_points_interp_2.append(sender)
 
 # test interpolatedattimes - assumes no one has used this tag
+# @pytest.mark.skipif(piserverissue, reason='PI Server times out when retrieving archived values')
 @pytest.mark.parametrize('query', ['name:PythonInterpolatedAtTime'])
-@pytest.mark.parametrize('times', [['2016-05-01T00:00:00Z','2016-06-01T00:00:00Z']])
-def test_subscription_interpolatedattimes_single_timestamp_notify_two(webapi, query, times, ci, pythonversion, callback=callback_interp_2):
+# @pytest.mark.parametrize('times', [['2016-05-01T00:00:00Z','2016-06-01T00:00:00Z']])
+def test_subscription_interpolatedattimes_single_timestamp_notify_two(webapi, query, now, ci, pythonversion, callback=callback_interp_2):
     #clear array from previous tests
     updated_points_interp_2[:] = []
-    
+    times = [now.shift(hours=-48).format('YYYY-MM-DD HH:mm:ss ZZ'), now.shift(hours=-96).format('YYYY-MM-DD HH:mm:ss ZZ')]
     #query points (should be 1)
     points = webapi.points(query='{}_{}{}'.format(query, ci, pythonversion))
     for point in points:
-        for time in times:
+        for t in times:
             #subscriber each timestamp for this point
-            webapi.subscribe(points, 'interpolatedattimes', startdatetime=time, callback=callback_interp_2)
+            webapi.subscribe(points, 'interpolatedattimes', startdatetime=t, callback=callback_interp_2)
 
             #setup with values here: insert a value 1 day before and after timestamp: 0 to 1000
             #datetime is parsed so days can added/subtracted
-            parseddatetime = parser.parse(time)
-            date1 = (parseddatetime + timedelta(days=-1)).strftime('%Y-%m-%dT%H:%M:%SZ')
+            parseddatetime = parser.parse(t)
+            date1 = (parseddatetime + timedelta(minutes=-1)).strftime('%Y-%m-%dT%H:%M:%SZ')
             point.update_value(date1, 0)
-            date2 = (parseddatetime + timedelta(days=1)).strftime('%Y-%m-%dT%H:%M:%SZ')
+            time.sleep(0.5)
+
+            date2 = (parseddatetime + timedelta(minutes=1)).strftime('%Y-%m-%dT%H:%M:%SZ')
             point.update_value(date2, 1000)
+            time.sleep(0.5)
 
     #gets initial values for subscriber
     point.interpolatedattimes(times)
 
     #queries new value and should trigger callback function
     for point in points:
-        for time in times:
+        for t in times:
             #updates after value to 500, so there should be a new interpolated value
-            parseddatetime = parser.parse(time)
-            date2 = (parseddatetime + timedelta(days=1)).strftime('%Y-%m-%dT%H:%M:%SZ')
+            parseddatetime = parser.parse(t)
+            date2 = (parseddatetime + timedelta(minutes=1)).strftime('%Y-%m-%dT%H:%M:%SZ')
             point.update_value(date2, 500)
+            time.sleep(0.5)
 
     point.interpolatedattimes(times)
     assert updated_points_interp_2.__len__() == 2
@@ -235,22 +251,28 @@ def callback_recorded(sender):
     updated_points_recorded.append(sender)
 
 # test recordedattimes - assumes no one has used this tag
+# @pytest.mark.skipif(piserverissue, reason='PI Server times out when retrieving archived values')
 @pytest.mark.parametrize('query', ['name:PythonRecordedAtTime'])
-@pytest.mark.parametrize('time', ['2017-01-01T00:00:00Z','2017-01-02T00:00:00Z'])
-def test_subscription_recordedattimes(webapi, query, time, ci, pythonversion, callback=callback_recorded):
+# @pytest.mark.parametrize('time', ['2017-01-01T00:00:00Z','2017-01-02T00:00:00Z'])
+def test_subscription_recordedattimes(webapi, query, now, ci, pythonversion, callback=callback_recorded):
     #clear array from previous test
     updated_points_recorded[:] = []
+
+    t = now.shift(hours=-26).format('YYYY-MM-DD HH:mm:ss ZZ')
 
     #query points (should be 1)
     points = webapi.points(query='{}_{}{}'.format(query, ci, pythonversion))
     for point in points:
-        webapi.subscribe(points, 'recordedattime', startdatetime=time, callback=callback_recorded)
+        webapi.subscribe(points, 'recordedattime', startdatetime=t, callback=callback_recorded)
         # parseddatetime = parser.parse(time)
         # date = (parseddatetime + timedelta(days=-1)).strftime('%Y-%m-%dT%H:%M:%SZ')
-        point.update_value(time, 134)
-        point.recordedattime(time)
-        point.update_value(time, 160)
+        point.update_value(t, 134)
+        time.sleep(0.5)
+
+        point.recordedattime(t)
+        point.update_value(t, 160)
+        time.sleep(0.5)
         #should trigger callback function
-        point.recordedattime(time)
+        point.recordedattime(t)
     assert len(updated_points_recorded) == 1
     webapi.unsubscribe(points, 'recordedattime')
