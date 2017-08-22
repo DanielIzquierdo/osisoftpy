@@ -186,3 +186,18 @@ def test_points_recorded_returns_one_value(
         # for value in values:
         #     print('Point {}, recorded value {} {}: {}'.format(
         #         point.name, retrievalmode, now, value.value))
+
+@pytest.mark.parametrize('query', ['name:sinusoid'])
+def test_point_contains_dataserver(
+    webapi, query
+):
+    payload = dict(query=query)
+    points = webapi.points(**payload)
+    assert all(isinstance(x.dataserver, osisoftpy.DataServer) for x in points)
+
+def test_webapi_dispalys_dataserver_helper(
+    webapi, capfd
+):
+    webapi.piservers()
+    out, err = capfd.readouterr()
+    assert 'pi:' in out
