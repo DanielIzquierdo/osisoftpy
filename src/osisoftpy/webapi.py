@@ -78,9 +78,9 @@ class WebAPI(Base):
             end of a keyword, like 'boilr~' will match 'boiler'. 
         
             If multiple terms are entered, they are assumed to be ORed together. 
-            If that's not appropriate, you can specify AND, OR, and NOT 
-            operators, along with parenthesis to create a complex query. For 
-            example '(vibration* AND datatype:float32) OR afelementtemplate:pump' 
+            If that's not appropriate, you can specify AND, OR, and NOT (must be
+            capitalized) operators, along with parenthesis to create a complex query. 
+            For example '(vibration* AND datatype:float32) OR afelementtemplate:pump' 
             Special characters are used through the keyword syntax, so those 
             characters must be escaped if they are in a literal search term. The 
             following characters must be escaped with a backslash: + - && || ! ( 
@@ -100,7 +100,7 @@ class WebAPI(Base):
             by default: paths; parents; explain (must be paired with the links 
             field)
         :param count: Max number of results to return. The default is 
-            10 per page.
+            100 per page.
         :param start: Index of search result to begin with. The 
             default is to start at index 0.
         :return: :class:`osisoftpy.Points` object containing :class:`osisoftpy.Point`

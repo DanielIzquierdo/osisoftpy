@@ -73,7 +73,7 @@ def test_webapi_query_sinusoid(webapi):
 
 def test_webapi_points_sinusoid(webapi):
     tag = 'sinusoid'
-    payload = dict(query="name:{}".format(tag), count=10)
+    payload = dict(query="name:{}".format(tag), count=10, scope='pi:gold')
     r = webapi.points(**payload)
     assert all(isinstance(x, osisoftpy.Point) for x in r)
     assert r.__len__() == 1
@@ -94,8 +94,12 @@ def test_webapi_points_query(webapi, query):
     print(msg.format(points.__len__(), query))
 
 def test_webapi_points_scope(webapi):
-    points = webapi.points(query='SINUSOID*', scope='pi:gold')
+    points = webapi.points(query='name:SINUSOID*', scope='pi:gold')
     assert points.__len__() == 4
+
+def test_webapi_points_pagination(webapi):
+    points = webapi.points(query='name:S*')
+    assert points.__len__() == 398
 
 
 # Subscription tests
