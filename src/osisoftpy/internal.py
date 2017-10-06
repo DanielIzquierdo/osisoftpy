@@ -59,7 +59,7 @@ def get(url, session, params=None):
                 if r.response.status_code != 200:
                     raise HTTPError(
                         'Wrong server response: %s %s' %
-                        (r.response.status, r.response.reason))
+                        (r.response.status_code, r.response.reason))
                 json = r.response.json()
                 if 'Errors' in json and json.get('Errors').__len__() > 0:
                     error = json.get('Errors')[0]
