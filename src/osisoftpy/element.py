@@ -40,7 +40,7 @@ class Element(Base):
         | path: Path for the AF Element
         | templatename: Name of template that this element belongs to
         | haschildren: Is this element a parent element of another element
-        | categorynames: Name of category that this element belongs to
+        | categorynames: List of categories that this element belongs to
         | extendedproperties: WebAPI object
         | links: Direct Link to the PI Web API 
     """

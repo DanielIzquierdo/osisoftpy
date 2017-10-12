@@ -39,18 +39,27 @@ class Attribute(Base):
         | id: Unique GUID for the attribute created by the PI System
         | name: Attribute name
         | description: Description for the AF Attribute
-        | path: Path for the AF Element
-        | templatename: Name of template that this element belongs to
+        | path: Path for the AF Attribute
+        | type: Data type
+        | typequalifier: More specific type (such as enumeration sets)
+        | defaultunitsname: Unit of measure
+        | datareferenceplugin: Type of data retrieval method
+        | configstring: AF attribute configuration string
+        | isconfigurationitem: Is configuration attribute
+        | isexcluded: Is from template but excluded
+        | ishidden: Is hidden in AF
+        | ismanualdataentry: Is an attribute that requires manual data entry
         | haschildren: Is this element a parent element of another element
-        | categorynames: Name of category that this element belongs to
-        | extendedproperties: WebAPI object
+        | categorynames: List of categories that this element belongs to
+        | step: Is the value stepped
+        | traitname: Specifies the name of the attribute trait
         | links: Direct Link to the PI Web API 
     """
 
     def __init__(self, **kwargs):
         super(self.__class__, self).__init__(**kwargs)
 
-        self.elements = {}
+        self.element = None
         self.attributes = {}
         self.database = None
         self.categories = {}
