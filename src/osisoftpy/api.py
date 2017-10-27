@@ -31,6 +31,7 @@ from osisoftpy.exceptions import (PIWebAPIError, Unauthorized, HTTPError)
 from osisoftpy.factory import Factory, create
 from osisoftpy.webapi import WebAPI
 from osisoftpy.dataserver import DataServer
+from osisoftpy.assetserver import AssetServer
 
 log = logging.getLogger(__name__)
 
@@ -90,6 +91,13 @@ def webapi(
         webapi = create(Factory(WebAPI), json, r.session)
         webapi.dataservers = list([create(Factory(DataServer), serveritem, webapi.session, webapi) 
             for serveritem in pijson])
+
+        afserverlink = json['Links']['AssetServers']
+        afresponse = APIResponse(s.get(afserverlink), s)
+        afjson = afresponse.response.json().get('Items', None)
+
+        webapi.assetservers = list([create(Factory(AssetServer), serveritem, webapi.session, webapi) 
+            for serveritem in afjson])
 
         return webapi
     except:

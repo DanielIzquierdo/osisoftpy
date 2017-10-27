@@ -60,6 +60,8 @@ def test_webapi_has_self_url_property(webapi, url):
 def test_webapi_has_search_url(webapi, url):
     assert webapi.links.get('Search') == url + '/search'
 
+def test_webapi_has_dataservers(webapi):
+    assert webapi.dataservers.__len__() == 2
 
 def test_webapi_query_sinusoid(webapi):
     tag = 'sinusoid'
@@ -285,3 +287,19 @@ def test_subscription_recordedattimes(webapi, query, now, ci, pythonversion, cal
         point.recordedattime(t)
     assert len(updated_points_recorded) == 1
     webapi.unsubscribe(points, 'recordedattime')
+
+# AF Tests
+
+def test_webapi_has_assetservers(webapi):
+    assert webapi.assetservers.__len__() == 3
+
+def test_webapi_has_assetdatabases(webapi):
+    servers = webapi.assetservers
+    for assetserver in servers:
+        print('AF Server: {0}'.format(assetserver.name))
+        if (assetserver.name == "GOLD"):
+            afdatabases = assetserver.get_databases()
+            for database in afdatabases:
+                print('AF Database: {0}'.format(database.name))
+    num_afdatabases = afdatabases.__len__()
+    assert num_afdatabases == 8

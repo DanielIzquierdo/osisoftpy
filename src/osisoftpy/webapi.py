@@ -38,6 +38,7 @@ log = logging.getLogger(__name__)
 class WebAPI(Base):
     valid_attr = {'links', 'session', 'debug'}
     dataservers = []
+    assetservers = []
 
     def __init__(self, **kwargs):
         super(self.__class__, self).__init__(**kwargs)
@@ -248,6 +249,10 @@ class WebAPI(Base):
     def piservers(self):
         for dataserver in self.dataservers:
             print('pi:' + dataserver.name)
+
+    def afservers(self):
+        for assetserver in self.assetservers:
+            print('af:' + assetserver.name)
 
     def _map_dataserver_to_point(self, point):
         uniqueid = point.uniqueid
