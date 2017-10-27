@@ -28,11 +28,13 @@ class Attribute(Base):
     Representation of an AF Element as described by the PI Web API. 
     """
 
-    valid_attr = { 'webid', 'id', 'name', 'description', 'path', 'type',
+    valid_attr = { 'webid', 'id', 'name', 'description', 'path', 'datatype', 'value',
         'typequalifier', 'defaultunitsname', 'datareferenceplugin', 'configstring',
         'isconfigurationitem', 'isexcluded', 'ishidden', 'ismanualdataentry', 
-        'haschildren', 'categorynames', 'step', 'traitname', 'links'}
+        'haschildren', 'categories', 'step', 'traitname', 'links'}
     
+
+    # TODO: update comment doc
     """
     Attributes:
         | webid: Unique GUID for the attribute created by the PI Web API
@@ -58,9 +60,3 @@ class Attribute(Base):
 
     def __init__(self, **kwargs):
         super(self.__class__, self).__init__(**kwargs)
-
-        self.element = None
-        self.attributes = {}
-        self.database = None
-        self.categories = {}
-        

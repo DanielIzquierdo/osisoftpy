@@ -16,9 +16,13 @@ import time
 from datetime import datetime
 import pytz
 
-webapi = osisoftpy.webapi('https://gold.dstcontrols.local/piwebapi')
-point = webapi.points(query='name:PythonInserted_test')[0]
-point.update_value('2000-01-01T07:00:00Z', 53)
+webapi = osisoftpy.webapi('https://dev.dstcontrols.com/piwebapi')
+elements = webapi.elements(query='name:Points')
+print elements
+
+# webapi = osisoftpy.webapi('https://gold.dstcontrols.local/piwebapi')
+# point = webapi.points(query='name:PythonInserted_test')[0]
+# point.update_value('2000-01-01T07:00:00Z', 53)
 
 # end_value = point.end()
 # timestamp = end_value.timestamp

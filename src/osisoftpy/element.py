@@ -28,9 +28,11 @@ class Element(Base):
     Representation of an AF Element as described by the PI Web API. 
     """
 
-    valid_attr = { 'webid', 'id', 'name', 'description', 'path', 'templatename',
-        'haschildren', 'categorynames', 'extendedproperties', 'links'}
+
+    valid_attr = { 'webid', 'uniqueid', 'name', 'description', 'path', 'template',
+        'haschildren', 'afcategories', 'extendedproperties', 'links', 'attributes'}
     
+    #TODO: update comment doc below
     """
     Attributes:
         | webid: Unique GUID for the element created by the PI Web API
@@ -48,8 +50,9 @@ class Element(Base):
     def __init__(self, **kwargs):
         super(self.__class__, self).__init__(**kwargs)
 
-        self.elements = {}
-        self.attributes = {}
-        self.database = None
-        self.categories = {}
-        
+        # self.attributes = []
+        self.assetdatabase = None
+        # self.categories = {}
+
+    # TODO: Get on Attribute Name instead of Index Number
+         

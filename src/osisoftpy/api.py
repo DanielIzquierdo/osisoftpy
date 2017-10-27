@@ -84,6 +84,8 @@ def webapi(
             msg = 'PI Web API returned an error: {}'
             raise PIWebAPIError(msg.format(json.get('Errors')))
 
+        #change bottom 2 to private functions
+
         piserverlink = json['Links']['DataServers']
         piresponse = APIResponse(s.get(piserverlink), s)
         pijson = piresponse.response.json().get('Items', None)
