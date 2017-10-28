@@ -206,10 +206,20 @@ class WebAPI(Base):
                  for x in items if x['ItemType'] == 'afelement'
             ])
         for element in preAttributeList:
-            attributes = list([
-                    create(Factory(Attribute), attribute, self.session, self) 
-                    for attribute in element.attributes
-                ])
+            if element.attributes:
+                #list implementation
+                # attributes = list([
+                #     create(Factory(Attribute), attribute, self.session, self) 
+                #     for attribute in element.attributes
+                # ])
+                #dict implementation
+                attributes = { 
+                    attribute['Name']: create(Factory(Attribute), attribute, self.session, self)
+                    for attribute in element.attributes 
+                }
+                
+            else:
+                attributes = []
             element.attributes = attributes
 
         elements = Elements(elements.list + preAttributeList, self)
@@ -224,6 +234,7 @@ class WebAPI(Base):
             items = r.json().get('Items', [])
             totalhits = r.json().get('TotalHits', 0)
             
+            # TODO: Copy logic from above
             preAttributeList = list([
                     create(Factory(Element), x, self.session, self)
                     for x in items if x['ItemType'] == 'afelement'
@@ -233,6 +244,7 @@ class WebAPI(Base):
                     create(Factory(Attribute), attribute, self.session, self) 
                     for attribute in element.attributes
                     ])
+
                 element.attributes = attributes
 
             elements = Elements(elements.list + preAttributeList, self)

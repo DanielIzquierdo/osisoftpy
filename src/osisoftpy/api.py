@@ -84,23 +84,20 @@ def webapi(
             msg = 'PI Web API returned an error: {}'
             raise PIWebAPIError(msg.format(json.get('Errors')))
 
-        #change bottom 2 to private functions
-
-        piserverlink = json['Links']['DataServers']
-        piresponse = APIResponse(s.get(piserverlink), s)
-        pijson = piresponse.response.json().get('Items', None)
-
         webapi = create(Factory(WebAPI), json, r.session)
-        webapi.dataservers = list([create(Factory(DataServer), serveritem, webapi.session, webapi) 
-            for serveritem in pijson])
-
-        afserverlink = json['Links']['AssetServers']
-        afresponse = APIResponse(s.get(afserverlink), s)
-        afjson = afresponse.response.json().get('Items', None)
-
-        webapi.assetservers = list([create(Factory(AssetServer), serveritem, webapi.session, webapi) 
-            for serveritem in afjson])
+        webapi.dataservers = _get_servers(webapi, s, json, DataServer, 'DataServers')
+        webapi.assetservers = _get_servers(webapi, s, json, AssetServer, 'AssetServers')
 
         return webapi
     except:
         raise
+
+    # TODO: Add Comment block
+    # Can we shorten this?
+def _get_servers(webapi, session, links, objectType, linkfield):
+    link = links['Links'][linkfield]
+    apiresponse = APIResponse(session.get(link), session)
+    itemsjson = apiresponse.response.json().get('Items', None)
+    servers = list([create(Factory(objectType), serveritem, session, webapi) 
+        for serveritem in itemsjson])
+    return servers

@@ -26,12 +26,12 @@ import pytest
 #change below statement from False to True when assetserver and assetdatabase is implemented
 assertserver_implemented = False
 assetdatabase_implemented = False
-ready_for_testing = pytest.mark.skipif(not assertserver_implemented and not assetdatabase_implemented, reason="Assert Server and Asset Database Not Implemented")
+ready_for_testing = pytest.mark.skipif(not assertserver_implemented or not assetdatabase_implemented, reason="Assert Server and Asset Database Not Implemented")
 
 @ready_for_testing
 class TestAssetDatabase(object):
    
-    def test_assetdatabase_has_webid(webapi):
+    def test_assetdatabase_has_webid(self, webapi):
         if webapi.assetservers.__len__() == 0:
             pytest.skip("No Asset Server(s) found")
         if webapi.assetservers[0].assetdatabases.__len__() == 0:
@@ -39,7 +39,7 @@ class TestAssetDatabase(object):
         assetdb = webapi.assetservers[0].assetdatabases[0] 
         assert type(assetdb.webid) == str
 
-    def test_assetdatabase_has_id(webapi):
+    def test_assetdatabase_has_id(self, webapi):
         if webapi.assetservers.__len__() == 0:
             pytest.skip("No Asset Server(s) found")
         if webapi.assetservers[0].assetdatabases.__len__() == 0:
@@ -47,7 +47,7 @@ class TestAssetDatabase(object):
         assetdb = webapi.assetservers[0].assetdatabases[0] 
         assert type(assetdb.id) == str
 
-    def test_assetdatabase_has_name(webapi):
+    def test_assetdatabase_has_name(self, webapi):
         if webapi.assetservers.__len__() == 0:
             pytest.skip("No Asset Server(s) found")
         if webapi.assetservers[0].assetdatabases.__len__() == 0:
@@ -55,7 +55,7 @@ class TestAssetDatabase(object):
         assetdb = webapi.assetservers[0].assetdatabases[0] 
         assert type(assetdb.name) == str
 
-    def test_assetdatabase_has_description(webapi):
+    def test_assetdatabase_has_description(self, webapi):
         if webapi.assetservers.__len__() == 0:
             pytest.skip("No Asset Server(s) found")
         if webapi.assetservers[0].assetdatabases.__len__() == 0:
@@ -63,7 +63,7 @@ class TestAssetDatabase(object):
         assetdb = webapi.assetservers[0].assetdatabases[0] 
         assert type(assetdb.description) == str
     
-    def test_assetdatabase_has_path(webapi):
+    def test_assetdatabase_has_path(self, webapi):
         if webapi.assetservers.__len__() == 0:
             pytest.skip("No Asset Server(s) found")
         if webapi.assetservers[0].assetdatabases.__len__() == 0:
@@ -71,7 +71,7 @@ class TestAssetDatabase(object):
         assetdb = webapi.assetservers[0].assetdatabases[0] 
         assert type(assetdb.path) == str
 
-    def test_assetdatabase_has_extendedproperties(webapi):
+    def test_assetdatabase_has_extendedproperties(self, webapi):
         if webapi.assetservers.__len__() == 0:
             pytest.skip("No Asset Server(s) found")
         if webapi.assetservers[0].assetdatabases.__len__() == 0:
@@ -79,7 +79,7 @@ class TestAssetDatabase(object):
         assetdb = webapi.assetservers[0].assetdatabases[0] 
         assert type(assetdb.extendedproperties) == dict
 
-    def test_assetdatabase_has_links(webapi):
+    def test_assetdatabase_has_links(self, webapi):
         if webapi.assetservers.__len__() == 0:
             pytest.skip("No Asset Server(s) found")
         if webapi.assetservers[0].assetdatabases.__len__() == 0:

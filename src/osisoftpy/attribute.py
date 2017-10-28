@@ -20,8 +20,9 @@ This module contains the class definition for the Attribute class, which
 represents an AF Attribute. It's described by the PI Web API.
 """
 from osisoftpy.base import Base
+from osisoftpy.stream import Stream
 
-class Attribute(Base):
+class Attribute(Stream):
     """
     An Element object.
 
@@ -31,7 +32,7 @@ class Attribute(Base):
     valid_attr = { 'webid', 'id', 'name', 'description', 'path', 'datatype', 'value',
         'typequalifier', 'defaultunitsname', 'datareferenceplugin', 'configstring',
         'isconfigurationitem', 'isexcluded', 'ishidden', 'ismanualdataentry', 
-        'haschildren', 'categories', 'step', 'traitname', 'links'}
+        'haschildren', 'categories', 'step', 'traitname', 'links', 'session', 'webapi'}
     
 
     # TODO: update comment doc

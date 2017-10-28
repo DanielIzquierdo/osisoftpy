@@ -17,8 +17,10 @@ from datetime import datetime
 import pytz
 
 webapi = osisoftpy.webapi('https://dev.dstcontrols.com/piwebapi')
-elements = webapi.elements(query='name:Points')
-print elements
+elements = webapi.elements(query='name:Attributes')
+element = elements[0]
+att = element.attributes[0]
+print att
 
 # webapi = osisoftpy.webapi('https://gold.dstcontrols.local/piwebapi')
 # point = webapi.points(query='name:PythonInserted_test')[0]
@@ -103,4 +105,3 @@ print elements
 #     print(time.strftime('%Y-%m-%dT%H:%M:%SZ', s))
 
 # ##
-

@@ -28,7 +28,7 @@ class AssetDatabase(Base):
     Representation of an AF Database as described by the PI Web API. 
     """
 
-    valid_attr = { 'webid', 'id', 'name', 'description', 'path', 'extendedproperties', 'links'}
+    valid_attr = { 'webid', 'id', 'name', 'description', 'path', 'extendedproperties', 'links', 'session', 'webapi'}
     
     """
     Attributes:

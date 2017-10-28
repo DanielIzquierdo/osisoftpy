@@ -25,8 +25,11 @@ import logging
 from osisoftpy.exceptions import (PIWebAPIError)
 from osisoftpy.webapi import (WebAPI)
 from osisoftpy.point import (Point)
+from osisoftpy.element import Element
+from osisoftpy.attribute import Attribute
 from osisoftpy.value import (Value)
 from osisoftpy.dataserver import DataServer
+from osisoftpy.assetserver import AssetServer
 from osisoftpy.api import webapi
 
 __author__ = 'Andrew Pong'

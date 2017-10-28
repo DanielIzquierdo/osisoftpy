@@ -49,10 +49,8 @@ class Element(Base):
 
     def __init__(self, **kwargs):
         super(self.__class__, self).__init__(**kwargs)
-
-        # self.attributes = []
         self.assetdatabase = None
-        # self.categories = {}
 
     # TODO: Get on Attribute Name instead of Index Number
-         
+    def __getitem__(self, key):
+        return self.attributes[key]
