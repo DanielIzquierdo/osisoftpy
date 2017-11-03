@@ -70,8 +70,7 @@ class AssetServer(Base):
         url = '{}/{}/{}/{}'.format(
             self.webapi.links.get('Self'), 'assetservers', self.webid, 'assetdatabases')
         r = get(url, self.session, params=payload, **kwargs)
-        print(r.response.json)
-
-        databases = list([create(Factory(AssetDatabase), r.response.json(), self.session,
-                       self.webapi)])
+        itemsjson = r.response.json().get('Items', None)
+        databases = list(create(Factory(AssetDatabase), databaseitem, self.session,
+                       self.webapi) for databaseitem in itemsjson)
         return databases

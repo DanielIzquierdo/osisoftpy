@@ -294,3 +294,11 @@ def test_webapi_has_assetservers_objects(webapi):
     assert all(isinstance(assetserver, osisoftpy.AssetServer) for assetserver in webapi.assetservers)
     assert webapi.assetservers.__len__() > 0
 
+def test_webapi_has_assetdatabases(webapi):
+    servers = webapi.assetservers
+    for assetserver in servers:
+        print('AF Server: {0}'.format(assetserver.name))
+        if (assetserver.name == 'GOLD'):
+            afdatabases = assetserver.get_databases()
+    num_afdatabases = afdatabases.__len__()
+    assert num_afdatabases > 2
