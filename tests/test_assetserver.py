@@ -20,10 +20,12 @@ Tests for the `osisoftpy.assertserver` module.
 """
 import osisoftpy
 import pytest
+from osisoftpy.assetserver import AssetServer
+from osisoftpy.assetdatabase import AssetDatabase
 
 #change below statement from True to False when assetserver and/or assetdatabase is implemented
 assertserver_implemented = pytest.mark.skipif(False, reason="Assert Server Not Implemented")
-assetdatabase_implemented = pytest.mark.skipif(True, reason="Assert Database Not Implemented")
+assetdatabase_implemented = pytest.mark.skipif(False, reason="Assert Database Not Implemented")
 
 @assertserver_implemented
 class TestAssetServer(object):
@@ -94,6 +96,7 @@ class TestAssetServer(object):
     def test_assertserver_has_assetdatabases(self, webapi):
         if webapi.assetservers.__len__() == 0:
             pytest.skip("No Asset Server(s) found")
-        assetserver = webapi.assetservers[0] 
+        assetserver = webapi.assetservers[0]
+        assetserver.get_databases()
         assetdatabases = assetserver.assetdatabases
-        assert all(isinstance(assetdatabase, osisoftpy.assetdatabase) for assetdatabase in assetdatabases)
+        assert all(isinstance(database, AssetDatabase) for database in assetdatabases)
