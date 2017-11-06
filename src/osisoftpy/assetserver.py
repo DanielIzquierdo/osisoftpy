@@ -33,8 +33,7 @@ class AssetServer(Base):
     """
 
     valid_attr = { 'webid', 'id', 'name', 'description', 'path', 'isconnected', 
-        'serverversion', 'extendedproperties', 'links', 'session', 'webapi'}
-    databases = []
+        'serverversion', 'extendedproperties', 'links', 'session', 'webapi', 'assetdatabases'}
     
     """
     Attributes:
@@ -59,6 +58,11 @@ class AssetServer(Base):
         return self_str.format(self.name, self.description)
 
     def get_databases(self, **kwargs):
+        databases = self._get_databases()
+        self.assetdatabases = databases
+        return self.assetdatabases
+
+    def _get_databases(self, **kwargs):
         """
         Retrieves all databases within the current server and returns
         a collection of AssetDatabase objects
@@ -72,5 +76,5 @@ class AssetServer(Base):
         r = get(url, self.session, params=payload, **kwargs)
         itemsjson = r.response.json().get('Items', None)
         databases = list(create(Factory(AssetDatabase), databaseitem, self.session,
-                       self.webapi) for databaseitem in itemsjson)
+                    self.webapi) for databaseitem in itemsjson)
         return databases
