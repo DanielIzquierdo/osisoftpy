@@ -59,7 +59,7 @@ class TestElements(object):
         assert all(isinstance(element, osisoftpy.Element) for element in elements)
         for element in elements:
             attributes = element.attributes
-            assert all(isinstance(attribute, osisoftpy.Attribute) for attribute in attributes)
+            assert all(isinstance(attributes[attribute], osisoftpy.Attribute) for attribute in attributes)
 
     @pytest.mark.parametrize('query', ['name:Attributes', 'name:Python', 'name:Points'])
     @pytest.mark.parametrize('count', [1])
