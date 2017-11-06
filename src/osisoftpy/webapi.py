@@ -139,11 +139,13 @@ class WebAPI(Base):
         [self._map_dataserver_to_point(point) for point in points]
         return points
 
+    # added default value to fields so it also returns paths and parents
     def elements(
             self,
             query,
             scope=None,
-            fields=None,
+            fields='afcategory;attributes;datatype;description;endtime;haschildren;itemtype;'
+                +'links;matchedfields;name;starttime;plottable;template;uniqueid;uom;webid;paths;parents;',
             count=100,
             start=0, ):
         #TODO: Update Comment Block
