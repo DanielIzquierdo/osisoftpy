@@ -68,7 +68,7 @@ def test_attribute_only_create_elements(webapi):
 @pytest.mark.parametrize('key', ['interpolated'])
 @pytest.mark.parametrize('params', [
     {'expected_count': 13, 'interval': '2h', },
-    {'expected_count': 20161, 'starttime': '*-14d', 'interval': '1m', }
+    {'expected_count': 20161, 'starttime': '2017-10-01 00:00', 'endtime': '2017-10-15 00:00', 'interval': '1m', }
 ])
 def test_attribute_interpolated_return_expected_value_count(
     webapi, query, key, params,
@@ -144,4 +144,12 @@ def test_attribute_recorded_returns_one_value(
     assert isinstance(value, osisoftpy.Value)
 
 
-
+@pytest.mark.parametrize('query', ['attributename:SampleConfigItem'])
+@pytest.mark.parametrize('key', ['value'])
+@pytest.mark.parametrize('params', [{}])
+def test_attribute_recorded_return_values_configitem(
+        webapi, query, key, params,
+):
+    element = webapi.elements(query)[0]
+    attribute = element['SampleConfigItem']
+    assert float(attribute.value) == 24
