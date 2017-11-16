@@ -99,7 +99,7 @@ def test_points_only_create_pipoints(webapi):
 @pytest.mark.parametrize('key', ['interpolated'])
 @pytest.mark.parametrize('params', [
     {'expected_count': 13, 'interval': '2h', },
-    {'expected_count': 20161, 'starttime': '*-14d', 'interval': '1m', }
+    {'expected_count': 20161,  'starttime': '2017-10-01 00:00', 'endtime': '2017-10-15 00:00', 'interval': '1m', }
 ])
 def test_points_interpolated_return_expected_value_count(
     webapi, query, count, key, params,
