@@ -34,7 +34,7 @@ from osisoftpy.api import webapi
 
 __author__ = 'Andrew Pong'
 __email__ = 'apong@dstcontrols.com'
-__version__ = '2.2.1'
+__version__ = '2.3.1'
 
 
 # Configure logging
