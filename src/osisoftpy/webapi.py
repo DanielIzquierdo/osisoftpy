@@ -197,7 +197,6 @@ class WebAPI(Base):
         elements = Elements([], self)
 
         #inital call
-        #TODO: Add path to query search
         r = self.request(
                 query=query, scope=scope, fields=fields, count=count, start=start)
         items = r.json().get('Items', [])
@@ -229,24 +228,32 @@ class WebAPI(Base):
         # repeating call when all elements are retrieved
         # ceiling division
         expectedloop = -(-totalhits // count)
-        for x in range(1, expectedloop):
+        for i in range(1, expectedloop):
             start += count
             r = self.request(   
                 query=query, scope=scope, fields=fields, count=count, start=start)
             items = r.json().get('Items', [])
             totalhits = r.json().get('TotalHits', 0)
             
-            # TODO: Copy logic from above
             preAttributeList = list([
-                    create(Factory(Element), x, self.session, self)
-                    for x in items if x['ItemType'] == 'afelement'
-                ])
+                 create(Factory(Element), x, self.session, self)
+                 for x in items if x['ItemType'] == 'afelement'
+            ])
             for element in preAttributeList:
-                attributes = list([
-                    create(Factory(Attribute), attribute, self.session, self) 
-                    for attribute in element.attributes
-                    ])
-
+                if element.attributes:
+                    #list implementation
+                    # attributes = list([
+                    #     create(Factory(Attribute), attribute, self.session, self) 
+                    #     for attribute in element.attributes
+                    # ])
+                    #dict implementation
+                    attributes = { 
+                        attribute['Name']: create(Factory(Attribute), attribute, self.session, self)
+                        for attribute in element.attributes 
+                    }
+                    
+                else:
+                    attributes = []
                 element.attributes = attributes
 
             elements = Elements(elements.list + preAttributeList, self)
