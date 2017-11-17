@@ -35,9 +35,9 @@ def test_attribute_singlevaluekeys_are_validtypes(webapi, query, keys):
         try:
             valuekey = getattr(attribute, k)
             if re.match('int\d{0,2}', attribute.datatype, re.IGNORECASE):
-                assert type(valuekey.value) is int
+                assert isinstance(valuekey.value, int)
             elif re.match('float\d{0,2}', attribute.datatype, re.IGNORECASE):
-                assert type(valuekey.value) is float
+                assert isinstance(valuekey.value, float)
         except AttributeError:
             pass
 
@@ -50,9 +50,9 @@ def test_attribute_multivaluekeys_are_validtypes(webapi, query, keys):
         try:
             valuekey = getattr(attribute, k)
             if re.match('int\d{0,2}', attribute.datatype, re.IGNORECASE):
-                assert type(valuekey.value) is int
+                assert isinstance(valuekey.value, int)
             elif re.match('float\d{0,2}', attribute.datatype, re.IGNORECASE):
-                assert type(valuekey.value) is float
+                assert isinstance(valuekey.value, float)
         except AttributeError:
             pass
 
@@ -81,7 +81,6 @@ def test_attribute_interpolated_return_expected_value_count(
     values = valuekey(**params)
     assert values.__len__() == expected_count
 
-# TODO: Currently failing cuz of daylight savings
 @pytest.mark.parametrize('query', ['attributename:SampleInput'])
 @pytest.mark.parametrize('key', ['interpolatedattimes'])
 @pytest.mark.parametrize('params', [

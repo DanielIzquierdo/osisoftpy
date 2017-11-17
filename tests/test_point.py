@@ -60,9 +60,9 @@ def test_points_singlevaluekeys_are_validtypes(webapi, query, count, keys):
             try:
                 valuekey = getattr(point, k)
                 if re.match('int\d{0,2}', point.datatype, re.IGNORECASE):
-                    assert type(valuekey.value) is int
+                    assert isinstance(valuekey.value, int)
                 elif re.match('float\d{0,2}', point.datatype, re.IGNORECASE):
-                    assert type(valuekey.value) is float
+                    assert isinstance(valuekey.value, float)
             except AttributeError:
                 pass
 
@@ -79,9 +79,9 @@ def test_points_multivaluekeys_are_validtypes(webapi, query, count, keys):
             try:
                 valuekey = getattr(point, k)
                 if re.match('int\d{0,2}', point.datatype, re.IGNORECASE):
-                    assert type(valuekey.value) is int
+                    assert isinstance(valuekey.value, int)
                 elif re.match('float\d{0,2}', point.datatype, re.IGNORECASE):
-                    assert type(valuekey.value) is float
+                    assert isinstance(valuekey.value, float)
             except AttributeError:
                 pass
 

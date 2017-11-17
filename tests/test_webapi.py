@@ -37,16 +37,16 @@ from .conftest import query
 piserverissue = True
 
 def test_get_webapi_object(webapi):
-    assert type(webapi) == osisoftpy.WebAPI
+    assert isinstance(webapi, osisoftpy.WebAPI)
 
 
 def test_webapi_has_session(webapi):
     print(', '.join("%s: %s" % item for item in vars(webapi).items()))
-    assert type(webapi.session) == requests.Session
+    assert isinstance(webapi.session, requests.Session)
 
 def test_webapi_has_links(webapi):
     print(', '.join("%s: %s" % item for item in vars(webapi).items()))
-    assert type(webapi.links) == dict
+    assert isinstance(webapi.links, dict)
 
 def test_webapi_has_str_(webapi, url):
     assert webapi.__str__() == '<OSIsoft PI Web API [{}]>'.format(url+'/')
@@ -85,7 +85,7 @@ def test_webapi_subscribe_typeerror(webapi):
     try:
         webapi.subscribe(points, 'current')
     except Exception as err:
-        assert type(err) == TypeError
+        assert isinstance(err, TypeError)
 
 @pytest.mark.parametrize('query', query())
 def test_webapi_points_query(webapi, query):

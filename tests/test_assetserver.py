@@ -22,6 +22,7 @@ import osisoftpy
 import pytest
 from osisoftpy.assetserver import AssetServer
 from osisoftpy.assetdatabase import AssetDatabase
+from six import string_types
 
 #change below statement from True to False when assetserver and/or assetdatabase is implemented
 assertserver_implemented = pytest.mark.skipif(False, reason="Assert Server Not Implemented")
@@ -42,55 +43,55 @@ class TestAssetServer(object):
         if webapi.assetservers.__len__() == 0:
             pytest.skip("No Asset Server(s) found")
         assetserver = webapi.assetservers[0]
-        assert type(assetserver.webid) == unicode
+        assert isinstance(assetserver.webid, string_types)
     
     def test_assertserver_has_id(self, webapi):
         if webapi.assetservers.__len__() == 0:
             pytest.skip("No Asset Server(s) found")
         assetserver = webapi.assetservers[0] 
-        assert type(assetserver.id) == unicode
+        assert isinstance(assetserver.id, string_types)
 
     def test_assertserver_has_name(self, webapi):
         if webapi.assetservers.__len__() == 0:
             pytest.skip("No Asset Server(s) found")
         assetserver = webapi.assetservers[0] 
-        assert type(assetserver.name) == unicode
+        assert isinstance(assetserver.name, string_types)
 
     def test_assertserver_has_description(self, webapi):
         if webapi.assetservers.__len__() == 0:
             pytest.skip("No Asset Server(s) found")
         assetserver = webapi.assetservers[0] 
-        assert type(assetserver.description) == unicode
+        assert isinstance(assetserver.description, string_types)
 
     def test_assertserver_has_path(self, webapi):
         if webapi.assetservers.__len__() == 0:
             pytest.skip("No Asset Server(s) found")
         assetserver = webapi.assetservers[0] 
-        assert type(assetserver.path) == unicode
+        assert isinstance(assetserver.path, string_types)
 
     def test_assertserver_has_isconnected(self, webapi):
         if webapi.assetservers.__len__() == 0:
             pytest.skip("No Asset Server(s) found")
         assetserver = webapi.assetservers[0] 
-        assert type(assetserver.isconnected) == bool
+        assert isinstance(assetserver.isconnected, bool)
 
     def test_assertserver_has_serverversion(self, webapi):
         if webapi.assetservers.__len__() == 0:
             pytest.skip("No Asset Server(s) found")
         assetserver = webapi.assetservers[0] 
-        assert type(assetserver.serverversion) == unicode
+        assert isinstance(assetserver.serverversion, string_types)
 
     def test_assertserver_has_extendedproperties(self, webapi):
         if webapi.assetservers.__len__() == 0:
             pytest.skip("No Asset Server(s) found")
         assetserver = webapi.assetservers[0] 
-        assert type(assetserver.extendedproperties) == dict
+        assert isinstance(assetserver.extendedproperties, dict)
 
     def test_assertserver_has_links(self, webapi):
         if webapi.assetservers.__len__() == 0:
             pytest.skip("No Asset Server(s) found")
         assetserver = webapi.assetservers[0] 
-        assert type(assetserver.links) == dict
+        assert isinstance(assetserver.links, dict)
 
     @assetdatabase_implemented
     def test_assertserver_has_assetdatabases(self, webapi):
