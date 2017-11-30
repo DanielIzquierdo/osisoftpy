@@ -22,11 +22,6 @@ import osisoftpy
 import pytest
 from six import string_types
 
-assertserver_implemented = pytest.mark.skipif(False, reason="Assert Server Not Implemented")
-element_implemented = pytest.mark.skipif(False, reason="Element Not Implemented")
-attributes_implemented = pytest.mark.skipif(False, reason="Attribute Not Implemented")
-
-@element_implemented
 class TestElements(object):
 
     #Attributes - Element with Attributes
@@ -52,7 +47,6 @@ class TestElements(object):
         assert all(isinstance(element, osisoftpy.Element) for element in elements)
         assert all(isinstance(element.haschildren, bool) for element in elements)
     
-    @attributes_implemented
     @pytest.mark.parametrize('query', ['name:Attributes', 'name:Points'])
     @pytest.mark.parametrize('count', [1])
     def test_element_has_attributes(self, webapi, query, count):

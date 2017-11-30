@@ -24,11 +24,6 @@ from osisoftpy.assetserver import AssetServer
 from osisoftpy.assetdatabase import AssetDatabase
 from six import string_types
 
-#change below statement from True to False when assetserver and/or assetdatabase is implemented
-assertserver_implemented = pytest.mark.skipif(False, reason="Assert Server Not Implemented")
-assetdatabase_implemented = pytest.mark.skipif(False, reason="Assert Database Not Implemented")
-
-@assertserver_implemented
 class TestAssetServer(object):
 
     def test_webapi_has_assertservers(self, webapi):
@@ -93,7 +88,6 @@ class TestAssetServer(object):
         assetserver = webapi.assetservers[0] 
         assert isinstance(assetserver.links, dict)
 
-    @assetdatabase_implemented
     def test_assertserver_has_assetdatabases(self, webapi):
         if webapi.assetservers.__len__() == 0:
             pytest.skip("No Asset Server(s) found")

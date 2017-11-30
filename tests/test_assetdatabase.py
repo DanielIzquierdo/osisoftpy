@@ -24,12 +24,6 @@ from six import string_types
 
 #questionable implementation
 
-#change below statement from False to True when assetserver and assetdatabase is implemented
-assertserver_implemented = True
-assetdatabase_implemented = True
-ready_for_testing = pytest.mark.skipif(not assertserver_implemented or not assetdatabase_implemented, reason="Assert Server and Asset Database Not Implemented")
-
-@ready_for_testing
 class TestAssetDatabase(object):
    
     def test_assetdatabase_has_webid(self, webapi):
