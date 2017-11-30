@@ -100,9 +100,16 @@ def test_webapi_points_scope(webapi):
     assert points.__len__() == 4
 
 def test_webapi_points_pagination(webapi):
-    points = webapi.points(query='name:S*')
+    points = webapi.points(query='name:S*', count=150)
     assert points.__len__() == 398
+    assert all(isinstance(point, osisoftpy.Point) for point in points)
 
+def test_webapi_elements_pagination(webapi):
+    elements = webapi.elements(query='name:3.*', scope='af:\\\\GOLD\\OSIsoftPy', count=1)
+    assert elements.__len__() > 1
+    for element in elements:
+        assert(isinstance(element, osisoftpy.Element))
+        assert(isinstance(element.attributes, dict))
 
 # Subscription tests
 
