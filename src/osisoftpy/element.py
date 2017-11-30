@@ -27,7 +27,7 @@ class Element(Base):
 
     Representation of an AF Element as described by the PI Web API. 
     """
-    valid_attr = { 'webid', 'uniqueid', 'name', 'description', 'path', 'template',
+    valid_attr = { 'webid', 'uniqueid', 'name', 'description', 'paths', 'template',
         'haschildren', 'afcategories', 'extendedproperties', 'links', 'attributes'}
     
     #TODO: update comment doc below

@@ -72,10 +72,14 @@ class Stream(Base):
         :param string bufferoption: Optional. Indicates how to buffer values
             updates. Default is 'BufferIfPossible'. 
         """
+        #TODO: Should we add error catching if user inserts a list by accident?
         payload = {'updateOption': updateoption, 'bufferOption': bufferoption }
         request = {'Timestamp': timestamp, 'Value': value, 'UnitsAbbreviation': unitsabbreviation, 'Good':good, 'Questionable':questionable}
         self._post_values(payload, request, 'value')
         
+
+    #TODO: can't we combine update_value and update_values?
+    # update_values just makes a list of dict, while update_value is just a dict
 
     def update_values(self, timestamps, values, unitsabbreviation=None, good=None, questionable=None, updateoption='Replace', bufferoption='BufferIfPossible'):
         """

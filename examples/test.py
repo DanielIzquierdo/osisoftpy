@@ -17,10 +17,11 @@ from datetime import datetime
 import pytz
 
 webapi = osisoftpy.webapi('https://dev.dstcontrols.com/piwebapi')
-elements = webapi.elements(query='name:Attributes')
+elements = webapi.elements(query='attributename:PythonAFInserted AND name:Attributes')
 element = elements[0]
-att = element.attributes[0]
-print att
+print element
+att = element['PythonAFInserted']
+att.update_value('11/22/2017 3PM', 12321)
 
 # webapi = osisoftpy.webapi('https://gold.dstcontrols.local/piwebapi')
 # point = webapi.points(query='name:PythonInserted_test')[0]
