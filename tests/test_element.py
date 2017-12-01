@@ -56,12 +56,11 @@ class TestElements(object):
             attributes = element.attributes
             assert all(isinstance(attributes[attribute], osisoftpy.Attribute) for attribute in attributes)
 
-    @pytest.mark.skipif(True, reason="Varying category states")
     @pytest.mark.parametrize('query', ['name:Attributes', 'name:Python', 'name:Points'])
     @pytest.mark.parametrize('count', [1])
     def test_element_has_afcategories(self, webapi, query, count):
         elements = webapi.elements(query=query, count=count)
-        assert all(isinstance(element.afcategories, dict) for element in elements)
+        assert all(isinstance(element.afcategories, list) or bool(element.afcategories) is False for element in elements)
 
     @pytest.mark.parametrize('query', ['name:Attributes', 'name:Python', 'name:Points'])
     @pytest.mark.parametrize('count', [1])
@@ -75,12 +74,11 @@ class TestElements(object):
         elements = webapi.elements(query=query, count=count)
         assert all(isinstance(element.webid, string_types) for element in elements)
 
-    @pytest.mark.skipif(True, reason="Varying template states")
     @pytest.mark.parametrize('query', ['name:Attributes', 'name:Python', 'name:Points'])
     @pytest.mark.parametrize('count', [1])
     def test_element_has_template(self, webapi, query, count):
         elements = webapi.elements(query=query, count=count)
-        assert all(isinstance(element.template, dict) for element in elements)
+        assert all(isinstance(element.template, dict) or bool(element.template) is False for element in elements)
 
     @pytest.mark.parametrize('query', ['name:Attributes', 'name:Python', 'name:Points'])
     @pytest.mark.parametrize('count', [1])
