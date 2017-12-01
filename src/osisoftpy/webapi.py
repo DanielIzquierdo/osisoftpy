@@ -320,34 +320,94 @@ class WebAPI(Base):
         except Exception as e:
             raise e
 
-    def subscribe(self, points, stream, startdatetime=None, enddatetime=None, callback=None):
-        """Monitor whenever the PI point is read and an update has occurred. 
-        Trigger the callback function when the value changes
 
-        :param Points points: List of Point objects to start monitoring
+    # def subscribe(self, points, stream, startdatetime=None, enddatetime=None, callback=None):
+    #     """Monitor whenever the PI point is read and an update has occurred. 
+    #     Trigger the callback function when the value changes
+
+    #     :param Points points: List of Point objects to start monitoring
+    #     :param string stream: Name of the reading method used for monitoring the point. 
+    #         Options are current, interpolatedattimes, recordedattime, end
+    #     :param string startdatetime: Optional – Timestamp for when to start monitoring
+    #     :param string enddatetime: Optional – Timestamp for when to stop monitoring
+    #     :param func callback: Reference to the function to trigger when an update occurs
+    #     """
+    #     if not isinstance(points, Points):
+    #         raise TypeError('The object "{}" is not of type "{}"'.format(
+    #             points, Points))
+    #     for p in points:
+    #         formattedstartdate = self._parse_timestamp(startdatetime)
+    #         formattedenddate = self._parse_timestamp(enddatetime)
+
+    #         signalkey = '{}/{}/{}{}'.format(p.webid.__str__(), stream, formattedstartdate or '', formattedenddate or '')
+    #         if signalkey not in self.signals:
+    #             s = blinker.signal(signalkey)
+    #             self.signals[signalkey] = s
+    #             if callback:
+    #                 self.signals[signalkey].connect(callback)
+    #     return self.signals
+
+    #TODO: Add doc block
+
+    def subscribe(self, objectList, stream, startdatetime=None, enddatetime=None, callback=None):
+        """Monitor whenever the PI point/AF attribute is read and an update has occurred. 
+        Trigger the callback function when the value changes
+        
+        :param MutableSequence points: List of Point or Elements objects to start monitoring
         :param string stream: Name of the reading method used for monitoring the point. 
             Options are current, interpolatedattimes, recordedattime, end
         :param string startdatetime: Optional – Timestamp for when to start monitoring
         :param string enddatetime: Optional – Timestamp for when to stop monitoring
         :param func callback: Reference to the function to trigger when an update occurs
         """
-        if not isinstance(points, Points):
+        if not isinstance(objectList, (Points, Elements)):
             raise TypeError('The object "{}" is not of type "{}"'.format(
-                points, Points))
-        for p in points:
-            formattedstartdate = self._parse_timestamp(startdatetime)
-            formattedenddate = self._parse_timestamp(enddatetime)
+                        objectList, 'Points or Elements'))
+        formattedstartdate = self._parse_timestamp(startdatetime)
+        formattedenddate = self._parse_timestamp(enddatetime)
+        if isinstance(objectList, Elements):
+            for element in objectList:
+                for attribute in element.attributes.itervalues():
+                    signalkey = '{}/{}/{}{}'.format(attribute.webid.__str__(), stream, formattedstartdate or '', formattedenddate or '')
+                    if signalkey not in self.signals:
+                        s = blinker.signal(signalkey)
+                        self.signals[signalkey] = s
+                        if callback:
+                            self.signals[signalkey].connect(callback)
+        else:
+            for o in objectList:
+                signalkey = '{}/{}/{}{}'.format(o.webid.__str__(), stream, formattedstartdate or '', formattedenddate or '')
+                if signalkey not in self.signals:
+                    s = blinker.signal(signalkey)
+                    self.signals[signalkey] = s
+                    if callback:
+                        self.signals[signalkey].connect(callback)
 
-            signalkey = '{}/{}/{}{}'.format(p.webid.__str__(), stream, formattedstartdate or '', formattedenddate or '')
-            if signalkey not in self.signals:
-                s = blinker.signal(signalkey)
-                self.signals[signalkey] = s
-                if callback:
-                    self.signals[signalkey].connect(callback)
-        return self.signals
 
-    def unsubscribe(self, points, stream, startdatetime=None, enddatetime=None):
-        """Stop monitoring a given list of PI Points for updates
+    #def unsubscribe(self, points, stream, startdatetime=None, enddatetime=None):
+    #    """Stop monitoring a given list of PI Points for updates
+    #
+    #    :param Points points: List of Point objects to stop monitoring
+    #    :param string stream: Name of the reading method used for monitoring the point. 
+    #        Options are current, interpolatedattimes, recordedattime, end
+    #    :param string startdatetime: Optional – Timestamp for when to start monitoring
+    #    :param string enddatetime: Optional – Timestamp for when to stop monitoring
+    #    """
+    #    if not isinstance(points, Points):
+    #        raise TypeError('The object "{}" is not of type "{}"'.format(
+    #            points, Points))
+    #    for p in points:
+    #        formattedstartdate = self._parse_timestamp(startdatetime)
+    #        formattedenddate = self._parse_timestamp(enddatetime)
+    #        signalkey = '{}/{}/{}{}'.format(p.webid.__str__(), stream, formattedstartdate or '', formattedenddate or '')
+    #        try:
+    #            self.signals.pop(signalkey)
+    #        except KeyError:
+    #            pass
+    #    return self.signals
+
+    def unsubscribe(self, objectList, stream, startdatetime=None, enddatetime=None):
+        """Stop monitoring a given list of PI Points/AF Attributes for updates
 
         :param Points points: List of Point objects to stop monitoring
         :param string stream: Name of the reading method used for monitoring the point. 
@@ -355,18 +415,30 @@ class WebAPI(Base):
         :param string startdatetime: Optional – Timestamp for when to start monitoring
         :param string enddatetime: Optional – Timestamp for when to stop monitoring
         """
-        if not isinstance(points, Points):
+        if not isinstance(objectList, (Points, Elements)):
             raise TypeError('The object "{}" is not of type "{}"'.format(
-                points, Points))
-        for p in points:
-            formattedstartdate = self._parse_timestamp(startdatetime)
-            formattedenddate = self._parse_timestamp(enddatetime)
-            signalkey = '{}/{}/{}{}'.format(p.webid.__str__(), stream, formattedstartdate or '', formattedenddate or '')
-            try:
-                self.signals.pop(signalkey)
-            except KeyError:
-                pass
+                objectList, 'Points or Elements'))
+
+        formattedstartdate = self._parse_timestamp(startdatetime)
+        formattedenddate = self._parse_timestamp(enddatetime)
+        if isinstance(objectList, Elements):
+            for element in objectList:
+                for attribute in element.attributes.itervalues():
+                    signalkey = '{}/{}/{}{}'.format(attribute.webid.__str__(), stream, formattedstartdate or '', formattedenddate or '')
+                    try:
+                        self.signals.pop(signalkey)
+                    except KeyError:
+                        pass
+        else:
+            for o in objectList:
+                signalkey = '{}/{}/{}{}'.format(o.webid.__str__(), stream, formattedstartdate or '', formattedenddate or '')
+                try:
+                    self.signals.pop(signalkey)
+                except KeyError:
+                    pass
         return self.signals
+ 
+
 
     def piservers(self):
         for dataserver in self.dataservers:
@@ -378,12 +450,6 @@ class WebAPI(Base):
 
     def _map_dataserver_to_point(self, point):
         uniqueid = point.uniqueid
-        serverid = re.search('{(.*?)}', uniqueid).group(1)
-        point.dataserver = next((dataserver for dataserver in self.dataservers if dataserver.id == serverid), None)
-
-    # can't use this
-    def _map_assetserver_to_element(self, element):
-        uniqueid = element.uniqueid
         serverid = re.search('{(.*?)}', uniqueid).group(1)
         point.dataserver = next((dataserver for dataserver in self.dataservers if dataserver.id == serverid), None)
 
