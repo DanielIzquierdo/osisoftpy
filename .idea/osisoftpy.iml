@@ -2,7 +2,7 @@
 <module type="JAVA_MODULE" version="4">
   <component name="FacetManager">
     <facet type="Python" name="Python">
-      <configuration sdkName="Python 3.6.1 (~/miniconda3/envs/osisoftpy-dev/bin/python)" />
+      <configuration sdkName="Python 3.6 (osisoftpy-dev)" />
     </facet>
   </component>
   <component name="NewModuleRootManager" LANGUAGE_LEVEL="JDK_1_9" inherit-compiler-output="true">
@@ -14,7 +14,10 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="library" name="Python 3.6.1 (~/miniconda3/envs/osisoftpy-dev/bin/python) interpreter library" level="application" />
+  </component>
+  <component name="ReSTService">
+    <option name="workdir" value="$MODULE_DIR$/docs/source" />
+    <option name="DOC_DIR" value="$MODULE_DIR$/docs/source" />
   </component>
   <component name="TestRunnerService">
     <option name="projectConfiguration" value="py.test" />
