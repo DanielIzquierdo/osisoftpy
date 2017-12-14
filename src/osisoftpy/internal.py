@@ -30,7 +30,7 @@ from osisoftpy.exceptions import (PIWebAPIError, Unauthorized, HTTPError)
 log = logging.getLogger(__name__)
 
 
-def get(url, session, params=None):
+def get(url, session, error_action='Stop', params=None):
     """Constructs a HTTP request to the provided url.
 
     Returns an APIResponse namedtuple with two named fields: response and
@@ -54,8 +54,11 @@ def get(url, session, params=None):
                 isCrawling = False
                 r = APIResponse(s.get(url, params=params), s)
                 if r.response.status_code == 401:
-                    raise Unauthorized(
-                        'Authorization denied - incorrect username or password.')
+                    msg = 'Authorization denied - incorrect username or password.'
+                    if error_action.lower() == 'stop':
+                        raise Unauthorized(msg)
+                    else:
+                        print(msg)
                 if r.response.status_code != 200:
                     raise HTTPError(
                         'Wrong server response: %s %s' %

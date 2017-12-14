@@ -14,6 +14,7 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="library" name="Python 3.6 (osisoftpy-dev) interpreter library" level="application" />
   </component>
   <component name="ReSTService">
     <option name="workdir" value="$MODULE_DIR$/docs/source" />
