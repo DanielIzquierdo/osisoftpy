@@ -23,7 +23,6 @@ Some blah blah about what this file is for...
 from __future__ import (absolute_import, division,
                         print_function, unicode_literals)
 from future.utils import iteritems
-import concurrent.futures
 import arrow
 import time
 import osisoftpy  # main package
@@ -31,19 +30,6 @@ import requests
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
 
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
-
-class bcolors:
-    HEADER = '\033[95m'
-    OKBLUE = '\033[94m'
-    OKGREEN = '\033[92m'
-    WARNING = '\033[93m'
-    FAIL = '\033[91m'
-    ENDC = '\033[0m'
-    BOLD = '\033[1m'
-    UNDERLINE = '\033[4m'
-
-def log(msg, color=bcolors.ENDC):
-    print('{}{}{}'.format(color, msg, bcolors.ENDC))
 
 # Connect and instantiate the webapi object for basic
 # webapi = osisoftpy.webapi('https://sbb03.eecs.berkeley.edu/piwebapi',
@@ -57,13 +43,10 @@ webapi = osisoftpy.webapi('https://dev.dstcontrols.com/piwebapi/')
 
 # webapi = osisoftpy.webapi('https://gold.dstcontrols.local/piwebapi/')
 
-log('Connected to {}'.format(webapi.links.get('Self')), color=bcolors.OKGREEN)
+print('Connected to {}'.format(webapi.links.get('Self')))
 
 # Get a list of Points from the Web API:
-# points = webapi.points(query='name:CD* or name:SINU*', count=100)
-points = webapi.points(query='name:S*', count=100)
-log('{} points to query'.format(points.__len__()), color=bcolors.OKGREEN)
-
+points = webapi.points(query='name:CD* or name:SINU*', count=100)
 
 # Get a list of point signals for the points we'd like to monitor for changes.
 # We're passing in a list of points, and the Point's method we're monitoring.
@@ -80,18 +63,10 @@ updated_points = []
 
 def notify(sender):
     msg = 'Current value for {} has changed to {}'
-    if sender not in updated_points: 
+    if sender not in updated_points:
         updated_points.append(sender)
-    log(msg.format(sender.name, sender.current_value))
+    print(msg.format(sender.name, sender.current_value))
 
-
-# Retrieve a single page and report the URL and contents
-def process(point):
-    point.current()
-    # log('The current value for {} is {}, recorded {}'.format(
-    #     point.name,
-    #     point.current_value.value,
-    #     arrow.get(point.current_value.timestamp).humanize()))
 
 # Here is where we're connecting to the signals that will be emitted. We're
 # going through the signals we retrieved earlier, and connecting to each
@@ -105,53 +80,17 @@ for (k, signal) in iteritems(signals):
 # we'll just run this until we receive 10 point changes:
 starttime = time.time()
 
+# for point in points:
+#     point.recorded(starttime='*-14d', endtime='*', maxcount=1000)
 
-
-# Time requests running synchronously
-then = time.time()
+# points.current()
 
 for point in points:
-    process(point)
-
-log("Synchronous calls done! \n {} points queried for current values. \n Elapsed time: {}".format(
-    points.__len__(), time.time() - then), color=bcolors.OKGREEN)
-
-
-
-# Time requests running in threads
-then = time.time()
-
-# We can use a with statement to ensure threads are cleaned up promptly
-with concurrent.futures.ThreadPoolExecutor(max_workers=points.__len__()) as executor:
-    # Start the load operations and mark each future with its URL
-    future_to_point = {executor.submit(process, point): point for point in points}
-    for future in concurrent.futures.as_completed(future_to_point):
-        point = future_to_point[future]
-        try:
-            data = future.result()
-        except Exception as exc:
-            pass
-            # log('{} named {} generated an exception: {}'.format(point, point.name, exc))
-        # else:
-            # log('The current value for {} is {}, recorded {}'.format(
-            #     point.name,
-            #     point.current_value.value,
-            #     arrow.get(point.current_value.timestamp).humanize()))
-log("ThreadPoolExecutor calls done! \n {} points queried for current values. \n Elapsed time: {}".format(
-    points.__len__(), time.time() - then), color=bcolors.OKGREEN)
-
-
-
-
-
-
-
-
-
-quit()
-
-
-
+    point.current()
+    print('The current value for {} is {}, recorded {}'.format(
+        point.name,
+        point.current_value.value,
+        arrow.get(point.current_value.timestamp).humanize()))
 
 # for point in points:
 #     point.end()
