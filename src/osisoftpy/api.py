@@ -43,7 +43,8 @@ def webapi(
         authtype='kerberos',
         username=None,
         password=None,
-        verifyssl=False):
+        verifyssl=False,
+        error_action='Stop'):
     """Sends a request to the provided url and authentication configuration. 
     If successfully, a WebAPI object will be constructed from the response 
     and returned. 

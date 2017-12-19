@@ -111,7 +111,7 @@ class Stream(Base):
             request.append({'Timestamp': timestamp, 'Value': value, 'UnitsAbbreviation': unitsabbreviation, 'Good':good, 'Questionable':questionable})
         self._post_values(payload, request, 'recorded')
 
-    def current(self, overwrite=True):
+    def current(self, overwrite=True, error_action='Stop'):
         """
         Returns the value of the stream at the current timestamp
 
@@ -125,7 +125,7 @@ class Stream(Base):
         oldvalue = self.current_value
         
         # grab and set the current value
-        newvalue = self._get_value(payload=payload, endpoint='value')
+        newvalue = self._get_value(payload=payload, endpoint='value', error_action=error_action)
 
         if not overwrite:
             warnings.warn('You have set the overwrite boolean to False - '
