@@ -588,7 +588,8 @@ class Stream(Base):
 
     def end(
         self,
-        overwrite=True):
+        overwrite=True,
+        error_action='Stop'):
         """
         Retrieves the end-of-stream (latest) value of the PI Tag.
         
