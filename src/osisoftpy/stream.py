@@ -80,6 +80,8 @@ class Stream(Base):
             with the same timestamp. Default is 'Replace'. 
         :param string bufferoption: Optional. Indicates how to buffer values
             updates. Default is 'BufferIfPossible'. 
+        :param string error_action: Optional. Defaults to 'Stop'. 'Continue' will
+            allow the program to continue upon errors. Useful for long-running loops. 
         """
         payload = {'updateOption': updateoption, 'bufferOption': bufferoption }
         request = {'Timestamp': timestamp, 'Value': value, 'UnitsAbbreviation': unitsabbreviation, 'Good':good, 'Questionable':questionable}
@@ -114,6 +116,8 @@ class Stream(Base):
             with the same timestamp. Default is 'Replace'. 
         :param string bufferoption: Optional. Indicates how to buffer values
             updates. Default is 'BufferIfPossible'.
+        :param string error_action: Optional. Defaults to 'Stop'. 'Continue' will
+            allow the program to continue upon errors. Useful for long-running loops.
 
         :raises MismatchEntriesError: The number of values in the Timestamps and 
             Values input list parameters are mismatched
@@ -134,6 +138,8 @@ class Stream(Base):
         Returns the value of the stream at the current timestamp
 
         :param bool overwrite: Optional – Boolean to determine whether to overwrite the value in Python. Defaults to true.
+        :param string error_action: Optional. Defaults to 'Stop'. 'Continue' will
+            allow the program to continue upon errors. Useful for long-running loops.
         :return: :class:`OSIsoftPy <osisoftpy.Value>` object
         :rtype: osisoftpy.Value
         """
@@ -196,6 +202,8 @@ class Stream(Base):
         :param string selectedfields: Optional - List of fields to be returned in the 
             response, separated by semicolons (;). If this parameter is not 
             specified, all available fields will be returned. 
+        :param string error_action: Optional. Defaults to 'Stop'. 'Continue' will
+            allow the program to continue upon errors. Useful for long-running loops.
         :return: Object containing a list of :class:`osisoftpy.Value` objects. 
         :rtype: List of :class:`osisoftpy.Value`
         """
@@ -249,6 +257,8 @@ class Stream(Base):
         :param string sortorder: Optional – String ‘Ascending’ or ‘Descending’. Defaults to ‘Ascending’.
         :param bool overwrite: Optional – Boolean to determine whether to overwrite the value in 
             Python. Defaults to true.
+        :param string error_action: Optional. Defaults to 'Stop'. 'Continue' will
+            allow the program to continue upon errors. Useful for long-running loops.
         :return: Object containing a list of :class:`osisoftpy.Value` objects. 
         :rtype: List of <osisoftpy.Value>
         """
@@ -326,6 +336,8 @@ class Stream(Base):
             ill be returned.
         :param bool overwrite: Optional – Boolean to determine whether to overwrite the value 
             in Python. Defaults to true.
+        :param string error_action: Optional. Defaults to 'Stop'. 'Continue' will
+            allow the program to continue upon errors. Useful for long-running loops.
         :return: Object containing a list of :class:`osisoftpy.Value` objects. 
         :rtype: List of :class:`osisoftpy.Value`
         """
@@ -408,6 +420,8 @@ class Stream(Base):
         :param string selectedfields: Optional – List of fields to be returned in the response, 
             separated by semicolons (;). If this parameter is not, all available fields 
             will be returned.
+        :param string error_action: Optional. Defaults to 'Stop'. 'Continue' will
+            allow the program to continue upon errors. Useful for long-running loops.
         :return: Object containing a list of :class:`osisoftpy.Value` objects. 
         :rtype: :func:`list` of :class:`osisoftpy.Value`
         """
@@ -466,6 +480,8 @@ class Stream(Base):
         :param string selectedfields: Optional - List of fields to be returned in the 
             response, separated by semicolons (;). If this parameter is not 
             specified, all available fields will be returned. 
+        :param string error_action: Optional. Defaults to 'Stop'. 'Continue' will
+            allow the program to continue upon errors. Useful for long-running loops.
         :return: :class:`osisoftpy.Value` object 
         :rtype: osisoftpy.Value
         """
@@ -553,6 +569,8 @@ class Stream(Base):
             fields will be returned.
         :param string overwrite: Optional – Boolean to determine whether to overwrite the 
             value in Python. Defaults to true.
+        :param string error_action: Optional. Defaults to 'Stop'. 'Continue' will
+            allow the program to continue upon errors. Useful for long-running loops.
         :return: Object containing a list of :class:`osisoftpy.Value` objects. 
         :rtype: :func:`list` of :class:`osisoftpy.Value`
         """
@@ -595,6 +613,8 @@ class Stream(Base):
         
         :param bool overwrite: Optional – Boolean to determine whether to 
             overwrite the value in Python. Defaults to true.
+        :param string error_action: Optional. Defaults to 'Stop'. 'Continue' will
+            allow the program to continue upon errors. Useful for long-running loops.
         :return: :class:`OSIsoftPy <osisoftpy.Value>` object 
         :rtype: osisoftpy.Value
         """
