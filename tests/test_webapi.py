@@ -216,7 +216,7 @@ def callback_interp_2(sender):
     updated_points_interp_2.append(sender)
 
 # test interpolatedattimes - assumes no one has used this tag
-# @pytest.mark.skipif(piserverissue, reason='PI Server times out when retrieving archived values')
+@pytest.mark.skipif(piserverissue, reason='PI Server times out when retrieving archived values')
 @pytest.mark.parametrize('query', ['name:PythonInterpolatedAtTime'])
 # @pytest.mark.parametrize('times', [['2016-05-01T00:00:00Z','2016-06-01T00:00:00Z']])
 def test_subscription_interpolatedattimes_single_timestamp_notify_two(webapi, query, now, ci, pythonversion, callback=callback_interp_2):
