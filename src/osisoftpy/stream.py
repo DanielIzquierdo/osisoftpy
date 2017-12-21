@@ -53,7 +53,16 @@ class Stream(Base):
         self.end_value = None
         self.value_value = None
 
-    def update_value(self, timestamp, value, unitsabbreviation=None, good=None, questionable=None, updateoption='Replace', bufferoption='BufferIfPossible'):
+    def update_value(
+        self, 
+        timestamp, 
+        value, 
+        unitsabbreviation=None, 
+        good=None, 
+        questionable=None, 
+        updateoption='Replace', 
+        bufferoption='BufferIfPossible',
+        error_action='Stop'):
         """
         Updates a value for the specified stream.
         Exception and Compression rules take effort in a batch POST request.
@@ -74,10 +83,19 @@ class Stream(Base):
         """
         payload = {'updateOption': updateoption, 'bufferOption': bufferoption }
         request = {'Timestamp': timestamp, 'Value': value, 'UnitsAbbreviation': unitsabbreviation, 'Good':good, 'Questionable':questionable}
-        self._post_values(payload, request, 'value')
+        self._post_values(payload, request, 'value', error_action=error_action)
         
 
-    def update_values(self, timestamps, values, unitsabbreviation=None, good=None, questionable=None, updateoption='Replace', bufferoption='BufferIfPossible'):
+    def update_values(
+        self, 
+        timestamps, 
+        values, 
+        unitsabbreviation=None, 
+        good=None, 
+        questionable=None, 
+        updateoption='Replace', 
+        bufferoption='BufferIfPossible',
+        error_action='Stop'):
         """
         Updates multiple values for the specified stream.
         Assumes values property remains the same within the single call.
@@ -109,7 +127,7 @@ class Stream(Base):
         request = []
         for timestamp, value in zip(timestamps, values):
             request.append({'Timestamp': timestamp, 'Value': value, 'UnitsAbbreviation': unitsabbreviation, 'Good':good, 'Questionable':questionable})
-        self._post_values(payload, request, 'recorded')
+        self._post_values(payload, request, 'recorded', error_action=error_action)
 
     def current(self, overwrite=True, error_action='Stop'):
         """
@@ -154,7 +172,8 @@ class Stream(Base):
             filterexpression=None,
             includefilteredvalues=False,
             selectedfields=None,
-            overwrite=True ):
+            overwrite=True,
+            error_action='Stop'):
         """Retrieves interpolated values over the specified time range at 
         the specified sampling interval.
 
@@ -188,7 +207,7 @@ class Stream(Base):
             'includefilteredvalues': includefilteredvalues,
             'selectedfields': selectedfields,
         }
-        values = self._get_values(payload=payload, endpoint='interpolated')
+        values = self._get_values(payload=payload, endpoint='interpolated', error_action=error_action)
         return values
         # if not overwrite:
         #     warnings.warn('You have set the overwrite boolean to False - '
@@ -211,7 +230,8 @@ class Stream(Base):
             includefilteredvalues=False,
             sortorder='Ascending',
             selectedfields=None,
-            overwrite=True ):
+            overwrite=True,
+            error_action='Stop'):
         """Retrieves interpolated values over the specified time range at the 
         specified sampling interval. 
 
@@ -239,7 +259,7 @@ class Stream(Base):
             'sortorder': sortorder,
             'selectedfields': selectedfields,
         }
-        new_intp_values = self._get_values(payload=payload, endpoint='interpolatedattimes')
+        new_intp_values = self._get_values(payload=payload, endpoint='interpolatedattimes', error_action=error_action)
         if not overwrite:
             warnings.warn('You have set the overwrite boolean to False - '
                           'the interpolated value(s) has been retrieved, but not '
@@ -279,6 +299,7 @@ class Stream(Base):
         desiredunits=None,
         selectedFields=None,
         overwrite=True,
+        error_action='Stop',
         **kwargs):
         """Retrieve values at intervals designed for plotting on a graph
 
@@ -317,7 +338,7 @@ class Stream(Base):
             'selectedFields': selectedFields
         }
 
-        values = self._get_values(payload=payload, endpoint='plot')
+        values = self._get_values(payload=payload, endpoint='plot', error_action=error_action)
         return values
         # if not overwrite:
         #     warnings.warn('You have set the overwrite boolean to False - '
@@ -342,7 +363,8 @@ class Stream(Base):
             maxcount=1000,
             includefilteredvalues=False,
             selectedfields=None,
-            overwrite=True):
+            overwrite=True,
+            error_action='Stop'):
         """Returns a list of compressed values for the requested time range 
         from the source provider. 
 
@@ -399,7 +421,7 @@ class Stream(Base):
             'selectedfields': selectedfields,
         }
 
-        values = self._get_values(payload=payload, endpoint='recorded')
+        values = self._get_values(payload=payload, endpoint='recorded', error_action=error_action)
         return values
         # if not overwrite:
         #     warnings.warn('You have set the overwrite boolean to False - '
@@ -420,7 +442,8 @@ class Stream(Base):
             time,
             retrievalmode='Auto',
             selectedfields=None,
-            overwrite=True ):
+            overwrite=True,
+            error_action='Stop'):
         """
         Returns a single recorded value based on the passed time and 
         retrieval mode from the stream. 
@@ -455,7 +478,7 @@ class Stream(Base):
         formattedtime = self._parse_timestamp(time)
         old_recorded_at_time_value = self.recorded_at_time_values.get(formattedtime)
         
-        new_recorded_at_time_value = self._get_value(payload=payload, endpoint='recordedattime')
+        new_recorded_at_time_value = self._get_value(payload=payload, endpoint='recordedattime', error_action=error_action)
 
         if not overwrite:
             warnings.warn('You have set the overwrite boolean to False - '
@@ -484,6 +507,7 @@ class Stream(Base):
         filterexpression=None,
         selectedfields=None,
         overwrite=True,
+        error_action='Stop',
         **kwargs):
         """Retrieve a summary value over a time range given start and end times.
         
@@ -546,7 +570,7 @@ class Stream(Base):
             'selectedFields': selectedfields
         }
 
-        values = self._get_summary(payload=payload)
+        values = self._get_summary(payload=payload, error_action=error_action)
         return values
         # if not overwrite:
         #     warnings.warn('You have set the overwrite boolean to False - '
@@ -576,7 +600,7 @@ class Stream(Base):
         # save the "old" end value before grabbing the "latest" end value
         oldendvalue = self.end_value
 
-        newendvalue = self._get_value(payload=None, endpoint='end')
+        newendvalue = self._get_value(payload=None, endpoint='end', error_action=error_action)
 
         if not overwrite:
             warnings.warn('You have set the overwrite boolean to False - '
@@ -601,19 +625,24 @@ class Stream(Base):
         url = '{}/{}/{}/{}'.format(
             self.webapi.links.get('Self'), controller, self.webid, endpoint)
         r = get(url, self.session, params=payload, **kwargs)
-        
-        value = create(Factory(Value), r.response.json(), self.session,
+        try:
+            value = create(Factory(Value), r.response.json(), self.session,
                        self.webapi)
+        except ValueError:
+            value = None
         return value
 
     def _get_values(self, payload, endpoint, controller='streams', **kwargs):
         url = '{}/{}/{}/{}'.format(self.webapi.links.get('Self'), controller,
                                         self.webid, endpoint)
         r = get(url, self.session, params=payload, **kwargs)
-        values = list(map(
-            lambda x: create(Factory(Value), x, self.session, self.webapi),
-            r.response.json().get('Items', None)
-        ))
+        try:
+            values = list(map(
+                lambda x: create(Factory(Value), x, self.session, self.webapi),
+                r.response.json().get('Items', None)
+            ))
+        except ValueError:
+            values = None
         return values
 
     def _get_summary(self, payload, endpoint='summary', controller='streams', **kwargs):
@@ -625,17 +654,20 @@ class Stream(Base):
         for item in items:
             item.get('Value')['calculationtype'] = item.get('Type')
 
-        values = list(map(
-            lambda x: create(Factory(Value), x.get('Value'), self.session, self.webapi),
-                items
-        ))
+        try:
+            values = list(map(
+                lambda x: create(Factory(Value), x.get('Value'), self.session, self.webapi),
+                    items
+            ))
+        except ValueError:
+            values = None
         
         return values
 
-    def _post_values(self, payload, request, endpoint):
+    def _post_values(self, payload, request, endpoint, **kwargs):
         url = '{}/{}/{}/{}'.format(
             self.webapi.links.get('Self'), 'streams', self.webid, endpoint)
-        post(url, self.session, params=payload, json=request)
+        post(url, self.session, params=payload, json=request, **kwargs)
 
     def _send_signal(self, signalkey):
         if signalkey in self.webapi.signals:

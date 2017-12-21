@@ -75,11 +75,17 @@ def webapi(
             s.auth = requests.auth.HTTPBasicAuth(username, password)
         r = APIResponse(s.get(url), s)
         if r.response.status_code == 401:
-            raise Unauthorized(
-                'Authorization denied - incorrect username or password.')
+            msg = 'Authorization denied - incorrect username or password.'
+            if error_action.lower() == 'stop':
+                raise Unauthorized(msg)
+            else:
+                print(msg + ', Continuing')
         if r.response.status_code != 200:
-            raise HTTPError('Wrong server response: %s %s' %
-                            (r.response.status_code, r.response.reason))
+            msg = 'Wrong server response: %s %s' % (r.response.status_code, r.response.reason)
+            if error_action.lower() == 'stop':
+                raise HTTPError(msg)
+            else:
+                print(msg + ', Continuing')
         json = r.response.json()
         if 'Errors' in json and json.get('Errors').__len__() > 0:
             msg = 'PI Web API returned an error: {}'

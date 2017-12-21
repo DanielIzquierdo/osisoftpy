@@ -39,6 +39,7 @@ def get(url, session, params=None, **kwargs):
 
     :param url: URL to send the HTTP request to.
     :param session: A Requests Session object.
+    :param error_action: 'Stop' to halt program execution upon error.
     :param params: Paramaters to be passed to the GET request.
         InsecureRequestWarning will be disabled.
 
@@ -47,6 +48,7 @@ def get(url, session, params=None, **kwargs):
     """
     s = session
     isCrawling = True
+    error_action = kwargs.pop('error_action', 'stop')
 
     with s:
         try:
@@ -55,33 +57,48 @@ def get(url, session, params=None, **kwargs):
                 r = APIResponse(s.get(url, params=params), s)
                 if r.response.status_code == 401:
                     msg = 'Authorization denied - incorrect username or password.'
-                    error_action = kwargs.pop('error_action', 'stop')
                     if error_action.lower() == 'stop':
                         raise Unauthorized(msg)
                     else:
-                        print(msg)
+                        print(msg + ', Continuing')
                 if r.response.status_code != 200:
-                    raise HTTPError(
-                        'Wrong server response: %s %s' %
-                        (r.response.status_code, r.response.reason))
-                json = r.response.json()
-                if 'Errors' in json and json.get('Errors').__len__() > 0:
-                    error = json.get('Errors')[0]
-                    if(error['ErrorCode'] == 20):
-                        print('Database is being crawled. Retrying in 5 sec.')
-                        isCrawling = True
-                        time.sleep(5)
-
-                        # should we terminate if database is stuck in crawling state?
-                        
+                    msg = 'Wrong server response: %s %s' % (r.response.status_code, r.response.reason)
+                    if error_action.lower() == 'stop':
+                        raise HTTPError(msg)
                     else:
+                        print(msg + ', Continuing')
+                try:
+                    json = r.response.json()
+                    if 'Errors' in json and json.get('Errors').__len__() > 0:
+                        error = json.get('Errors')[0]
                         msg = 'PI Web API returned an error: {}'
-                        raise PIWebAPIError(msg.format(error))
+                        if hasattr(error, 'ErrorCode'): 
+                            if(error['ErrorCode'] == 20):
+                                print('Database is being crawled. Retrying in 5 sec.')
+                                isCrawling = True
+                                time.sleep(5)
+                                # should we terminate if database is stuck in crawling state?
+                            else:
+                                if error_action.lower() == 'stop':
+                                    raise PIWebAPIError(msg.format(error))
+                                else:
+                                    print(msg.format(error) + ', Continuing')
+                        else:
+                            if error_action.lower() == 'stop':
+                                raise PIWebAPIError(msg.format(error))
+                            else:
+                                print(msg.format(error) + ', Continuing')
+                except ValueError:
+                    msg = 'No JSON object could be decoded'
+                    if error_action.lower() == 'stop':
+                        raise ValueError(msg)
+                    else:
+                        print(msg + ', Continuing')
             return r
         except:
             raise
 
-def post(url, session, params=None, json=None):
+def post(url, session, error_action='Stop', params=None, json=None, **kwargs):
     """Constructs a HTTP request to the provided url.
 
     Returns an APIResponse namedtuple with two named fields: response and
@@ -90,6 +107,7 @@ def post(url, session, params=None, json=None):
 
     :param url: URL to send the HTTP request to.
     :param session: A Requests Session object.
+    :param error_action: 'Stop' to halt program execution upon error.
     :param params: Paramaters to be passed to the GET request.
         InsecureRequestWarning will be disabled.
 
@@ -97,43 +115,61 @@ def post(url, session, params=None, json=None):
     :rtype: osisoftpy.APIResponse
     """
     s = session
+    error_action = kwargs.pop('error_action', 'stop')
 
     with s:
         try:
             r = APIResponse(s.post(url, json=json, params=params), s)
             if r.response.status_code == 401:
-                raise Unauthorized(
-                    'Server rejected request: wrong username or password')
+                msg = 'Authorization denied - incorrect username or password.'
+                if error_action.lower() == 'stop':
+                    raise Unauthorized(msg)
+                else:
+                    print(msg + ', Continuing')
             if r.response.status_code != 202:
-                raise HTTPError(
-                    'Wrong server response: %s %s' %
-                    (r.response.status_code, r.response.reason))
+                msg = 'Wrong server response: %s %s' % (r.response.status_code, r.response.reason)
+                if error_action.lower() == 'stop':
+                    raise HTTPError(msg)
+                else:
+                    print(msg + ', Continuing')
             return r
         except:
             raise
 
-def put(url, session, params=None):
+def put(url, session, error_action='Stop', params=None, **kwargs):
 
     s = session
+    error_action = kwargs.pop('error_action', 'stop')
 
     with s:
         try:
             r = APIResponse(s.put(url, params=params), s)
             if r.response.status_code == 401:
-                raise Unauthorized(
-                    'Server rejected request: wrong username or password')
+                msg = 'Authorization denied - incorrect username or password.'
+                if error_action.lower() == 'stop':
+                    raise Unauthorized(msg)
+                else:
+                    print(msg + ', Continuing')
             if r.response.status_code != 200:
-                raise HTTPError(
-                    'Wrong server response: %s %s' %
-                    (r.response.status, r.response.reason))
-            json = r.response.json()
-            if 'Errors' in json and json.get('Errors').__len__() > 0:
-                msg = 'PI Web API returned an error: {}'
-                raise PIWebAPIError(msg.format(json.get('Errors')))
+                msg = 'Wrong server response: %s %s' % (r.response.status_code, r.response.reason)
+                if error_action.lower() == 'stop':
+                    raise HTTPError(msg)
+                else:
+                    print(msg + ', Continuing')
+            try:
+                json = r.response.json()
+                if 'Errors' in json and json.get('Errors').__len__() > 0:
+                    msg = 'PI Web API returned an error: {}'
+                    raise PIWebAPIError(msg.format(json.get('Errors')))
+            except ValueError:
+                msg = 'No JSON object could be decoded'
+                if error_action.lower() == 'stop':
+                    raise ValueError(msg)
+                else:
+                    print(msg + ', Continuing')
             return r
         except:
             raise
-
 
 def get_batch(method, webapi, points, action, params=None):
     s = webapi.session
